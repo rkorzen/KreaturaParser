@@ -87,3 +87,11 @@ class TestQuestionRecoginize(TestCase):
     def test_simple_single(self):
         line = "Q S Q1 Treść"
         self.assertEqual("QUESTION", recognize(line))
+
+    def test_simple_multi(self):
+        line = "Q M Q1 Treść"
+        self.assertEqual("QUESTION", recognize(line))
+
+    def test_simple_layout(self):
+        line = "Q L Q1 Treść"
+        self.assertEqual("QUESTION", recognize(line))

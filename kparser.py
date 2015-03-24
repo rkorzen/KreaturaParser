@@ -1,7 +1,6 @@
 import re
 
 
-
 def recognize(line):
 
     """text -> text
@@ -52,7 +51,7 @@ def recognize(line):
     if page_pattern.match(line):
         return "PAGE"
 
-    question_pattern = re.compile("^Q ((L)|(S)|(M)|)$")
+    question_pattern = re.compile("^Q ((L)|(S)|(M)|) ([a-zA-Z0-9_.]+) .+$")
     if question_pattern.match(line):
         return "QUESTION"
 
