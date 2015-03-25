@@ -53,13 +53,13 @@ def recognize(line):
     if page_pattern.match(line):
         return "PAGE"
 
-    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G) [\w_.]+ .*$")
+    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G){1}([0-9]+_[0-9]+){0,1} [\w_.]+ (.*)$")
     if question_pattern.match(line):
         return "QUESTION"
 
-    open_with_size_pattern = re.compile("^Q O([0-9]+_[0-9]+) [\w_.]+ .*]$")
-    if open_with_size_pattern.match(line):
-        return "QUESTION"
+    # open_with_size_pattern = re.compile("^Q O([0-9]+_[0-9]+) [\w_.]+ .*$")
+    # if open_with_size_pattern.match(line):
+    #     return "QUESTION"
 
     precode_pattern = re.compile("^PRE .*$")
     if precode_pattern.match(line):

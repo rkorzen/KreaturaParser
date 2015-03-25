@@ -14,6 +14,7 @@ class SurveyElements():
         self.typ = False
         self.cafeteria = []
         self.statements = []
+        self.size = []
 
     def __eq__(self, other):
         return self.id == other.id and \
@@ -26,7 +27,8 @@ class SurveyElements():
                self.childs == other.childs and \
                self.typ == other.typ and \
                self.cafeteria == other.cafeteria and \
-               self.statements == other.statements
+               self.statements == other.statements and \
+               self.size == other.size
 
 
 class Block(SurveyElements):

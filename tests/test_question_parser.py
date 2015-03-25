@@ -90,5 +90,46 @@ class TestQuestion_parser(TestCase):
         expected = Question("Q0")
         expected.typ = "O"
         expected.content = "Treść"
+        expected.size = ['90', '4']
+
+        result = question_parser(line)
+        self.assertEqual(expected, result)
+
+    def test_open_question_with_size_and_hide_parser(self):
+        line = 'Q O90_4 Q0 Treść --hide:$A1="1"'
+        expected = Question("Q0")
+        expected.typ = "O"
+        expected.content = "Treść"
+        expected.size = ['90', '4']
+        expected.hide = '$A1="1"'
+        result = question_parser(line)
+        self.assertEqual(expected, result)
+
+    def test_grid_with_rotation(self):
+        line = "Q G Q0 Treść --rot"
+        expected = Question("Q0")
+        expected.typ = "G"
+        expected.content = "Treść"
+        expected.rotation = True
+        result = question_parser(line)
+        self.assertEqual(expected, result)
+
+    def test_grid_with_random(self):
+        line = "Q G Q0 Treść --ran"
+        expected = Question("Q0")
+        expected.typ = "G"
+        expected.content = "Treść"
+        expected.random = True
+        result = question_parser(line)
+        self.assertEqual(expected, result)
+
+
+    def test_grid_with_random(self):
+        line = 'Q G Q0 Treść --ran --hide:$A1:1 == "1"'
+        expected = Question("Q0")
+        expected.typ = "G"
+        expected.content = "Treść"
+        expected.random = True
+        expected.hide = '$A1:1 == "1"'
         result = question_parser(line)
         self.assertEqual(expected, result)
