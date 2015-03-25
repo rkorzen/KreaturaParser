@@ -1,6 +1,5 @@
 from unittest import TestCase
 from kparser import recognize
-__author__ = 'KorzeniewskiR'
 
 
 class TestBlockRecognize(TestCase):
@@ -90,6 +89,10 @@ class TestQuestionRecoginize(TestCase):
 
     def test_simple_open(self):
         line = "Q O Q1 Treść"
+        self.assertEqual("QUESTION", recognize(line))
+
+    def test_open_with_size(self):
+        line = "Q O90_4 Q1 Treść"
         self.assertEqual("QUESTION", recognize(line))
 
     def test_simple_baskets_old(self):

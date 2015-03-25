@@ -1,51 +1,6 @@
 import re
 
-
-class SurveyElements():
-    """Base of survey structures/elements"""
-    def __init__(self, id):
-        self.id = id
-        self.precode = False
-        self.postcode = False
-        self.rotation = False
-        self.random = False
-        self.hide = False
-        self.childs = []
-        self.parent_id = False
-
-    def __eq__(self, other):
-        return self.id == other.id and \
-               self.parent_id == other.parent_id and \
-               self.precode == other.precode and \
-               self.postcode == other.postcode and \
-               self.rotation == other.rotation and \
-               self.random == other.random and \
-               self.hide == other.hide and \
-               self.childs == other.childs
-
-class Block(SurveyElements):
-    pass
-
-
-class Page(SurveyElements):
-    pass
-
-
-class Question(SurveyElements):
-    """Question"""
-    def __init__(self):
-        super().__init__()
-        self.typ = ""
-        self.cafeteria = []
-        self.statements = []
-
-
-class ListElement():
-    """List element - to np cafeteria, statements"""
-    def __init__(self, id):
-        self.id = ""
-        self.content = ""
-        self.hide = ""
+from parsers import block_parser, page_parser, question_parser
 
 
 def recognize(line):
@@ -102,6 +57,10 @@ def recognize(line):
     if question_pattern.match(line):
         return "QUESTION"
 
+    open_with_size_pattern = re.compile("^Q O([0-9]+_[0-9]+) [\w_.]+ .*]$")
+    if open_with_size_pattern.match(line):
+        return "QUESTION"
+
     precode_pattern = re.compile("^PRE .*$")
     if precode_pattern.match(line):
         return "PRECODE"
@@ -125,42 +84,6 @@ def clean_line(line):
     line = line.replace('&amp;amp;', '&amp;')
 
     return line
-
-
-def block_parser(line):
-    id = line.split(' ', 2)[1]
-    block = Block(id)
-
-    parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
-    r = parent_pattern.match(line)
-    if r:
-        block.parent_id = r.group(4)
-
-    if " --rot" in line:
-        block.rotation = True
-        line = line.replace(' --rot', '')
-    if " --ran" in line:
-        block.random = True
-        line = line.replace(' --ran', '')
-    if " --hide:" in line:
-        block.hide = line.split(" --hide:")[1]
-
-    return block
-
-
-def page_parser(line):
-    id = line.split(' ', 2)[1]
-    page = Page(id)
-
-    if " --hide:" in line:
-        page.hide = line.split(" --hide:")[1]
-
-    return page
-
-def question_parser(line):
-    pass
-
-
 
 
 def parse(text_input):
@@ -198,7 +121,7 @@ def parse(text_input):
             current_block = block_parser(line)
 
         if structure == "PAGE":
-            pass
+            current_page = page_parser(line)
 
         if structure == "QUESTION":
             pass

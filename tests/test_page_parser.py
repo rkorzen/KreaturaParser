@@ -1,7 +1,6 @@
 from unittest import TestCase
-from kparser import page_parser, Page
-__author__ = 'rkorzen'
-
+from kparser import page_parser
+from elements import Page
 
 class TestPage_parser(TestCase):
     def test_page_parser(self):

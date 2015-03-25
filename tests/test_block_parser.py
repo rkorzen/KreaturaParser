@@ -1,6 +1,6 @@
 from unittest import TestCase
-from kparser import block_parser
-from kparser import Block
+from parsers import block_parser
+from elements import Block
 __author__ = 'KorzeniewskiR'
 
 
