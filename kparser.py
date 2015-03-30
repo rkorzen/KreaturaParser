@@ -1,13 +1,15 @@
 import re
 
-from parsers import block_parser, page_parser, question_parser
+from parsers import block_parser, page_parser, question_parser, statement_parser
 
 
 def recognize(line):
-
     """text -> text
 
     Ma za zadanie rozpoznać co to za struktura.
+
+    :param line:
+
     Strukturą mogą być:
     :BLOK: B B0
     :PAGE: P P0
@@ -38,14 +40,13 @@ def recognize(line):
     --hide: pattern
 
     """
-    line = clean_line(line)         # czyszczę linię
+    line = clean_line(line)  # czyszczę linię
 
     if line == "_" or line == "_\n":
         return "SWITCH"
 
     # block example: B B1 B0 --ran --hide: $A1:{0} == "1"
     block_pattern = re.compile("^(B)(( )[\w_.]+){1,2}(( --ran)|( --rot)){0,1}( --hide:.*){0,1}$")
-
     if block_pattern.match(line):
         return "BLOCK"
 
@@ -57,9 +58,6 @@ def recognize(line):
     if question_pattern.match(line):
         return "QUESTION"
 
-    # open_with_size_pattern = re.compile("^Q O([0-9]+_[0-9]+) [\w_.]+ .*$")
-    # if open_with_size_pattern.match(line):
-    #     return "QUESTION"
 
     precode_pattern = re.compile("^PRE .*$")
     if precode_pattern.match(line):
@@ -69,12 +67,21 @@ def recognize(line):
     if precode_pattern.match(line):
         return "POSTCODE"
 
+    statement_pattern = re.compile(r"^(\d+(\.c|\.d){0,1}){0,1}(([a-zA-ZąćęłóśźżĄĆĘŁÓŚŹŻ&'-@#\"]+){0,1}|( [a-zA-ZąćęłóśźżĄĆĘŁÓŚŹŻ&'-@#\"]+)*)(( ){0,1}--hide:[ :\"$#=\w]+){0,1}$")
+    if statement_pattern.match(line) and not line.startswith("B ") and not line.startswith("P "):
+        return "STATEMENT"
+
+    blanck_pattern = "^$"
+    if blanck_pattern.match(line):
+        return "BLANK"
+
 
 def clean_line(line):
-    """text -> text
+    """:rtype : string
 
     Funkcja ma za zadanie oczyść linię ze zbędnych odstępów, tabulacji
     ? Ewentualne znaki & zamienić powinna na &amp;
+
 
     """
     line = line.replace("\t", ' ')
@@ -88,7 +95,9 @@ def clean_line(line):
 
 def parse(text_input):
     """
-    text -> xml
+    :ivar: text_input
+    :rtype : sstring(xml)
+
 
     Główny parser.
 
@@ -102,10 +111,13 @@ def parse(text_input):
 
     """
 
+    survey_blocks = []
+
     # ustawienia początkowe
     current_block = None
     current_page = None
     current_question = None
+    collect_statements = False
 
 
     # dzielimy wejście na linie:
@@ -114,20 +126,38 @@ def parse(text_input):
     # dla każdej linii musimy sprawdzić co to jest
     for line in text_input:
 
-        structure = recognize(line)     # rozpoznaję strukturę
+        structure = recognize(line)  # rozpoznaję strukturę
 
         # w zależności od tego co to jest reagujemy tworząc odpowiednie obiekty
         if structure == "BLOCK":
-            current_block = block_parser(line)
+            b = block_parser(line)
+            if b.parent_id:
+                current_block.childs.append(b)
+            else:
+                current_block = b
+                survey_blocks.append(current_block)
+            collect_statements = False
 
         if structure == "PAGE":
             current_page = page_parser(line)
+            current_block.childs.append(current_page)
+            collect_statements = False
 
         if structure == "QUESTION":
-            pass
+            current_question = question_parser(line)
+            current_page.childs.append(current_question)
+            collect_statements = False
+
+        if structure == "STATEMENT":
+            statement = statement_parser(line)
+
+            if collect_statements:
+                current_question.statements.append(statement)
+            else:
+                current_question.cafeteria.append(statement)
 
         if structure == "SWITCH":
-            pass
+            collect_statements = True
 
         if structure == "PRECODE":
             pass
@@ -135,9 +165,14 @@ def parse(text_input):
         if structure == "POSTCODE":
             pass
 
+        if structure == "BLANK":
+            collect_statements = False
+
+    return survey_blocks
+
 
 if __name__ == "__main__":
-    input = """B B0
-B B1"""
+    input = """B0"""
 
-    parse(input)
+    t = parse(input)
+

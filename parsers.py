@@ -60,10 +60,16 @@ def question_parser(line):
     return question
 
 
-def list_element_parser(line):
-    line = line.strip()
+def statement_parser(line):
 
+    line = line.strip()
     pattern = re.compile("^(\d+|\d+\.) (.*)( --hide:.*){0,1}$")
+    statement_pattern = re.compile(r"^(\d+(\.c|\.d){0,1}){0,1}(([a-zA-ZąćęłóśźżĄĆĘŁÓŚŹŻ&'-@#\"]+){0,1}|( [a-zA-ZąćęłóśźżĄĆĘŁÓŚŹŻ&'-@#\"]+)*)(( ){0,1}--hide:[ :\"$#=\w]+){0,1}$")
+    statement = statement_pattern.match(line)
+
+
+
+
 
     if " --hide:" in line:
         hide = line.split(' --hide:')[1]
