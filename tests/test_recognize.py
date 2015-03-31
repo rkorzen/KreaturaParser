@@ -119,6 +119,10 @@ class TestQuestionRecoginize(TestCase):
         line = "Q T Q1 Treść --rot"
         self.assertEqual("QUESTION", recognize(line))
 
+    def test_question_with_parrent(self):
+        line = "Q T Q1 Q0 Treść --rot"
+        self.assertEqual("QUESTION", recognize(line))
+
 
 class TestSwitchRecognize(TestCase):
     def test_switch(self):
@@ -145,37 +149,44 @@ class TestPostcodeRecognize(TestCase):
         line = 'POST $Q1="1";$Q2="2"'
         self.assertEqual("POSTCODE", recognize(line))
 
-class TestStatementRecognize(TestCase):
+
+class TestCafeteriaRecognize(TestCase):
     """kafeterie stwierdzen i odpowiedzi"""
 
-    def test_simple_statement_just_number(self):
+    def test_just_number(self):
         line = "1"
-        self.assertEqual("STATEMENT", recognize(line))
+        self.assertEqual("CAFETERIA", recognize(line))
 
-    def test_simple_statement_just_word(self):
+    def test_just_word(self):
         line = "coś"
-        self.assertEqual("STATEMENT", recognize(line))
+        self.assertEqual("CAFETERIA", recognize(line))
 
-    def test_simple_statement_num_word_slash(self):
+    def test_num_word_slash(self):
         line = "97 nie wiem/trudno powiedzieć"
-        self.assertEqual("STATEMENT", recognize(line))
+        self.assertEqual("CAFETERIA", recognize(line))
 
-    def test_simple_statement_num_word_backslash(self):
-        line = "97 nie wiem\trudno powiedzieć"
-        self.assertEqual("STATEMENT", recognize(line))
+    def test_num_word_backslash(self):
+        line = r"97 nie wiem\trudno powiedzieć"
+        self.assertEqual("CAFETERIA", recognize(line))
 
-    def test_simple_statement_num_dot_word_backslash(self):
-        line = "97.d nie wiem\trudno powiedzieć"
-        self.assertEqual("STATEMENT", recognize(line))
+    def test_num_dot_word_backslash(self):
+        line = r"97.d nie wiem\trudno powiedzieć"
+        self.assertEqual("CAFETERIA", recognize(line))
 
     def test_num_dot_c(self):
         line = '97.c inne'
-        self.assertEqual("STATEMENT", recognize(line))
+        self.assertEqual("CAFETERIA", recognize(line))
 
     def test_hide(self):
         line = '1 cos --hide:$A1:1 == "1"'
-        self.assertEqual("STATEMENT", recognize(line))
+        self.assertEqual("CAFETERIA", recognize(line))
 
     def test_wrong_call_two_hides(self):
-        line = '97.c nie wiem\trudno powiedzieć --hide:$A1:1 == "1" --hide:$A1:1 == "1"'
+        line = r'97.c nie wiem\trudno powiedzieć --hide:$A1:1 == "1" --hide:$A1:1 == "1"'
         self.assertEqual(None, recognize(line))
+
+
+class TestBlankRecognize(TestCase):
+    def test_blank_line(self):
+        line = ""
+        self.assertEqual("BLANK", recognize(line))

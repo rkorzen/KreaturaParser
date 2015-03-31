@@ -1,7 +1,5 @@
 import re
-
-from parsers import block_parser, page_parser, question_parser, statement_parser
-
+from parsers import block_parser, page_parser, question_parser, cafeteria_parser
 
 def recognize(line):
     """text -> text
@@ -46,7 +44,7 @@ def recognize(line):
         return "SWITCH"
 
     # block example: B B1 B0 --ran --hide: $A1:{0} == "1"
-    block_pattern = re.compile("^(B)(( )[\w_.]+){1,2}(( --ran)|( --rot)){0,1}( --hide:.*){0,1}$")
+    block_pattern = re.compile("^(B)(( )[\w_.]+){1,2}(( --ran)|( --rot))?( --hide:.*)?$")
     if block_pattern.match(line):
         return "BLOCK"
 
@@ -54,10 +52,9 @@ def recognize(line):
     if page_pattern.match(line):
         return "PAGE"
 
-    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G){1}([0-9]+_[0-9]+){0,1} [\w_.]+ (.*)$")
+    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
     if question_pattern.match(line):
         return "QUESTION"
-
 
     precode_pattern = re.compile("^PRE .*$")
     if precode_pattern.match(line):
@@ -67,14 +64,13 @@ def recognize(line):
     if precode_pattern.match(line):
         return "POSTCODE"
 
-    statement_pattern = re.compile(r"^(\d+(\.c|\.d){0,1}){0,1}(([a-zA-ZąćęłóśźżĄĆĘŁÓŚŹŻ&'-@#\"]+){0,1}|( [a-zA-ZąćęłóśźżĄĆĘŁÓŚŹŻ&'-@#\"]+)*)(( ){0,1}--hide:[ :\"$#=\w]+){0,1}$")
-    if statement_pattern.match(line) and not line.startswith("B ") and not line.startswith("P "):
-        return "STATEMENT"
+    cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/\\:#\$\[\]\w\d\{\} \";' =]+))?( --out)?$")
+    if cafeteria_pattern.match(line) and not line.startswith("B ") and not line.startswith("P "):
+        return "CAFETERIA"
 
-    blanck_pattern = "^$"
+    blanck_pattern = re.compile("^$")
     if blanck_pattern.match(line):
         return "BLANK"
-
 
 def clean_line(line):
     """:rtype : string
@@ -91,7 +87,6 @@ def clean_line(line):
     line = line.replace('&amp;amp;', '&amp;')
 
     return line
-
 
 def parse(text_input):
     """
@@ -119,7 +114,6 @@ def parse(text_input):
     current_question = None
     collect_statements = False
 
-
     # dzielimy wejście na linie:
     text_input = text_input.splitlines()
 
@@ -129,7 +123,10 @@ def parse(text_input):
         structure = recognize(line)  # rozpoznaję strukturę
 
         # w zależności od tego co to jest reagujemy tworząc odpowiednie obiekty
+
         if structure == "BLOCK":
+            current_page = None    # pojawił się blok, więc poprzednia strona powinna być pusta, tak by nic do niej nie dodać
+
             b = block_parser(line)
             if b.parent_id:
                 current_block.childs.append(b)
@@ -144,11 +141,17 @@ def parse(text_input):
             collect_statements = False
 
         if structure == "QUESTION":
+
             current_question = question_parser(line)
+
+            if not current_page:
+                tmp_line = "P " + current_question.id + "_p"
+                current_page = page_parser(tmp_line)
+
             current_page.childs.append(current_question)
             collect_statements = False
 
-        if structure == "STATEMENT":
+        if structure == "CAFETERIA":
             statement = statement_parser(line)
 
             if collect_statements:
@@ -172,7 +175,7 @@ def parse(text_input):
 
 
 if __name__ == "__main__":
-    input = """B0"""
+    input_text = """B0"""
 
-    t = parse(input)
+    t = parse(input_text)
 

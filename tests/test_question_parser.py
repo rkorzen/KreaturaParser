@@ -91,7 +91,6 @@ class TestQuestion_parser(TestCase):
         expected.typ = "O"
         expected.content = "Treść"
         expected.size = ['90', '4']
-
         result = question_parser(line)
         self.assertEqual(expected, result)
 
@@ -131,5 +130,15 @@ class TestQuestion_parser(TestCase):
         expected.content = "Treść"
         expected.random = True
         expected.hide = '$A1:1 == "1"'
+        result = question_parser(line)
+        self.assertEqual(expected, result)
+
+
+    def test_single_with_parent(self):
+        line = "Q S Q1 --p:Q0 Treść"
+        expected = Question("Q1")
+        expected.typ = "S"
+        expected.content = "Treść"
+        expected.parent_id = "Q0"
         result = question_parser(line)
         self.assertEqual(expected, result)

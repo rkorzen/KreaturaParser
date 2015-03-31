@@ -44,9 +44,20 @@ class Question(SurveyElements):
     pass
 
 
-class ListElement():
+class Cafeteria():
     """List element - to np cafeteria, statements"""
-    def __init__(self, id):
-        self.id = ""
+    def __init__(self):
+        self.id = None
         self.content = ""
-        self.hide = ""
+        self.hide = None
+        self.deactivate = False
+        self.other = False
+        self.out = False
+
+    def __eq__(self, other):
+        return self.id == other.id and \
+               self.content == other.content and \
+               self.hide == other.hide and \
+               self.deactivate == other.deactivate and \
+               self.other == other.other and \
+               self.out == other.out
