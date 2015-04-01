@@ -135,7 +135,7 @@ class TestSwitchRecognize(TestCase):
 
     def test_switch_double__(self):
         line = "__  "
-        self.assertEqual(None, recognize(line))
+        self.assertEqual("SWITCH", recognize(line))
 
 
 class TestPrecodeRecognize(TestCase):

@@ -40,7 +40,7 @@ def recognize(line):
     """
     line = clean_line(line)  # czyszczę linię
 
-    if line == "_" or line == "_\n":
+    if line == "_" or line == "_\n" or re.compile("^[_]+$").match(line):
         return "SWITCH"
 
     # block example: B B1 B0 --ran --hide: $A1:{0} == "1"
@@ -90,8 +90,8 @@ def clean_line(line):
 
 def parse(text_input):
     """
-    :ivar: text_input
-    :rtype : sstring(xml)
+    :param text_input: String
+    :rtype : String (xml)
 
 
     Główny parser.
@@ -109,6 +109,7 @@ def parse(text_input):
     survey_blocks = []
 
     # ustawienia początkowe
+    current_element = None
     current_block = None
     current_page = None
     current_question = None
@@ -124,8 +125,26 @@ def parse(text_input):
 
         # w zależności od tego co to jest reagujemy tworząc odpowiednie obiekty
 
+        # region block
         if structure == "BLOCK":
-            current_page = None    # pojawił się blok, więc poprzednia strona powinna być pusta, tak by nic do niej nie dodać
+
+            # region reset
+            """
+                Jeśli wieresz to nowa struktura BLOCK/PAGE/QUESTION,
+                to poprzednie pytane sie kończy i trzeba się znowu
+                przełączyć na zbieranie kafeterii odpowiedzi a nie stwierdzeń
+
+            """
+            collect_statements = False
+
+            """
+                pojawił się blok, więc poprzednia strona powinna być pusta,
+                Jeśli następny element będzie typy QUESTION, to będzie wiadomo,
+                że trzeba utworzyć też PAGE
+            """
+            current_page = None
+
+            # endregion
 
             b = block_parser(line)
             if b.parent_id:
@@ -133,14 +152,36 @@ def parse(text_input):
             else:
                 current_block = b
                 survey_blocks.append(current_block)
-            collect_statements = False
 
+            current_element = current_block
+
+        # endregion
+
+        # region page
         if structure == "PAGE":
+
+            # region reset
+            """
+                Jeśli wieresz to nowa struktura BLOCK/PAGE/QUESTION,
+                to poprzednie pytane sie kończy i trzeba się znowu
+                przełączyć na zbieranie kafeterii odpowiedzi a nie stwierdzeń
+
+            """
+
+            collect_statements = False
+            # endregion
+
             current_page = page_parser(line)
             current_block.childs.append(current_page)
-            collect_statements = False
+            current_element = current_page
 
+        # endregion
+
+        # region question
         if structure == "QUESTION":
+            # region reset
+            collect_statements = False
+            # endregion
 
             current_question = question_parser(line)
 
@@ -149,27 +190,42 @@ def parse(text_input):
                 current_page = page_parser(tmp_line)
 
             current_page.childs.append(current_question)
-            collect_statements = False
+            current_block.childs.append(current_page)
+        # endregion
 
+        # region cafeteria
         if structure == "CAFETERIA":
-            statement = statement_parser(line)
+            statement = cafeteria_parser(line)
 
             if collect_statements:
                 current_question.statements.append(statement)
             else:
                 current_question.cafeteria.append(statement)
+        # endregion
 
+        # region switch
         if structure == "SWITCH":
             collect_statements = True
 
+        # endregion
+
+        # region precode
         if structure == "PRECODE":
-            pass
+            current_element.precode = line.split('PRE ')[1]
+        # endregion
 
+        # region postcode
         if structure == "POSTCODE":
-            pass
+            current_element.postcode = line.split('POST ')[1]
+        # endregion
 
+        # region postcode
         if structure == "BLANK":
             collect_statements = False
+
+        # endregion
+
+
 
     return survey_blocks
 
