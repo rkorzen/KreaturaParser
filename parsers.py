@@ -113,3 +113,35 @@ def cafeteria_parser(line):
         cafeteria.out = True
 
     return cafeteria
+
+
+def program_parser(input_):
+    """text - > text
+
+    Sprawdza czy w tekscie są bloki
+    BEGIN PROGRAM
+
+    END PROGRAM
+
+    zwraca text z wykonanymi blokami programów.
+    To będą najczęściej jakieś pętle typu:
+    out = ""
+    for i in range(x):
+        out += "B B{}\n".format(i)
+
+    """
+
+    program_pattern = re.compile(r"(.*(BEGIN PROGRAM\nEND PROGRAM)?)?", re.MULTILINE|re.DOTALL)
+    #program_pattern = re.compile(r'^BEGIN PROGRAM[\n\r]([.*\n\r]+)END PROGRAM$', re.MULTILINE|re.DOTALL)
+    programs = program_pattern.findall(input_)
+    matches = [m.groups() for m in program_pattern.finditer(input_)]
+
+    print(matches)
+
+    out = ""
+
+    return out
+
+
+
+

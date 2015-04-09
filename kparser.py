@@ -1,6 +1,7 @@
 import re
 from parsers import block_parser, page_parser, question_parser, cafeteria_parser
 
+
 def recognize(line):
     """text -> text
 
@@ -98,8 +99,6 @@ def print_tree(lista):
 
             deep = 1
             print("\t"*deep + child.id )
-
-
 
 def parse(text_input):
     """
@@ -251,9 +250,6 @@ def parse(text_input):
 
 
     return survey_blocks
-
-
-
 
 if __name__ == "__main__":
     input_text = """B WSTEP
