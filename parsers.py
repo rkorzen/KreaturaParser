@@ -1,4 +1,5 @@
 import re
+import subprocess
 from elements import Block, Page, Question, Cafeteria
 
 def block_parser(line):
@@ -131,17 +132,81 @@ def program_parser(input_):
 
     """
 
-    program_pattern = re.compile(r"(.*(BEGIN PROGRAM\nEND PROGRAM)?)?", re.MULTILINE|re.DOTALL)
-    #program_pattern = re.compile(r'^BEGIN PROGRAM[\n\r]([.*\n\r]+)END PROGRAM$', re.MULTILINE|re.DOTALL)
-    programs = program_pattern.findall(input_)
-    matches = [m.groups() for m in program_pattern.finditer(input_)]
+    #program_pattern = re.compile("((BEGIN PROGRAM)(\\n[\\n\w\d\"\[\]\():,\{}+=\. ']*)(END PROGRAM))", re.DOTALL)
+    program_pattern = re.compile("BEGIN PROGRAM((?!BEGIN PROGRAM).)*END PROGRAM", re.DOTALL)
 
-    print(matches)
+    # programs = program_pattern.findall(input_)
+    # print(programs)
+    matches = [m.groups() for m in program_pattern.finditer(input_)]
 
     out = ""
 
+    programs = program_pattern.finditer(input_)
+
+    bad_separator = """BEGIN PROGRAM
+END PROGRAM"""
+    print(type(bad_separator))
+
+    for program in programs:
+        separator = program.group()
+        print(type(separator))
+
+        if separator is not bad_separator:
+            print(separator)
+
+            to_subprocess = program.group().replace("BEGIN PROGRAM", '')\
+                                        .replace("END PROGRAM", '')
+
+            result = subprocess.check_output(["python", '-c', to_subprocess])
+            result = str(result)[:-1].replace("b'", '')\
+                                     .replace(r"\r\n", '\n')
+
+            input_ = input_.split(separator)
+            print(input_)
+            input_ = input_[0] + result + input_[1]
+
+
+
+
+    # for match in matches:
+    #     if match[1] == "BEGIN PROGRAM":
+    #         #print(match)
+    #         out = subprocess.check_output(["python", '-c', match[2]])
+    #         out = str(out)[:-1].replace("b'", '')\
+    #                            .replace(r"\r\n", '\n')
+    #
+    #         wyrazenie = match[1]+match[2]+match[3]
+    #         #print("wyrazenie = " + wyrazenie)
+    #         in_ = input_.split(wyrazenie)
+    #         input_ = in_[0] + out + in_[1]
+
+
+    input_ = input_.replace("BEGIN PROGRAM", '')\
+                   .replace("END PROGRAM", '')
+
+    while '\n\n' in input_:
+        input_ = input_.replace('\n\n', '\n')
+
+    out = input_
+    #print(out+"\n\n\n")
     return out
 
 
 
 
+# input_ = """B B0
+# BEGIN PROGRAM
+# for i in range(2):
+#     print('P P{0}'.format(i))
+#
+# END PROGRAM
+#
+# B B1
+# BEGIN PROGRAM
+# for i in range(2):
+#     print('P Q{0}'.format(i))
+#
+# END PROGRAM
+# """
+#
+# program_parser(input_)
