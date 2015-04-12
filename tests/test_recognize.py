@@ -2,6 +2,7 @@ from unittest import TestCase
 from kparser import recognize
 
 
+
 class TestBlockRecognize(TestCase):
 
     def test_simple_block(self):

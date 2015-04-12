@@ -2,16 +2,16 @@ import re
 import subprocess
 from elements import Block, Page, Question, Cafeteria
 
+
 def block_parser(line):
     """
     :param line: String
     :rtype: Block
 
-
     """
 
-    id = line.split(' ', 2)[1]
-    block = Block(id)
+    id_ = line.split(' ', 2)[1]
+    block = Block(id_)
 
     parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
     r = parent_pattern.match(line)
@@ -38,8 +38,8 @@ def page_parser(line):
     :rtype: Page
 
     """
-    id = line.split(' ', 2)[1]
-    page = Page(id)
+    id_ = line.split(' ', 2)[1]
+    page = Page(id_)
 
     if " --hide:" in line:
         page.hide = line.split(" --hide:")[1]
@@ -53,8 +53,9 @@ def question_parser(line):
     :rtype: Question
 
     """
-                    #  1                            2                   3           4                     5
-    r = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G){1}([0-9]+_[0-9]+){0,1} ([\w_.]+){1}( --p:([\w_.]+)){0,1} (.*)$").match(line)
+    #                  1                            2                   3           4                     5
+    r = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")\
+          .match(line)
     question = Question(r.group(3))  # id
     question.typ = r.group(1)
 
@@ -63,7 +64,7 @@ def question_parser(line):
         question.size = size
 
     if r.group(5):
-       question.parent_id = r.group(5)
+        question.parent_id = r.group(5)
 
     question.content = r.group(6)    # content
 
@@ -79,7 +80,6 @@ def question_parser(line):
         question.random = True
         question.content = question.content.replace(' --ran', '')
 
-
     return question
 
 
@@ -91,7 +91,6 @@ def cafeteria_parser(line):
     """
     cafeteria = Cafeteria()
     cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --out)?$")
-    # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w& /"+r"\\"+"]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --out)?$") # to samo tylko nieco inaczej
 
     caf = cafeteria_pattern.match(line)
 
@@ -131,68 +130,46 @@ def program_parser(input_):
         out += "B B{}\n".format(i)
 
     """
-
-    #program_pattern = re.compile("((BEGIN PROGRAM)(\\n[\\n\w\d\"\[\]\():,\{}+=\. ']*)(END PROGRAM))", re.DOTALL)
-    program_pattern = re.compile("BEGIN PROGRAM((?!BEGIN PROGRAM).)*END PROGRAM", re.DOTALL)
-
-    # programs = program_pattern.findall(input_)
-    # print(programs)
-    matches = [m.groups() for m in program_pattern.finditer(input_)]
-
     out = ""
-
-    programs = program_pattern.finditer(input_)
-
     bad_separator = """BEGIN PROGRAM
 END PROGRAM"""
-    print(type(bad_separator))
+
+    input_ = input_.replace(bad_separator, '')
+
+    program_pattern = re.compile("BEGIN PROGRAM((?!BEGIN PROGRAM).)*END PROGRAM", re.DOTALL)
+    programs = program_pattern.finditer(input_)
+
 
     for program in programs:
+
         separator = program.group()
-        print(type(separator))
 
-        if separator is not bad_separator:
-            print(separator)
+        to_subprocess = program.group()\
+                               .replace("BEGIN PROGRAM", '')\
+                               .replace("END PROGRAM", '')
 
-            to_subprocess = program.group().replace("BEGIN PROGRAM", '')\
-                                        .replace("END PROGRAM", '')
+        # result = subprocess.check_output(["python", '-c', to_subprocess])
+        # result = result.decode()
+        ns = {}
+        # code = compile(to_subprocess, '<string>', 'exec')
+        code = to_subprocess
+        exec(code, ns)
+        if 'xxx' in ns.keys():
+            result = ns['xxx']
+        # result = out
+        else:
+            result = ""
+        # print("result", result)
+        input_ = input_.split(separator)
+        input_ = input_[0] + result + input_[1]
 
-            result = subprocess.check_output(["python", '-c', to_subprocess])
-            result = str(result)[:-1].replace("b'", '')\
-                                     .replace(r"\r\n", '\n')
+    # input_ = input_.replace("BEGIN PROGRAM", '').replace("END PROGRAM", '')
 
-            input_ = input_.split(separator)
-            print(input_)
-            input_ = input_[0] + result + input_[1]
-
-
-
-
-    # for match in matches:
-    #     if match[1] == "BEGIN PROGRAM":
-    #         #print(match)
-    #         out = subprocess.check_output(["python", '-c', match[2]])
-    #         out = str(out)[:-1].replace("b'", '')\
-    #                            .replace(r"\r\n", '\n')
-    #
-    #         wyrazenie = match[1]+match[2]+match[3]
-    #         #print("wyrazenie = " + wyrazenie)
-    #         in_ = input_.split(wyrazenie)
-    #         input_ = in_[0] + out + in_[1]
-
-
-    input_ = input_.replace("BEGIN PROGRAM", '')\
-                   .replace("END PROGRAM", '')
-
-    while '\n\n' in input_:
-        input_ = input_.replace('\n\n', '\n')
+    while '\n\n\n' in input_:
+        input_ = input_.replace('\n\n\n', '\n\n')
 
     out = input_
-    #print(out+"\n\n\n")
     return out
-
-
-
 
 # input_ = """B B0
 # BEGIN PROGRAM

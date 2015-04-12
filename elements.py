@@ -1,9 +1,8 @@
-
-
 class SurveyElements():
     """Base of survey structures/elements"""
-    def __init__(self, id):
-        self.id = id
+
+    def __init__(self, id_):
+        self.id = id_
         self.precode = False
         self.postcode = False
         self.rotation = False
@@ -18,19 +17,20 @@ class SurveyElements():
         self.content = False
 
     def __eq__(self, other):
-        return self.id == other.id and \
-               self.parent_id == other.parent_id and \
-               self.precode == other.precode and \
-               self.postcode == other.postcode and \
-               self.rotation == other.rotation and \
-               self.random == other.random and \
-               self.hide == other.hide and \
-               self.childs == other.childs and \
-               self.typ == other.typ and \
-               self.cafeteria == other.cafeteria and \
-               self.statements == other.statements and \
-               self.size == other.size and \
-               self.content == other.content
+        return (self.id == other.id and
+                self.parent_id == other.parent_id and
+                self.precode == other.precode and
+                self.postcode == other.postcode and
+                self.rotation == other.rotation and
+                self.random == other.random and
+                self.hide == other.hide and
+                self.childs == other.childs and
+                self.typ == other.typ and
+                self.cafeteria == other.cafeteria and
+                self.statements == other.statements and
+                self.size == other.size and
+                self.content == other.content
+                )
 
 
 class Block(SurveyElements):
@@ -48,6 +48,7 @@ class Question(SurveyElements):
 
 class Cafeteria():
     """List element - to np cafeteria, statements"""
+
     def __init__(self):
         self.id = None
         self.content = ""
@@ -57,9 +58,10 @@ class Cafeteria():
         self.out = False
 
     def __eq__(self, other):
-        return self.id == other.id and \
-               self.content == other.content and \
-               self.hide == other.hide and \
-               self.deactivate == other.deactivate and \
-               self.other == other.other and \
+        return(self.id == other.id and
+               self.content == other.content and
+               self.hide == other.hide and
+               self.deactivate == other.deactivate and
+               self.other == other.other and
                self.out == other.out
+               )

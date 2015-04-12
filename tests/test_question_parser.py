@@ -1,10 +1,9 @@
 from unittest import TestCase
 from kparser import question_parser
 from elements import Question
-__author__ = 'KorzeniewskiR'
 
 
-class TestQuestion_parser(TestCase):
+class TestQuestionParser(TestCase):
     def test_simple_single_question_parser(self):
         line = "Q S Q0 Treść"
         expected = Question("Q0")
@@ -122,8 +121,7 @@ class TestQuestion_parser(TestCase):
         result = question_parser(line)
         self.assertEqual(expected, result)
 
-
-    def test_grid_with_random(self):
+    def test_grid_with_random_and_hide(self):
         line = 'Q G Q0 Treść --ran --hide:$A1:1 == "1"'
         expected = Question("Q0")
         expected.typ = "G"
@@ -132,7 +130,6 @@ class TestQuestion_parser(TestCase):
         expected.hide = '$A1:1 == "1"'
         result = question_parser(line)
         self.assertEqual(expected, result)
-
 
     def test_single_with_parent(self):
         line = "Q S Q1 --p:Q0 Treść"

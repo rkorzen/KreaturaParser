@@ -1,9 +1,8 @@
 from unittest import TestCase
 from kparser import clean_line
-__author__ = 'KorzeniewskiR'
 
 
-class TestClean_line(TestCase):
+class TestCleanLine(TestCase):
 
     def test_double_spaces(self):
         line = "B  B0  "

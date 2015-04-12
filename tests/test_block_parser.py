@@ -1,10 +1,9 @@
 from unittest import TestCase
 from parsers import block_parser
 from elements import Block
-__author__ = 'KorzeniewskiR'
 
 
-class TestBlock_parser(TestCase):
+class TestBlockParser(TestCase):
     def test_simple_block(self):
         line = "B B0"
         result = block_parser(line)

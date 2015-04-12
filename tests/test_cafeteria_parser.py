@@ -1,10 +1,9 @@
 from unittest import TestCase
 from elements import Cafeteria
 from parsers import cafeteria_parser
-__author__ = 'KorzeniewskiR'
 
 
-class TestStatement_parser(TestCase):
+class TestStatementParser(TestCase):
 
     def test_slash(self):
         line = "Nie wiem/trudno powiedzieć"
@@ -12,7 +11,6 @@ class TestStatement_parser(TestCase):
         expected.content = "Nie wiem/trudno powiedzieć"
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
-
 
     def test_backslash(self):
         line = r"Nie wiem\trudno powiedzieć"
@@ -40,7 +38,6 @@ class TestStatement_parser(TestCase):
     def test_with_no_id(self):
         line = "coś coś"
         expected = Cafeteria()
-        #expected.id = "1"
         expected.content = "coś coś"
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
@@ -72,7 +69,6 @@ class TestStatement_parser(TestCase):
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
 
-
     def test_with_out(self):
         line = '1 coś coś --out'
         expected = Cafeteria()
@@ -81,7 +77,6 @@ class TestStatement_parser(TestCase):
         expected.out = True
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
-
 
     def test_all_possible(self):
         line = '96.d Procter&Gamble --hide: $A1:{0} == "1" --out'

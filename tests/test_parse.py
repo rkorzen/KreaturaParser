@@ -2,6 +2,7 @@ from unittest import TestCase
 from kparser import parse
 from elements import Block, Page, Question, Cafeteria
 
+
 class TestParse(TestCase):
 
     def test_only_block(self):
@@ -172,7 +173,6 @@ Q L Q2 Pyt 2
 
         expected = [block]
 
-
         result = parse(text_in)
-        print(result[0].childs[0].childs)
+        # print(result[0].childs[0].childs)
         self.assertEqual(expected, result)

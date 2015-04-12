@@ -65,7 +65,8 @@ def recognize(line):
     if precode_pattern.match(line):
         return "POSTCODE"
 
-    cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/\\:#\$\[\]\w\d\{\} \";' =]+))?( --out)?$")
+    cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/\:#\$\[\]\w\d\{\} \";' =]+))"
+                                   "?( --out)?$")
     if cafeteria_pattern.match(line) and not line.startswith("B ") and not line.startswith("P "):
         return "CAFETERIA"
 
@@ -73,12 +74,12 @@ def recognize(line):
     if blanck_pattern.match(line):
         return "BLANK"
 
+
 def clean_line(line):
     """:rtype : string
 
     Funkcja ma za zadanie oczyść linię ze zbędnych odstępów, tabulacji
     ? Ewentualne znaki & zamienić powinna na &amp;
-
 
     """
     line = line.replace("\t", ' ')
@@ -89,6 +90,7 @@ def clean_line(line):
 
     return line
 
+
 def print_tree(lista):
     deep = 0
     for blok in lista:
@@ -98,7 +100,8 @@ def print_tree(lista):
         for child in blok.childs:
 
             deep = 1
-            print("\t"*deep + child.id )
+            print("\t"*deep + child.id)
+
 
 def parse(text_input):
     """
@@ -246,9 +249,6 @@ def parse(text_input):
             collect_statements = False
             current_page = None
         # endregion
-
-
-
     return survey_blocks
 
 if __name__ == "__main__":

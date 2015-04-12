@@ -2,7 +2,8 @@ from unittest import TestCase
 from kparser import page_parser
 from elements import Page
 
-class TestPage_parser(TestCase):
+
+class TestPageParser(TestCase):
 
     def test_page_parser(self):
         line = "P P0"
@@ -10,7 +11,7 @@ class TestPage_parser(TestCase):
         expected = Page("P0")
         self.assertEqual(result, expected)
 
-    def test_page_parser(self):
+    def test_page_parser_with_hide(self):
         line = 'P P0 --hide: $A1:97 == "1"'
         result = page_parser(line)
         expected = Page("P0")
