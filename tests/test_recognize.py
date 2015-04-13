@@ -2,7 +2,6 @@ from unittest import TestCase
 from kparser import recognize
 
 
-
 class TestBlockRecognize(TestCase):
 
     def test_simple_block(self):
@@ -124,6 +123,10 @@ class TestQuestionRecoginize(TestCase):
         line = "Q T Q1 Q0 Treść --rot"
         self.assertEqual("QUESTION", recognize(line))
 
+    def test_question_with_hide(self):
+        line = 'Q T Q1 Q0 Treść --hide: $A1:{0} == "1"'
+        self.assertEqual("QUESTION", recognize(line))
+
 
 class TestSwitchRecognize(TestCase):
     def test_switch(self):
@@ -191,3 +194,10 @@ class TestBlankRecognize(TestCase):
     def test_blank_line(self):
         line = ""
         self.assertEqual("BLANK", recognize(line))
+
+
+class TestCommentRecognize(TestCase):
+
+    def test_comment_line(self):
+        input_ = "// this is a comment"
+        self.assertEqual("COMMENT", recognize(input_))

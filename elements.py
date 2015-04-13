@@ -1,3 +1,13 @@
+def find_parent(blocks, parent_id):
+    for block in blocks:
+        if block.id == parent_id:
+            return block
+        else:
+            b = find_parent(block.childs, parent_id)
+            if b:
+                return b
+
+
 class SurveyElements():
     """Base of survey structures/elements"""
 
@@ -31,6 +41,29 @@ class SurveyElements():
                 self.size == other.size and
                 self.content == other.content
                 )
+
+
+class Survey():
+    """
+    Survey contain blocks
+    Survey have s method to add a block element to his parent
+    """
+
+    def __init__(self):
+        self.blocks = []
+
+    def __eq__(self, other):
+        return self.blocks == other.blocks
+
+    def append(self, block):
+        self.blocks.append(block)
+
+    def add_to_parent(self, block):
+        parent = find_parent(self.blocks, block.parent_id)
+        if parent:
+            parent.childs.append(block)
+        else:
+            raise Exception("Wrong parent id")
 
 
 class Block(SurveyElements):

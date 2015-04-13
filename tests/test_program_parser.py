@@ -31,8 +31,6 @@ B B1
 
         self.assertEqual(expected, result)
 
-
-
     def test_for_loop(self):
         input_ = """B B0
 BEGIN PROGRAM
@@ -52,7 +50,6 @@ P P1
         result = program_parser(input_)
 
         self.assertEqual(expected, result)
-
 
     def test_loop_over_list(self):
         input_ = """B B0

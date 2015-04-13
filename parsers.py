@@ -130,7 +130,6 @@ def program_parser(input_):
         out += "B B{}\n".format(i)
 
     """
-    out = ""
     bad_separator = """BEGIN PROGRAM
 END PROGRAM"""
 
@@ -138,7 +137,6 @@ END PROGRAM"""
 
     program_pattern = re.compile("BEGIN PROGRAM((?!BEGIN PROGRAM).)*END PROGRAM", re.DOTALL)
     programs = program_pattern.finditer(input_)
-
 
     for program in programs:
 
@@ -148,27 +146,24 @@ END PROGRAM"""
                                .replace("BEGIN PROGRAM", '')\
                                .replace("END PROGRAM", '')
 
-        # result = subprocess.check_output(["python", '-c', to_subprocess])
-        # result = result.decode()
         ns = {}
-        # code = compile(to_subprocess, '<string>', 'exec')
-        code = to_subprocess
-        exec(code, ns)
+        exec(to_subprocess, ns)
         if 'xxx' in ns.keys():
             result = ns['xxx']
-        # result = out
+
         else:
             result = ""
-        # print("result", result)
+        # print(ns['xxx'])
         input_ = input_.split(separator)
         input_ = input_[0] + result + input_[1]
-
-    # input_ = input_.replace("BEGIN PROGRAM", '').replace("END PROGRAM", '')
 
     while '\n\n\n' in input_:
         input_ = input_.replace('\n\n\n', '\n\n')
 
     out = input_
+    # print("\n\n\nWEJSCIE:")
+    # print(out)
+
     return out
 
 # input_ = """B B0
