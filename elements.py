@@ -88,7 +88,8 @@ class Cafeteria():
         self.hide = None
         self.deactivate = False
         self.other = False
-        self.out = False
+        self.screenout = False
+        self.gotonext = False
 
     def __eq__(self, other):
         return(self.id == other.id and
@@ -96,5 +97,6 @@ class Cafeteria():
                self.hide == other.hide and
                self.deactivate == other.deactivate and
                self.other == other.other and
-               self.out == other.out
+               self.screenout == other.screenout and
+               self.gotonext == other.gotonext
                )

@@ -69,23 +69,53 @@ class TestStatementParser(TestCase):
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
 
-    def test_with_out(self):
-        line = '1 coś coś --out'
+    def test_with_screenout(self):
+        line = '1 coś coś --so'
         expected = Cafeteria()
         expected.id = "1"
         expected.content = "coś coś"
-        expected.out = True
+        expected.screenout = True
+        result = cafeteria_parser(line)
+        self.assertEqual(expected, result)
+
+    def test_with_gotonext(self):
+        line = '1 coś coś --gn'
+        expected = Cafeteria()
+        expected.id = "1"
+        expected.content = "coś coś"
+        expected.gotonext = True
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
 
     def test_all_possible(self):
-        line = '96.d Procter&Gamble --hide: $A1:{0} == "1" --out'
+        line = '96.d Procter&Gamble --hide: $A1:{0} == "1" --so'
         expected = Cafeteria()
         expected.id = "96"
         expected.content = "Procter&Gamble"
         expected.hide = ' $A1:{0} == "1"'
         expected.deactivate = True
-        expected.out = True
+        expected.screenout = True
         result = cafeteria_parser(line)
-        print(result.content)
+        self.assertEqual(expected, result)
+
+    def test_screeonout_info(self):
+        line = '1 cos --so'
+
+        expected = Cafeteria()
+        expected.id = '1'
+        expected.content = 'cos'
+        expected.screenout = True
+
+        result = cafeteria_parser(line)
+        self.assertEqual(expected, result)
+
+    def test_screeonout_info_2(self):
+        line = '1 a --so'
+
+        expected = Cafeteria()
+        expected.id = '1'
+        expected.content = 'a'
+        expected.screenout = True
+
+        result = cafeteria_parser(line)
         self.assertEqual(expected, result)

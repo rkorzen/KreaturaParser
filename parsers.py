@@ -90,7 +90,7 @@ def cafeteria_parser(line):
 
     """
     cafeteria = Cafeteria()
-    cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --out)?$")
+    cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
 
     caf = cafeteria_pattern.match(line)
 
@@ -109,8 +109,11 @@ def cafeteria_parser(line):
     if caf.group(6):
         cafeteria.hide = caf.group(6)
 
-    if caf.group(7):
-        cafeteria.out = True
+    if caf.group(7) == ' --so':
+        cafeteria.screenout = True
+
+    if caf.group(7) == ' --gn':
+        cafeteria.gotonext = True
 
     return cafeteria
 

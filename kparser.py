@@ -97,16 +97,22 @@ def clean_line(line):
     return line
 
 
-def print_tree(lista):
-    deep = 0
-    for blok in lista:
-        print(blok.id)
-        print(len(blok.childs))
+def print_tree(Survey):
+    """Wizualizuje drzewo elementow"""
+    out = []
+    def element_tree(element, level=0):
+        out.append('\t'*level + element.id)
+        if not element.childs:
+            pass
+        else:
+            for child in element.childs:
+                element_tree(child, level+1)
 
-        for child in blok.childs:
+    bloki = Survey.blocks
+    for blok in bloki:
+        element_tree(blok)
 
-            deep = 1
-            print("\t"*deep + child.id)
+    return '\n'.join(out)
 
 
 def parse(text_input):
@@ -232,6 +238,7 @@ def parse(text_input):
                 if not current_question.parent_id and isinstance(current_element, Question):
                     current_page = None
             except AttributeError:
+                """To raczej nie wymaga testu."""
                 pass
 
             if not current_block:
@@ -251,10 +258,46 @@ def parse(text_input):
         if structure == "CAFETERIA":
             statement = cafeteria_parser(line)
 
+            """jeśli nie ma numeru kafeterii to nadajemy go - albo dla kafeterii odpowiedzi (cafeteria),
+               albo dla kafeterii stwierdzen (statements), jeśli akurat je zbieramy.
+
+               To jest potrzebne do wyliczania filtrow screenout i gotonext
+
+
+            """
+            if not statement.id:
+                if not collect_statements:
+                    ktory = len(current_question.cafeteria)
+                    statement.id = str(ktory + 1)
+                else:
+                    ktory = len(current_question.statements)
+                    statement.id = str(ktory + 1)
+
+            """Do warunku bierzemy:
+
+            id pytania (question.id)
+            nr odpowiedzi
+
+            """
+
+            if statement.screenout:
+                current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                    current_question.id, statement.id
+                )
+
+            if statement.gotonext:
+                current_page.postcode += '''if ({0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''
+
+            print(current_question)
+
             if collect_statements:
                 current_question.statements.append(statement)
             else:
                 current_question.cafeteria.append(statement)
+
+
+
+
         # endregion
 
         # region switch
@@ -265,12 +308,18 @@ def parse(text_input):
 
         # region precode
         if structure == "PRECODE":
-            current_element.precode = line.split('PRE ')[1]
+            if type(current_element) is Question:
+                current_page.precode = line.split('PRE ')[1]
+            else:
+                current_element.precode = line.split('PRE ')[1]
         # endregion
 
         # region postcode
         if structure == "POSTCODE":
-            current_element.postcode = line.split('POST ')[1]
+            if type(current_element) is Question:
+                current_page.postcode = line.split('POST ')[1]
+            else:
+                current_element.postcode = line.split('POST ')[1]
         # endregion
 
         # region postcode

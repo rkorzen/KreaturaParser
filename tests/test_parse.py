@@ -5,7 +5,8 @@ from elements import Block, Page, Question, Cafeteria, Survey
 
 class TestParse(TestCase):
 
-    def test_only_block(self):
+    # region block tests
+    def test_block(self):
         text_input = """B B0"""
         result = parse(text_input)
         block = Block("B0")
@@ -27,7 +28,59 @@ P P0"""
 
         self.assertEqual(expected, result)
 
-    def test_only_page(self):
+    def test_block_question(self):
+        text_input = """B B0
+Q S Q1 Cos"""
+        block = Block("B0")
+        page = Page("Q1_p")
+        question = Question("Q1")
+        question.typ = "S"
+        question.content = "Cos"
+        page.childs.append(question)
+        block.childs.append(page)
+
+        survey = Survey()
+        survey.append(block)
+        expected = survey
+
+        result = parse(text_input)
+        self.assertEqual(expected, result)
+
+    def test_block_precode_postcode(self):
+        text_input = "B B0\nPRE x\nPOST y"
+        block = Block("B0")
+        block.precode = "x"
+        block.postcode = "y"
+
+        survey = Survey()
+        survey.append(block)
+        expected = survey
+
+        result = parse(text_input)
+        self.assertEqual(expected, result)
+
+    def test_block_parrent(self):
+        input_ = """B B0
+
+B B1 B0
+"""
+        b1 = Block('B0')
+        b2 = Block('B1')
+
+        b2.parent_id = "B0"
+
+        b1.childs.append(b2)
+
+        survey = Survey()
+        survey.append(b1)
+        expected = survey
+
+        result = parse(input_)
+        self.assertEqual(expected, result)
+    # endregion
+
+    # region page tests
+    def test_page(self):
         text_input = "P P0"
         page = Page("P0")
         block = Block("Default")
@@ -60,7 +113,25 @@ P P0"""
 
         self.assertEqual(expected, result)
 
-    def test_only_question(self):
+    def test_page_precode_postcode(self):
+        text_input = "P P0\nPRE x\nPOST y"
+        page = Page("P0")
+        page.precode = "x"
+        page.postcode = "y"
+
+        block = Block("Default")
+        block.childs.append(page)
+
+        survey = Survey()
+        survey.append(block)
+        expected = survey
+
+        result = parse(text_input)
+        self.assertEqual(expected, result)
+    # endregion
+
+    # region question test
+    def test_question(self):
         text_input = "Q S Q0 pytanie"
 
         question = Question('Q0')
@@ -80,97 +151,38 @@ P P0"""
         result = parse(text_input)
         self.assertEqual(expected, result)
 
-    def test_block_question(self):
-        text_input = """B B0
-Q S Q1 Cos"""
-        block = Block("B0")
-        page = Page("Q1_p")
-        question = Question("Q1")
-        question.typ = "S"
-        question.content = "Cos"
+    def test_question_rot(self):
+        input_ = "Q S Q1 Cos --rot"
+        question = Question('Q1')
+        question.typ = 'S'
+        question.content = 'Cos'
+        question.rotation = True
+
+        page = Page('Q1_p')
         page.childs.append(question)
-        block.childs.append(page)
+
+        blok = Block('Default')
+        blok.childs.append(page)
 
         survey = Survey()
-        survey.append(block)
-        expected = survey
+        survey.append(blok)
 
-        result = parse(text_input)
-        self.assertEqual(expected, result)
+        result = parse(input_)
+        x = survey.blocks[0].childs[0].childs[0].content
+        y = result.blocks[0].childs[0].childs[0].content
 
-    def test_block_question_single_1_el(self):
-        text_input = """B B0
-Q S Q1 Cos
-1 a"""
-        block = Block("B0")
-        page = Page("Q1_p")
-        question = Question("Q1")
-        question.typ = "S"
+        print(x==y)
+        self.assertEqual(survey, result)
+
+    def test_question_precode_postcode(self):
+        text_input = "Q O Q0 Cos\nPRE x\nPOST y"
+        question = Question('Q0')
+        question.typ = "O"
         question.content = "Cos"
-        caf = Cafeteria()
-        caf.id = "1"
-        caf.content = "a"
-        question.cafeteria.append(caf)
-
-        page.childs.append(question)
-        block.childs.append(page)
-
-        survey = Survey()
-        survey.append(block)
-        expected = survey
-
-        result = parse(text_input)
-        self.assertEqual(expected, result)
-
-    def test_block_question_table_1_el_1_st(self):
-        text_input = """B B0
-Q T Q1 Cos
-1 a
-_
-stwierdzenie 1"""
-        block = Block("B0")
-        page = Page("Q1_p")
-        question = Question("Q1")
-        question.typ = "T"
-        question.content = "Cos"
-        caf = Cafeteria()
-        caf.id = "1"
-        caf.content = "a"
-        question.cafeteria.append(caf)
-
-        stw = Cafeteria()
-        stw.content = "stwierdzenie 1"
-        question.statements.append(stw)
-
-        page.childs.append(question)
-        block.childs.append(page)
-
-        survey = Survey()
-        survey.append(block)
-        expected = survey
-
-        result = parse(text_input)
-        self.assertEqual(expected, result)
-
-    def test_block_with_precode_postcode(self):
-        text_input = "B B0\nPRE x\nPOST y"
-        block = Block("B0")
-        block.precode = "x"
-        block.postcode = "y"
-
-        survey = Survey()
-        survey.append(block)
-        expected = survey
-
-        result = parse(text_input)
-        self.assertEqual(expected, result)
-
-    def test_page_with_precode_postcode(self):
-        text_input = "P P0\nPRE x\nPOST y"
-        page = Page("P0")
+        page = Page("Q0_p")
         page.precode = "x"
         page.postcode = "y"
-
+        page.childs.append(question)
         block = Block("Default")
         block.childs.append(page)
 
@@ -179,6 +191,7 @@ stwierdzenie 1"""
         expected = survey
 
         result = parse(text_input)
+
         self.assertEqual(expected, result)
 
     def test_two_questions(self):
@@ -211,10 +224,12 @@ Q L Q2 Pyt 2
         expected = survey
 
         result = parse(text_in)
-        # print(result[0].childs[0].childs)
-        self.assertEqual(expected, result)
 
-    def test_with_empty_program(self):
+        self.assertEqual(expected, result)
+    # endregion
+
+    # region BEGIN PROGRAM tests
+    def test_empty_program(self):
         input_ = """
 B B0
 BEGIN PROGRAM
@@ -226,10 +241,9 @@ END PROGRAM
         survey.append(block)
         expected = survey
 
-
         self.assertEqual(expected, parse(input_))
 
-    def test_with_loop(self):
+    def test_program_loop(self):
         input_ = """B B0
 
 BEGIN PROGRAM
@@ -280,25 +294,152 @@ END PROGRAM
 
         self.assertEqual(expected, parse(input_))
 
-    def test_block_with_parrent(self):
+    def test_block_nesting(self):
         input_ = """B B0
 
-B B1 B0
+BEGIN PROGRAM
+def func():
+    out = ''
+    for i in range(4):
+        out += '''B B{1} B{0}
+'''.format(i, i+1)
+    return out
+xxx = func()
+END PROGRAM
 """
-        b1 = Block('B0')
-        b2 = Block('B1')
 
-        b2.parent_id = "B0"
+        b0 = Block("B0")
 
+        b1 = Block("B1")
+        b1.parent_id = "B0"
+
+        b2 = Block("B2")
+        b2.parent_id = "B1"
+
+        b3 = Block("B3")
+        b3.parent_id = "B2"
+
+        b4 = Block("B4")
+        b4.parent_id = "B3"
+
+        b0.childs.append(b1)
         b1.childs.append(b2)
+        b2.childs.append(b3)
+        b3.childs.append(b4)
 
         survey = Survey()
-        survey.append(b1)
+        survey.append(b0)
         expected = survey
-
         result = parse(input_)
+
         self.assertEqual(expected, result)
 
+    def test_block_nesting_one_parent(self):
+        input_ = """B B0
+
+BEGIN PROGRAM
+def func():
+    out = ''
+    for i in range(4):
+        out += '''B B{0} B0
+
+'''.format(i+1)
+    return out
+xxx = func()
+END PROGRAM
+"""
+
+        b0 = Block("B0")
+        b1 = Block("B1")
+        b2 = Block("B2")
+        b3 = Block("B3")
+        b4 = Block("B4")
+
+        b1.parent_id = "B0"
+        b2.parent_id = "B0"
+        b3.parent_id = "B0"
+        b4.parent_id = "B0"
+
+        b0.childs.append(b1)
+        b0.childs.append(b2)
+        b0.childs.append(b3)
+        b0.childs.append(b4)
+
+        survey = Survey()
+        survey.append(b0)
+        expected = survey
+        result = parse(input_)
+
+        self.assertEqual(expected, result)
+    # endregion
+
+    # region question types tests
+    def test_single_1_el(self):
+        text_input = """B B0
+Q S Q1 Cos
+1 a"""
+        block = Block("B0")
+        page = Page("Q1_p")
+        question = Question("Q1")
+        question.typ = "S"
+        question.content = "Cos"
+        caf = Cafeteria()
+        caf.id = "1"
+        caf.content = "a"
+        question.cafeteria.append(caf)
+
+        page.childs.append(question)
+        block.childs.append(page)
+
+        survey = Survey()
+        survey.append(block)
+        expected = survey
+
+        result = parse(text_input)
+        self.assertEqual(expected, result)
+
+    def test_table_1_el_1_st(self):
+        text_input = """B B0
+Q T Q1 Cos
+1 a
+_
+stwierdzenie 1"""
+        block = Block("B0")
+        page = Page("Q1_p")
+        question = Question("Q1")
+        question.typ = "T"
+        question.content = "Cos"
+        caf = Cafeteria()
+        caf.id = "1"
+        caf.content = "a"
+        question.cafeteria.append(caf)
+
+        stw = Cafeteria()
+        stw.content = "stwierdzenie 1"
+        stw.id = "1"
+        question.statements.append(stw)
+
+        page.childs.append(question)
+        block.childs.append(page)
+
+        survey = Survey()
+        survey.append(block)
+        expected = survey
+
+        result = parse(text_input)
+
+        self.assertEqual(expected, result)
+    # endregion
+
+    # region Exceptions tests
+    def test_wrong_parent_id(self):
+        input_ = """B B0
+B B1
+B B3 B2"""
+        self.assertRaises(Exception, parse, input_)
+    # endregion
+
+    # region Other
     def test_two_questions_on_page(self):
         input_ = """B B0
 P P1
@@ -326,96 +467,77 @@ Q O Q2 --p:P1 B
 
         survey = Survey()
         survey.append(b1)
-        expected = survey
 
         result = parse(input_)
 
-        # for page in result[0].childs:
-        #     for question in page.childs:
-        #         print("question: ", question.id)
-        #         for key in question.__dict__:
-        #             if question.__dict__[key]:
-        #                 print(key, question.__dict__[key])
-        #
-        # print('\n\nexpected')
-        # for page in expected[0].childs:
-        #     for question in page.childs:
-        #         print("question: ", question.id)
-        #         for key in question.__dict__:
-        #             if question.__dict__[key]:
-        #                 print(key, question.__dict__[key])
+        self.assertEqual(survey, result)
 
+    def test_two_questions_parent(self):
+        input_ = """Q O Q1 A
 
-        self.assertEqual(expected, result)
-
-    def test_block_nesting(self):
-        input_ = """B B0
-
-BEGIN PROGRAM
-def func():
-    out = ''
-    for i in range(5):
-        out += '''B B{1} B{0}
-'''.format(i, i+1)
-    return out
-xxx = func()
-END PROGRAM
+Q O Q2 --p:Q1_p COS
 """
+        b1 = Block('Default')
+        p1 = Page('Q1_p')
 
-        b0 = Block("B0")
-        b1 = Block("B1")
-        b1.parent_id = "B0"
-        b2 = Block("B2")
-        b2.parent_id = "B1"
-        b3 = Block("B3")
-        b3.parent_id = "B2"
-        b4 = Block("B4")
-        b4.parent_id = "B3"
+        b1.childs.append(p1)
 
+        q1 = Question('Q1')
+        q1.typ = "O"
+        q1.content = 'A'
 
-        b0.childs.append(b1)
-        b1.childs.append(b2)
-        b2.childs.append(b3)
-        b3.childs.append(b4)
+        q2 = Question('Q2')
+        q2.typ = "O"
+        q2.content = 'COS'
+        q2.parent_id = "Q1_p"
+
+        p1.childs.append(q1)
+        p1.childs.append(q2)
 
         survey = Survey()
-
-        expected = survey.append(b0)
+        survey.append(b1)
 
         result = parse(input_)
 
-        self.assertEqual(expected, result)
+        self.assertEqual(survey, result)
+    # endregion
 
-    def test_block_nesting_one_parent(self):
-        input_ = """B B0
+    def test_caf_screenout(self):
+        input_ = """Q S Q1 A
+1 a --so"""
 
-BEGIN PROGRAM
-def func():
-    out = ''
-    for i in range(5):
-        out += '''B B{0} B0
+        caf = Cafeteria()
+        caf.id = '1'
+        caf.content = 'a'
+        caf.screenout = True
 
-'''.format(i+1)
-    return out
-xxx = func()
-END PROGRAM
+        q = Question('Q1')
+        q.type = "S"
+        q.content = 'A'
+        q.cafeteria.append(caf)
+        q.postcode = 'if ($Q1:1 == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\endif'
+
+        p = Page('Q1_p')
+        p.childs.append(q)
+        p.postcode = """
+if ($Q1:1 == "1")
+  #OUT = "1"
+  goto KONKURS
+else
+endif
 """
-
-        b0 = Block("B0")
-        b1 = Block("B1")
-        b2 = Block("B2")
-        b3 = Block("B3")
-        b4 = Block("B4")
-
-        b0.childs.append(b1)
-        b0.childs.append(b2)
-        b0.childs.append(b3)
-        b0.childs.append(b4)
+        b = Block('Default')
+        b.childs.append(p)
 
         survey = Survey()
-        survey.append(b0)
-        expected = survey
-
+        survey.append(b)
         result = parse(input_)
 
-        self.assertEqual(expected, result)
+        print(survey.blocks[0].childs[0].childs[0].cafeteria)
+        print(result.blocks[0].childs[0].childs[0].cafeteria)
+        print(result.blocks[0].childs[0].childs[0])
+
+        self.assertEqual(survey, result)
+
+if __name__ == "__main__":
+    pass
