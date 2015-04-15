@@ -72,7 +72,7 @@ def recognize(line):
     if comment_line_patrn.match(line):
         return "COMMENT"
 
-    caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/\:#\$\[\]\w\d\{\} \";' =]+))?( --out)?$")
+    caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/\:#\$\[\]\w\d\{\} \";' =]+))?( --so| --gn)?$")
     if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
         return "CAFETERIA"
 
@@ -108,7 +108,7 @@ def print_tree(Survey):
             for child in element.childs:
                 element_tree(child, level+1)
 
-    bloki = Survey.blocks
+    bloki = Survey.childs
     for blok in bloki:
         element_tree(blok)
 
@@ -279,16 +279,30 @@ def parse(text_input):
             nr odpowiedzi
 
             """
+            # print("question id", current_question.id)
+            # print("statement id", statement.id)
+            #
+            # print("current_page", current_page, current_page.postcode)
+            # print("current_question", current_question, current_question.postcode)
 
             if statement.screenout:
-                current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                    current_question.id, statement.id
-                )
+
+                if current_page.postcode:
+                    current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                        current_question.id, statement.id
+                    )
+                else:
+                    current_page.postcode = '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                        current_question.id, statement.id
+                    )
+
+            # print("current_page", current_page, current_page.postcode)
+            # print("current_question", current_question, current_question.postcode)
+
+
 
             if statement.gotonext:
                 current_page.postcode += '''if ({0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''
-
-            print(current_question)
 
             if collect_statements:
                 current_question.statements.append(statement)

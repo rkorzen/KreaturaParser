@@ -189,8 +189,9 @@ class TestCafeteriaRecognize(TestCase):
         line = r'97.c nie wiem\trudno powiedzieć --hide:$A1:1 == "1" --hide:$A1:1 == "1"'
         self.assertEqual(None, recognize(line))
 
-    def caf_screenout_nfo(self):
+    def test_caf_screenout_nfo(self):
         line = '1 cos --so'
+
         self.assertEqual('CAFETERIA', recognize(line))
 
 class TestBlankRecognize(TestCase):

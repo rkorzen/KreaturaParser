@@ -1,7 +1,7 @@
 from unittest import TestCase
 from kparser import parse
 from elements import Block, Page, Question, Cafeteria, Survey
-
+from tools import show_attr, find_by_id
 
 class TestParse(TestCase):
 
@@ -168,10 +168,10 @@ B B1 B0
         survey.append(blok)
 
         result = parse(input_)
-        x = survey.blocks[0].childs[0].childs[0].content
-        y = result.blocks[0].childs[0].childs[0].content
+        x = survey.childs[0].childs[0].childs[0].content
+        y = result.childs[0].childs[0].childs[0].content
 
-        print(x==y)
+
         self.assertEqual(survey, result)
 
     def test_question_precode_postcode(self):
@@ -512,20 +512,17 @@ Q O Q2 --p:Q1_p COS
         caf.screenout = True
 
         q = Question('Q1')
-        q.type = "S"
+        q.typ = "S"
         q.content = 'A'
         q.cafeteria.append(caf)
-        q.postcode = 'if ($Q1:1 == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\endif'
 
         p = Page('Q1_p')
         p.childs.append(q)
-        p.postcode = """
-if ($Q1:1 == "1")
+        p.postcode = """if ($Q1:1 == "1")
   #OUT = "1"
   goto KONKURS
 else
-endif
-"""
+endif"""
         b = Block('Default')
         b.childs.append(p)
 
@@ -533,11 +530,21 @@ endif
         survey.append(b)
         result = parse(input_)
 
-        print(survey.blocks[0].childs[0].childs[0].cafeteria)
-        print(result.blocks[0].childs[0].childs[0].cafeteria)
-        print(result.blocks[0].childs[0].childs[0])
+        # qr = find_by_id(result, 'Q1')
+        # qe = find_by_id(survey, 'Q1')
+        #
+        # #qr.cafeteria
+        #
+        # print(len(qr.cafeteria))
+        # print(len(qe.cafeteria))
+        #
+        # a = show_attr(survey.childs[0].childs[0].childs[0].cafeteria[0])
+        # b = show_attr(result.childs[0].childs[0].childs[0].cafeteria[0])
+        #
+        # print(a)
+        # print(b)
 
+        #self.assertEqual(caf_r, caf_e)
         self.assertEqual(survey, result)
-
 if __name__ == "__main__":
     pass

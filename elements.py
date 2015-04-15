@@ -45,21 +45,22 @@ class SurveyElements():
 
 class Survey():
     """
-    Survey contain blocks
+    Survey contain childs
     Survey have s method to add a block element to his parent
     """
 
     def __init__(self):
-        self.blocks = []
+        self.childs = []
+        self.id = False   # just for a case... and for find_by_id function
 
     def __eq__(self, other):
-        return self.blocks == other.blocks
+        return self.childs == other.childs and self.id == other.id
 
     def append(self, block):
-        self.blocks.append(block)
+        self.childs.append(block)
 
     def add_to_parent(self, block):
-        parent = find_parent(self.blocks, block.parent_id)
+        parent = find_parent(self.childs, block.parent_id)
         if parent:
             parent.childs.append(block)
         else:
