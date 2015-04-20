@@ -139,3 +139,14 @@ class TestQuestionParser(TestCase):
         expected.parent_id = "Q0"
         result = question_parser(line)
         self.assertEqual(expected, result)
+
+    def test_open_with_deactivate(self):
+        line = "Q O Q1 TRESC --d:'Nie wiem'"
+        expected = Question("Q1")
+        expected.typ = "O"
+        expected.content = "TRESC"
+        expected.deactivate = "Nie wiem"
+        result = question_parser(line)
+        print(result.deactivate)
+
+        self.assertEqual(expected, result)

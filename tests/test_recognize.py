@@ -127,6 +127,9 @@ class TestQuestionRecoginize(TestCase):
         line = 'Q T Q1 Q0 Treść --hide: $A1:{0} == "1"'
         self.assertEqual("QUESTION", recognize(line))
 
+    def test_q_with_deactivate(self):
+        line = "Q O Q1 TRESC --d:'Nie wiem'"
+        self.assertEqual('QUESTION', recognize(line))
 
 class TestSwitchRecognize(TestCase):
     def test_switch(self):
@@ -193,6 +196,7 @@ class TestCafeteriaRecognize(TestCase):
         line = '1 cos --so'
 
         self.assertEqual('CAFETERIA', recognize(line))
+
 
 class TestBlankRecognize(TestCase):
     def test_blank_line(self):
