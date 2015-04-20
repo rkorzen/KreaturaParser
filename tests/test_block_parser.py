@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from parsers import block_parser
 from elements import Block
 
@@ -43,3 +43,5 @@ class TestBlockParser(TestCase):
         expected.parent_id = "B1"
         self.assertEqual(result, expected)
 
+if __name__ == '__main__':
+    main()

@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from kparser import parse
 from elements import Block, Page, Question, Cafeteria, Survey
 from tools import show_attr, find_by_id
@@ -429,6 +429,42 @@ stwierdzenie 1"""
         result = parse(text_input)
 
         self.assertEqual(expected, result)
+
+    def test_open_with_dk_explicite(self):
+        line = "Q O Q1 Cos --dk: Nie wiem"
+        expected = Survey()
+        b = Block('Default')
+        p = Page('Q1_p')
+        q = Question('Q1')
+        q.typ = 'O'
+        q.content = 'Cos'
+        q.dontknow = 'Nie wiem'
+        p.childs.append(q)
+        b.childs.append(p)
+        expected.append(b)
+
+        result = parse(line)
+        #print(show_attr(result.childs[0].childs[0].childs[0]))
+
+        self.assertEqual(expected, result)
+
+    def test_open_with_dk_implicite(self):
+        line = "Q O Q1 Cos --dk:"
+        expected = Survey()
+        b = Block('Default')
+        p = Page('Q1_p')
+        q = Question('Q1')
+        q.typ = 'O'
+        q.content = 'Cos'
+        q.dontknow = 'Nie wiem/trudno powiedzieć'
+        p.childs.append(q)
+        b.childs.append(p)
+        expected.append(b)
+
+        result = parse(line)
+        #print(show_attr(result.childs[0].childs[0].childs[0]))
+
+        self.assertEqual(expected, result)
     # endregion
 
     # region Exceptions tests
@@ -546,5 +582,6 @@ endif"""
 
         #self.assertEqual(caf_r, caf_e)
         self.assertEqual(survey, result)
+
 if __name__ == "__main__":
     pass

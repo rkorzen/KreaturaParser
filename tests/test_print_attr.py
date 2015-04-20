@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from tools import show_attr
 __author__ = 'KorzeniewskiR'
 
@@ -31,9 +31,13 @@ childs = []
 typ = False
 cafeteria = []
 hide = False
+dontknow = False
 id = B0
 precode = False
 size = []
 parent_id = False
 content = False'''.splitlines())
         self.assertEqual(expected, result)
+
+if __name__ == '__main__':
+    main()

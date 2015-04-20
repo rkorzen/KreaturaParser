@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from kparser import parse, print_tree
 
 
@@ -36,3 +36,6 @@ B B4"""
         result = print_tree(survey)
         expected = '''B0\n\tB1\n\tB2\n\t\tB3\n\tP1\n\t\tQ1\nB4'''
         self.assertEqual(expected, result)
+
+if __name__ == '__main__':
+    main()

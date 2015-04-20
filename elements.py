@@ -25,6 +25,7 @@ class SurveyElements():
         self.statements = []
         self.size = []
         self.content = False
+        self.dontknow = False
 
     def __eq__(self, other):
         return (self.id == other.id and
@@ -39,7 +40,8 @@ class SurveyElements():
                 self.cafeteria == other.cafeteria and
                 self.statements == other.statements and
                 self.size == other.size and
-                self.content == other.content
+                self.content == other.content and
+                self.dontknow == other.dontknow
                 )
 
 

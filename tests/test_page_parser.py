@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from kparser import page_parser
 from elements import Page
 
@@ -17,3 +17,6 @@ class TestPageParser(TestCase):
         expected = Page("P0")
         expected.hide = ' $A1:97 == "1"'
         self.assertEqual(result, expected)
+
+if __name__ == '__main__':
+    main()

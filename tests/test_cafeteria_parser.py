@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from elements import Cafeteria
 from parsers import cafeteria_parser
 
@@ -119,3 +119,6 @@ class TestStatementParser(TestCase):
 
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
+
+if __name__ == '__main__':
+    main()

@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from tools import find_by_id
 from kparser import parse
 from elements import Question
@@ -25,3 +25,6 @@ Q S Q1 A
         qe.content = 'A'
 
         self.assertEqual(qe, qr)
+
+if __name__ == '__main__':
+    main()

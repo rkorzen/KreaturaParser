@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from kparser import recognize
 
 
@@ -209,3 +209,6 @@ class TestCommentRecognize(TestCase):
     def test_comment_line(self):
         input_ = "// this is a comment"
         self.assertEqual("COMMENT", recognize(input_))
+
+if __name__ == '__main__':
+    main()

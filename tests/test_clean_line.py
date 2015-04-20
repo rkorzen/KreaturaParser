@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from kparser import clean_line
 
 
@@ -19,3 +19,6 @@ class TestCleanLine(TestCase):
     def test_switch_with_spaces(self):
         line = "_  "
         self.assertEqual("_", clean_line(line))
+
+if __name__ == '__main__':
+    main()

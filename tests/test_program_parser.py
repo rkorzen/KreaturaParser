@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from parsers import program_parser
 
 
@@ -82,3 +82,6 @@ Q O Q1_3 Co myślisz o osobie o imieniu Lena
 """
 
         self.assertEqual(expected, result)
+
+if __name__ == '__main__':
+    main()

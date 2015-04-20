@@ -53,9 +53,10 @@ def question_parser(line):
     :rtype: Question
 
     """
-    #                  1                            2                   3           4                     5
+    #                  typ                      size             id       parent                     5
     r = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")\
           .match(line)
+
     question = Question(r.group(3))  # id
     question.typ = r.group(1)
 
@@ -67,6 +68,20 @@ def question_parser(line):
         question.parent_id = r.group(5)
 
     question.content = r.group(6)    # content
+
+    ''' sprawdzam, czy w treści jest " --dk:"
+    jeśli jest to przeczyszczam q.content i ustawian q.dontknow
+
+    jeśli w open jest dontknow to będę dodawać skrypt deaktywacja opena
+
+    '''
+    if '--dk:' in question.content:
+        tmp = question.content.split(' --dk:')
+        question.content = tmp[0]
+        if tmp[1].strip():
+            question.dontknow = tmp[1].strip()
+        else:
+            question.dontknow = r"Nie wiem/trudno powiedzieć"
 
     if " --hide:" in line:           # hide
         question.hide = line.split(" --hide:")[1]
