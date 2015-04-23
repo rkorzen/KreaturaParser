@@ -584,4 +584,4 @@ endif"""
         self.assertEqual(survey, result)
 
 if __name__ == "__main__":
-    pass
+    main()

@@ -1,3 +1,5 @@
+from lxml import etree
+
 def find_parent(blocks, parent_id):
     for block in blocks:
         if block.id == parent_id:
@@ -59,27 +61,60 @@ class Survey():
         return self.childs == other.childs and self.id == other.id
 
     def append(self, block):
+        """Add child to self.childs list"""
         self.childs.append(block)
 
     def add_to_parent(self, block):
+        """
+        Add child to his parent. Parent is nested somewhere in survey childs
+        If there is not element with parent_id Exception is thrown.
+        """
         parent = find_parent(self.childs, block.parent_id)
         if parent:
             parent.childs.append(block)
         else:
+            # TODO: some other exception type?
             raise Exception("Wrong parent id")
+
+    def build_xml(self):
+        """survey xml"""
+        # TODO: opcjonalnie - procedury, zmienne
+        self.xml = etree.Element('survey')
+        for child in self.childs:
+            child.build_xml()
+            self.xml.append(child.xml)
 
 
 class Block(SurveyElements):
-    pass
+    """Block element."""
+    def build_xml(self):
+        """xml representation of Block element"""
+        self.xml = etree.Element('block')
+        self.xml.set('id', self.id)
+        for child in self.childs:
+            child.build_xml()
+            self.xml.append(child.xml)
 
 
 class Page(SurveyElements):
-    pass
+    """Page element."""
+    def build_xml(self):
+        """xml representation of Page element"""
+        self.xml = etree.Element('page')
+        self.xml.set('id', self.id)
+        for child in self.childs:
+            child.build_xml()
+            self.xml.append(child.xml)
 
 
 class Question(SurveyElements):
     """Question"""
-    pass
+    def build_xml(self):
+        """xml representation of Question element"""
+
+        # TODO: tutaj duużo do zrobienia - wszystkie typy
+        self.xml = etree.Element('question')
+        self.xml.set('id', self.id)
 
 
 class Cafeteria():
