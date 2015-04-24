@@ -226,6 +226,33 @@ Q L Q2 Pyt 2
         result = parse(text_in)
 
         self.assertEqual(expected, result)
+
+    def test_autonum(self):
+        input_ = 'Q S Q1 COS\na\nb'
+        survey = Survey()
+
+        b = Block('Default')
+        survey.append(b)
+
+        p = Page('Q1_p')
+        b.childs.append(p)
+
+        q = Question('Q1')
+        q.typ = 'S'
+        q.content = 'COS'
+        p.childs.append(q)
+
+        c1, c2 = Cafeteria(), Cafeteria()
+        c1.content = 'a'
+        c1.id = '1'
+        c2.content = 'b'
+        c2.id = '2'
+
+        q.cafeteria.append(c1)
+        q.cafeteria.append(c2)
+
+        self.assertEqual(survey, parse(input_))
+
     # endregion
 
     # region BEGIN PROGRAM tests

@@ -15,8 +15,8 @@ class SurveyElements():
 
     def __init__(self, id_):
         self.id = id_
-        self.precode = False
-        self.postcode = False
+        self.precode = ''
+        self.postcode = ''
         self.rotation = False
         self.random = False
         self.hide = False

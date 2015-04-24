@@ -263,7 +263,6 @@ def parse(text_input):
 
                To jest potrzebne do wyliczania filtrow screenout i gotonext
 
-
             """
             if not statement.id:
                 if not collect_statements:
@@ -286,15 +285,18 @@ def parse(text_input):
             # print("current_question", current_question, current_question.postcode)
 
             if statement.screenout:
+                current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                        current_question.id, statement.id
+                )
 
-                if current_page.postcode:
-                    current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                        current_question.id, statement.id
-                    )
-                else:
-                    current_page.postcode = '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                        current_question.id, statement.id
-                    )
+                # if current_page.postcode:
+                #     current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                #         current_question.id, statement.id
+                #     )
+                # else:
+                #     current_page.postcode = '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                #         current_question.id, statement.id
+                #     )
 
             # print("current_page", current_page, current_page.postcode)
             # print("current_question", current_question, current_question.postcode)

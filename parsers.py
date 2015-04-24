@@ -109,25 +109,25 @@ def cafeteria_parser(line):
 
     caf = cafeteria_pattern.match(line)
 
-    if caf.group(2):
+    if caf.group(2):           # id
         cafeteria.id = caf.group(2)
 
-    if caf.group(4):
+    if caf.group(4):           # content
         cafeteria.content = caf.group(4)
 
-    if caf.group(3) == ".d":
+    if caf.group(3) == ".d":   # deactivate
         cafeteria.deactivate = True
 
-    if caf.group(3) == ".c":
+    if caf.group(3) == ".c":   # comment
         cafeteria.other = True
 
-    if caf.group(6):
+    if caf.group(6):           # hide
         cafeteria.hide = caf.group(6)
 
-    if caf.group(7) == ' --so':
+    if caf.group(7) == ' --so': # screen out
         cafeteria.screenout = True
 
-    if caf.group(7) == ' --gn':
+    if caf.group(7) == ' --gn': # goto next
         cafeteria.gotonext = True
 
     return cafeteria

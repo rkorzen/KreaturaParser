@@ -25,7 +25,7 @@ class TestPrint_attr(TestCase):
         result = show_attr(b)
         expected = sorted('''statements = []
 rotation = False
-postcode = False
+postcode = 
 random = False
 childs = []
 typ = False
@@ -33,7 +33,7 @@ cafeteria = []
 hide = False
 dontknow = False
 id = B0
-precode = False
+precode = 
 size = []
 parent_id = False
 content = False'''.splitlines())
