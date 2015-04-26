@@ -19,10 +19,8 @@ class TestBlock(TestCase):
         b1 = Block('B1')
         b2 = Block('B2')
         b1.childs.append(b2)
-        b1.build_xml()
+        b1.to_xml()
 
         xml = etree.tostring(b1.xml)
         self.assertEqual(e_xml, xml)
-
-
 

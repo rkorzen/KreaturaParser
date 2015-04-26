@@ -131,6 +131,7 @@ class TestQuestionRecoginize(TestCase):
         line = "Q O Q1 TRESC --d:'Nie wiem'"
         self.assertEqual('QUESTION', recognize(line))
 
+
 class TestSwitchRecognize(TestCase):
     def test_switch(self):
         line = "_"

@@ -1,3 +1,5 @@
+from lxml import etree
+
 
 def show_attr(element):
     """Drukuje atrybuty"""
@@ -10,9 +12,18 @@ def show_attr(element):
 
     out = sorted(out.splitlines())
 
-
     return out
 
+
+def find_parent(blocks, parent_id):
+    """Szuka bloku o zadanym parent_id"""
+    for block in blocks:
+        if block.id == parent_id:
+            return block
+        else:
+            b = find_parent(block.childs, parent_id)
+            if b:
+                return b
 
 
 def find_by_id(parent, child_id):
@@ -33,3 +44,37 @@ def find_by_id(parent, child_id):
                 if r:
                     return r
 
+
+def build_precode(precode):
+    """text -> xml: <precode>"""
+
+    is_inside_if = False
+    prec = etree.Element('precode')
+
+    text = precode.split(';')
+
+    # pobieżna walidacja
+    # czy ilość if else i endif jest taka sama
+
+    count_ifs = [x.startswith('if') for x in text].count(True)
+    count_elses = [x.startswith('else') for x in text].count(True)
+    count_endifs = [x.startswith('endif') for x in text].count(True)
+
+    if count_ifs is not count_elses or count_ifs is not count_endifs:
+        raise ValueError('Liczba if, else, endif nie zgadza się')
+
+    for i, t in enumerate(text):
+        t = t.strip()
+
+        if t.startswith('if'):
+            is_inside_if = True
+        if t.startswith('endif'):
+            is_inside_if = False
+
+        if not t.startswith('if') and not t.startswith('else') and not t.startswith('endif') and is_inside_if:
+            text[i] = '  ' + text[i]
+    text = '\n'.join(text)
+
+    prec.text = etree.CDATA(text)
+
+    return prec

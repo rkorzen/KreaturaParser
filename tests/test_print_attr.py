@@ -2,20 +2,20 @@ from unittest import TestCase, main
 from tools import show_attr
 __author__ = 'KorzeniewskiR'
 
+
 class SomeObject():
     def __init__(self):
         self.x = 'x'
         self.y = 'y'
 
 
-class TestPrint_attr(TestCase):
+class TestPrintAttr(TestCase):
     def test_print_attr(self):
         element = SomeObject()
         result = show_attr(element)
         expected = sorted('x = x\ny = y'.splitlines())
 
         self.assertEqual(expected, result)
-
 
     def test_block(self):
         from kparser import parse
@@ -36,8 +36,10 @@ id = B0
 precode = 
 size = []
 parent_id = False
-content = False'''.splitlines())
+content = False
+xml = False'''.splitlines())
         self.assertEqual(expected, result)
+
 
 if __name__ == '__main__':
     main()

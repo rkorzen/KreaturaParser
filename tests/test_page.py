@@ -21,7 +21,7 @@ class TestPage(TestCase):
         q = Question('Q1')
 
         p.childs.append(q)
-        p.build_xml()
+        p.to_xml()
 
         xml = etree.tostring(p.xml)
         self.assertEqual(e_xml, xml)

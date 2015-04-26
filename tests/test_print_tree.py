@@ -2,7 +2,7 @@ from unittest import TestCase, main
 from kparser import parse, print_tree
 
 
-class TestPrint_tree(TestCase):
+class TestPrintTree(TestCase):
     def test_print_tree(self):
         input_ = """B B0
 B B1 B0

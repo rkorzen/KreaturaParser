@@ -1,7 +1,11 @@
 from unittest import TestCase, main
+
 from kparser import parse
 from elements import Block, Page, Question, Cafeteria, Survey
-from tools import show_attr, find_by_id
+# from tools import show_attr, find_by_id
+
+from lxml import etree
+
 
 class TestParse(TestCase):
 
@@ -168,9 +172,6 @@ B B1 B0
         survey.append(blok)
 
         result = parse(input_)
-        x = survey.childs[0].childs[0].childs[0].content
-        y = result.childs[0].childs[0].childs[0].content
-
 
         self.assertEqual(survey, result)
 
@@ -246,6 +247,58 @@ Q L Q2 Pyt 2
         c1.content = 'a'
         c1.id = '1'
         c2.content = 'b'
+        c2.id = '2'
+
+        q.cafeteria.append(c1)
+        q.cafeteria.append(c2)
+
+        self.assertEqual(survey, parse(input_))
+
+    def test_numeration_explicite(self):
+        input_ = 'Q S Q1 COS\n3 a\n4 b'
+        survey = Survey()
+
+        b = Block('Default')
+        survey.append(b)
+
+        p = Page('Q1_p')
+        b.childs.append(p)
+
+        q = Question('Q1')
+        q.typ = 'S'
+        q.content = 'COS'
+        p.childs.append(q)
+
+        c1, c2 = Cafeteria(), Cafeteria()
+        c1.content = 'a'
+        c1.id = '3'
+        c2.content = 'b'
+        c2.id = '4'
+
+        q.cafeteria.append(c1)
+        q.cafeteria.append(c2)
+
+        self.assertEqual(survey, parse(input_))
+
+    def test_same_numbers_and_content(self):
+        input_ = 'Q S Q1 COS\n1 1\n2 2'
+        survey = Survey()
+
+        b = Block('Default')
+        survey.append(b)
+
+        p = Page('Q1_p')
+        b.childs.append(p)
+
+        q = Question('Q1')
+        q.typ = 'S'
+        q.content = 'COS'
+        p.childs.append(q)
+
+        c1, c2 = Cafeteria(), Cafeteria()
+        c1.content = '1'
+        c1.id = '1'
+        c2.content = '2'
         c2.id = '2'
 
         q.cafeteria.append(c1)
@@ -471,7 +524,6 @@ stwierdzenie 1"""
         expected.append(b)
 
         result = parse(line)
-        #print(show_attr(result.childs[0].childs[0].childs[0]))
 
         self.assertEqual(expected, result)
 
@@ -489,7 +541,6 @@ stwierdzenie 1"""
         expected.append(b)
 
         result = parse(line)
-        #print(show_attr(result.childs[0].childs[0].childs[0]))
 
         self.assertEqual(expected, result)
     # endregion
@@ -563,7 +614,6 @@ Q O Q2 --p:Q1_p COS
         result = parse(input_)
 
         self.assertEqual(survey, result)
-    # endregion
 
     def test_caf_screenout(self):
         input_ = """Q S Q1 A
@@ -593,22 +643,77 @@ endif"""
         survey.append(b)
         result = parse(input_)
 
-        # qr = find_by_id(result, 'Q1')
-        # qe = find_by_id(survey, 'Q1')
-        #
-        # #qr.cafeteria
-        #
-        # print(len(qr.cafeteria))
-        # print(len(qe.cafeteria))
-        #
-        # a = show_attr(survey.childs[0].childs[0].childs[0].cafeteria[0])
-        # b = show_attr(result.childs[0].childs[0].childs[0].cafeteria[0])
-        #
-        # print(a)
-        # print(b)
-
-        #self.assertEqual(caf_r, caf_e)
         self.assertEqual(survey, result)
+    # endregion
+
+    # region to xml
+    def test_block_with_precode_to_xml(self):
+        input_ = 'B B0\nPRE if($A1:1 == "1");goto next;else;endif'
+
+        result = parse(input_)
+        result.to_xml()
+        r_xml = etree.tostring(result.xml)
+
+        expected = Survey()
+        expected.append(Block('B0'))
+        expected.childs[0].precode = 'if($A1:1 == "1");goto next;else;endif'
+        expected.to_xml()
+        e_xml = etree.tostring(expected.xml)
+
+        self.assertEqual(expected, result)
+        self.assertEqual(e_xml, r_xml)
+
+    def test_block_precode_value_error(self):
+        input_ = 'B B0\nPRE if($A1:1 == "1");goto next;endif'
+        survey = parse(input_)
+        self.assertRaises(ValueError, survey.to_xml)
+
+    def test_page_with_precode_to_xml(self):
+        input_ = 'P P0\nPRE if($A1:1 == "1");goto next;else;endif'
+
+        result = parse(input_)
+        result.to_xml()
+
+        expected = Survey()
+        expected.append(Block('Default'))
+        expected.childs[0].childs.append(Page('P0'))
+        expected.childs[0].childs[0].precode = 'if($A1:1 == "1");goto next;else;endif'
+        expected.to_xml()
+        r_xml = etree.tostring(result.xml)
+        e_xml = etree.tostring(expected.xml)
+
+        self.assertEqual(expected, result)
+        self.assertEqual(e_xml, r_xml)
+
+    def test_page_precode_value_error(self):
+        input_ = 'P P0\nPRE if($A1:1 == "1");goto next;endif'
+        survey = parse(input_)
+        self.assertRaises(ValueError, survey.to_xml)
+
+    # endregion
+
+    def test_control_open_xml(self):
+        line = "Q O Q1 COS"
+
+
+        survey = parse(line)
+        survey.to_xml()
+        expected = etree.fromstring('''<block id="Default" quoted="false" random="false" rotation="false">
+  <page id="Q1_p" hideBackButton="false">
+    <precode></precode>
+    <postcode></postcode>
+    <question id="Q1" name="">
+      <control_layout id="Q1.labelka" layout="default" style="">
+        <content>COS</content>
+      </control_layout>
+      <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/>
+    </question>
+  </page>
+</block>''')
+
+        print(etree.tostring(survey.xml, pretty_print=True))
+        b = Block('Default')
+
 
 if __name__ == "__main__":
     main()

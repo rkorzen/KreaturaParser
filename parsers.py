@@ -1,5 +1,5 @@
 import re
-import subprocess
+# import subprocess
 from elements import Block, Page, Question, Cafeteria
 
 
@@ -124,10 +124,10 @@ def cafeteria_parser(line):
     if caf.group(6):           # hide
         cafeteria.hide = caf.group(6)
 
-    if caf.group(7) == ' --so': # screen out
+    if caf.group(7) == ' --so':  # screen out
         cafeteria.screenout = True
 
-    if caf.group(7) == ' --gn': # goto next
+    if caf.group(7) == ' --gn':  # goto next
         cafeteria.gotonext = True
 
     return cafeteria

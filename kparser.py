@@ -1,6 +1,8 @@
 import re
 from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser
 from elements import Question, Survey
+# from lxml import etree
+
 
 def recognize(line):
     """text -> text
@@ -97,9 +99,10 @@ def clean_line(line):
     return line
 
 
-def print_tree(Survey):
+def print_tree(survey):
     """Wizualizuje drzewo elementow"""
     out = []
+
     def element_tree(element, level=0):
         out.append('\t'*level + element.id)
         if not element.childs:
@@ -108,7 +111,7 @@ def print_tree(Survey):
             for child in element.childs:
                 element_tree(child, level+1)
 
-    bloki = Survey.childs
+    bloki = survey.childs
     for blok in bloki:
         element_tree(blok)
 
@@ -133,7 +136,7 @@ def parse(text_input):
 
     """
 
-    survey = []
+    # survey = []
     survey = Survey()
 
     # ustawienia początkowe
@@ -179,13 +182,9 @@ def parse(text_input):
             # endregion
 
             b = block_parser(line)
-            if b.parent_id:    # jeśli blok ma rodzica, to ten blok dodać do tego rodzica, a powinien nim być current_block
-                survey.add_to_parent(b)
 
-                # if b.parent_id == current_block.id:
-                #     current_block.childs.append(b)
-                # else:
-                #     raise Exception("Rodzicem powinien być poprzedni blok?")
+            if b.parent_id:
+                survey.add_to_parent(b)
             else:
                 current_block = b
                 survey.append(current_block)
@@ -225,8 +224,7 @@ def parse(text_input):
             collect_statements = False
 
             # endregion
-            # print("current page", current_page)
-            # print("current element", current_element)
+
             current_question = question_parser(line)
 
             try:
@@ -278,30 +276,11 @@ def parse(text_input):
             nr odpowiedzi
 
             """
-            # print("question id", current_question.id)
-            # print("statement id", statement.id)
-            #
-            # print("current_page", current_page, current_page.postcode)
-            # print("current_question", current_question, current_question.postcode)
 
             if statement.screenout:
                 current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                        current_question.id, statement.id
+                    current_question.id, statement.id
                 )
-
-                # if current_page.postcode:
-                #     current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                #         current_question.id, statement.id
-                #     )
-                # else:
-                #     current_page.postcode = '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                #         current_question.id, statement.id
-                #     )
-
-            # print("current_page", current_page, current_page.postcode)
-            # print("current_question", current_question, current_question.postcode)
-
-
 
             if statement.gotonext:
                 current_page.postcode += '''if ({0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''
@@ -310,10 +289,6 @@ def parse(text_input):
                 current_question.statements.append(statement)
             else:
                 current_question.cafeteria.append(statement)
-
-
-
-
         # endregion
 
         # region switch
@@ -345,3 +320,18 @@ def parse(text_input):
         # endregion
     return survey
 
+# text = '''B B0
+# Q S Q1 A
+# 1 a
+#
+# Q S Q2 B
+# PRE if ($Q1:1 == "1");else;goto next;endif
+# '''
+# p = parse(text)
+# p.to_xml()
+# import sys
+# x = p.xml
+# print(x)
+# #x = etree.ElementTree(x)
+# with open('test.xml', 'wb') as f:
+#     f.write(etree.tostring(x, pretty_print=True))
