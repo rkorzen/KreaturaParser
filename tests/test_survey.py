@@ -41,5 +41,5 @@ class TestSurvey(TestCase):
         surv.append(Block('B1'))
         surv.childs[0].childs.append(Block('B2'))
         surv.to_xml()
-        xml_expc = etree.fromstring('<survey><block id="B1"><block id="B2"/></block></survey>')
+        xml_expc = etree.fromstring('<survey><block id="B1" name="" quoted="false" random="false" rotation="false"><block id="B2" name="" quoted="false" random="false" rotation="false"/></block></survey>')
         self.assertEqual(etree.tostring(surv.xml), etree.tostring(xml_expc))

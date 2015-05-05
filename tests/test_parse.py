@@ -694,26 +694,14 @@ endif"""
 
     def test_control_open_xml(self):
         line = "Q O Q1 COS"
-
-
         survey = parse(line)
         survey.to_xml()
-        expected = etree.fromstring('''<block id="Default" quoted="false" random="false" rotation="false">
-  <page id="Q1_p" hideBackButton="false">
-    <precode></precode>
-    <postcode></postcode>
-    <question id="Q1" name="">
-      <control_layout id="Q1.labelka" layout="default" style="">
-        <content>COS</content>
-      </control_layout>
-      <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/>
-    </question>
-  </page>
-</block>''')
-
-        print(etree.tostring(survey.xml, pretty_print=True))
-        b = Block('Default')
-
+        result = etree.tostring(survey.xml, pretty_print=True)
+        print(result)
+        expected = etree.fromstring('''<survey><block id="Default" quoted="false" random="false" rotation="false"><page id="Q1_p" hideBackButton="false"><precode/><question id="Q1" name=""><control_layout id="Q1.labelka" layout="default" style=""><content>COS</content></control_layout><control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/></question><postcode/></page></block></survey>''')
+        expected = str(etree.tostring(expected))
+        print(expected)
+        self.assertEqual(expected, result)
 
 if __name__ == "__main__":
     main()

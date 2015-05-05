@@ -16,11 +16,9 @@ class TestPage(TestCase):
         self.assertEqual('P1', p.id)
 
     def test_build_xml(self):
-        e_xml = etree.tostring(etree.fromstring('<page id="P1"><question id="Q1"></question></page>'))
+        e_xml = etree.tostring(etree.fromstring('<page id="P1" hideBackButton="false" name=""></page>'))
         p = Page('P1')
-        q = Question('Q1')
 
-        p.childs.append(q)
         p.to_xml()
 
         xml = etree.tostring(p.xml)

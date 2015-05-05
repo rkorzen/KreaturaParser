@@ -45,11 +45,11 @@ def find_by_id(parent, child_id):
                     return r
 
 
-def build_precode(precode):
-    """text -> xml: <precode>"""
+def build_precode(precode, tag):
+    """Designed to build precode, postcode or hide - elements with CDATA"""
 
     is_inside_if = False
-    prec = etree.Element('precode')
+    prec = etree.Element(tag)
 
     text = precode.split(';')
 

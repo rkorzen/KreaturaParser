@@ -278,9 +278,14 @@ def parse(text_input):
             """
 
             if statement.screenout:
-                current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                    current_question.id, statement.id
-                )
+                if current_page.postcode:
+                    current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                        current_question.id, statement.id
+                    )
+                else:
+                    current_page.postcode = '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                        current_question.id, statement.id
+                    )
 
             if statement.gotonext:
                 current_page.postcode += '''if ({0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''

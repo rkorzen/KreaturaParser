@@ -7,8 +7,10 @@ class SurveyElements():
 
     def __init__(self, id_):
         self.id = id_
-        self.precode = ''
-        self.postcode = ''
+        #self.precode = ''
+        self.precode = False
+        #self.postcode = ''
+        self.postcode = False
         self.rotation = False
         self.random = False
         self.hide = False
@@ -41,9 +43,10 @@ class SurveyElements():
                 )
 
     def set_precode(self):
+        """Set precode of element"""
         if self.precode:  # jeśli element ma precode
             try:
-                prec = build_precode(self.precode)
+                prec = build_precode(self.precode, 'precode')
                 self.xml.append(prec)
 
             except ValueError as e:
@@ -90,10 +93,31 @@ class Survey():
 
 class Block(SurveyElements):
     """Block element."""
+
+    def __init__(self, id_):
+        SurveyElements.__init__(self, id_)
+        self.quoted = False
+
     def to_xml(self):
         """xml representation of Block element"""
         self.xml = etree.Element('block')
         self.xml.set('id', self.id)
+        self.xml.set('name', '')
+
+        if self.quoted:
+            self.xml.set('quoted', 'true')
+        else:
+            self.xml.set('quoted', 'false')
+
+        if self.random:
+            self.xml.set('random', 'true')
+        else:
+            self.xml.set('random', 'false')
+
+        if self.rotation:
+            self.xml.set('rotation', 'true')
+        else:
+            self.xml.set('rotation', 'false')
 
         self.set_precode()  # SurveyElements method
 
@@ -104,10 +128,22 @@ class Block(SurveyElements):
 
 class Page(SurveyElements):
     """Page element."""
+
+    def __init__(self, id_):
+        SurveyElements.__init__(self, id_)
+        self.hideBackButton = False
+
     def to_xml(self):
         """xml representation of Page element"""
         self.xml = etree.Element('page')
         self.xml.set('id', self.id)
+
+        if self.hideBackButton:
+            self.xml.set('hideBackButton', 'true')
+        else:
+            self.xml.set('hideBackButton', 'false')
+
+        self.xml.set('name', '')
 
         self.set_precode()  # SurveyElements method
 
@@ -124,17 +160,20 @@ class Question(SurveyElements):
         # TODO: tutaj duużo do zrobienia - wszystkie typy
         self.xml = etree.Element('question')
         self.xml.set('id', self.id)
-
+        self.xml.set('name', '')
         if self.typ is "O":
             if self.cafeteria:
                 for caf in self.cafeteria:
                     pass
             else:
+                layout = ControlLaout(self.id+'_txt')
+                open_ = ControlOpen(self.id)
 
-                control = ControlOpen(self.id)
-                control.to_xml()
+                layout.to_xml()
+                open_.to_xml()
 
-                self.xml.append(control.xml)
+                self.xml.append(layout.xml)
+                self.xml.append(open_.xml)
 
 
 class Control():
@@ -142,6 +181,13 @@ class Control():
         self.id = id
         self.xml = False
         self.tag = None
+        self.layout = False
+        self.style = False
+
+        if 'require' in kwargs:
+            self.require = kwargs['require']
+        else:
+            self.require = "true"
 
         if 'hide' in kwargs:
             self.hide = kwargs['hide']
@@ -170,7 +216,17 @@ class Control():
         # el_control.attrib['require'] = self.require
         # el_control.attrib['results'] = self.results
         # el_control.attrib['rotation'] = self.rotation
-        # el_control.attrib['style'] = self.style
+
+        if self.layout:
+            self.xml.attrib['layout'] = self.layout
+            self.xml.set('layout', self.layout)
+        else:
+            self.xml.set('layout', 'default')
+        if self.style:
+            self.xml.set('style', self.style)
+        else:
+            self.xml.set('style', '')
+
         # el_control.attrib['name'] = self.name
 
 
@@ -178,9 +234,19 @@ class ControlLaout(Control):
     def __init__(self, id_, **kwargs):
         Control.__init__(self, id_,**kwargs)
         self.tag = 'control_layout'
-
+        if 'content' in kwargs:
+            self.content = kwargs['content']
+        else:
+            self.content = False
     def to_xml(self):
+        Control.to_xml(self)
         self.xml.attrib['id']
+
+        content = etree.Element('content')
+        if self.content:
+            content.text = self.content
+
+        self.xml.append(content)
 
 
 
@@ -192,6 +258,9 @@ class ControlOpen(Control):
         if 'content' in kwargs:
             self.content = kwargs['content']
             self.name = self.id + ' | ' + self.content
+        else:
+            self.name = self.id
+            self.content = False
 
         if 'require' in kwargs:
             self.require = kwargs['require']
@@ -211,11 +280,45 @@ class ControlOpen(Control):
             self.length = '25'
             self.line = '1'
 
+        if 'mask' in kwargs:
+            self.mask = kwargs['mask']
+        else:
+            self.mask = '.*'
+
+        if 'results' in kwargs:
+            self.results = kwargs['results']
+        else:
+            self.results = 'true'
+
+        if 'style' in kwargs:
+            self.style = kwargs['style']
+        else:
+            self.style = ''
+
+
+
+
     # <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/>
     def to_xml(self):
-        control = etree.Element(self.tag)
-        control.attrib['id'] = self.id
-        self.xml = control
+        self.xml = etree.Element(self.tag)
+        self.xml.set('id', self.id)
+        self.xml.set('length', self.length)
+        self.xml.set('lines', self.line)
+        self.xml.set('mask', self.mask)
+        self.xml.set('name', self.name)
+        self.xml.set('require', self.require)
+        self.xml.set('results', self.results)
+        #self.xml.set('rotation', self.rotation)
+        self.xml.set('style', self.style)
+
+
+        content = etree.Element('content')
+        if self.content:
+            content.text = self.content
+            print(content.text)
+
+        self.xml.append(content)
+
 
 class Cafeteria():
     """List element - to np cafeteria, statements"""

@@ -15,7 +15,7 @@ class TestBlock(TestCase):
         self.assertEqual('B1', b.id)
 
     def test_build_xml(self):
-        e_xml = etree.tostring(etree.fromstring('<block id="B1"><block id="B2"></block></block>'))
+        e_xml = etree.tostring(etree.fromstring('<block id="B1" name="" quoted="false" random="false" rotation="false"><block id="B2" name="" quoted="false" random="false" rotation="false"></block></block>'))
         b1 = Block('B1')
         b2 = Block('B2')
         b1.childs.append(b2)

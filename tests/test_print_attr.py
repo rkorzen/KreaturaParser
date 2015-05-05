@@ -25,7 +25,7 @@ class TestPrintAttr(TestCase):
         result = show_attr(b)
         expected = sorted('''statements = []
 rotation = False
-postcode = 
+postcode = False
 random = False
 childs = []
 typ = False
@@ -33,11 +33,12 @@ cafeteria = []
 hide = False
 dontknow = False
 id = B0
-precode = 
+precode = False
 size = []
 parent_id = False
 content = False
-xml = False'''.splitlines())
+xml = False
+quoted = False'''.splitlines())
         self.assertEqual(expected, result)
 
 
