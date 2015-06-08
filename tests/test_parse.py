@@ -5,9 +5,17 @@ from elements import Block, Page, Question, Cafeteria, Survey
 # from tools import show_attr, find_by_id
 
 from lxml import etree
+from doctest import Example
+from lxml.doctestcompare import LXMLOutputChecker
 
 
 class TestParse(TestCase):
+
+    def assertXmlEqual(self, got, want):
+        checker = LXMLOutputChecker()
+        if not checker.check_output(want, got, 0):
+            message = checker.output_difference(Example("", want), got, 0)
+            raise AssertionError(message)
 
     # region block tests
     def test_block(self):
@@ -692,16 +700,24 @@ endif"""
 
     # endregion
 
+
+
     def test_control_open_xml(self):
         line = "Q O Q1 COS"
         survey = parse(line)
         survey.to_xml()
-        result = etree.tostring(survey.xml, pretty_print=True)
-        print(result)
-        expected = etree.fromstring('''<survey><block id="Default" quoted="false" random="false" rotation="false"><page id="Q1_p" hideBackButton="false"><precode/><question id="Q1" name=""><control_layout id="Q1.labelka" layout="default" style=""><content>COS</content></control_layout><control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/></question><postcode/></page></block></survey>''')
-        expected = str(etree.tostring(expected))
-        print(expected)
-        self.assertEqual(expected, result)
+        # result = etree.tostring(survey.xml, pretty_print=True)
+        # print(result)
+        # expected = etree.fromstring('''<survey><block id="Default" quoted="false" random="false" rotation="false"><page id="Q1_p" hideBackButton="false"><precode/><question id="Q1" name=""><control_layout id="Q1.labelka" layout="default" style=""><content>COS</content></control_layout><control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/></question><postcode/></page></block></survey>''')
+        # expected = str(etree.tostring(expected, pretty_print=True))
+        # print(expected)
+        got = survey.xml
+        want = etree.fromstring('''<survey><block id="Default" quoted="false" random="false" rotation="false"><page id="Q1_p" hideBackButton="false"><precode/><question id="Q1" name=""><control_layout id="Q1.labelka" layout="default" style=""><content>COS</content></control_layout><control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/></question><postcode/></page></block></survey>''')
+        print(type(got), type(want))
+        # got = etree.tostring(got)
+        # want = etree.tostring(want)
+
+        self.assertXmlEqual(got, want)
 
 if __name__ == "__main__":
     main()

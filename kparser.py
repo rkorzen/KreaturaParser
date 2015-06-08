@@ -1,3 +1,14 @@
+"""
+Author: Rafał Korzeniewski
+Mail: korzeniewski@gmail.com
+
+Main module for Kreatura Parser Project.
+
+The main function is parse
+
+"""
+
+
 import re
 from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser
 from elements import Question, Survey
@@ -127,9 +138,9 @@ def parse(text_input):
     Główny parser.
 
     Parser ma zadania:
-        1. rozpoznać struktury
-        2. zapisać je do słownika struktur
-        3. zapisuje relacje pomiedzy strukturami
+        1. Sprawdza, czy w wejściu są bloki programu i jeśli tak to wykonuje je.
+        2. Dzieli wejście na linie i dla każdej linii sprawdza co to jest a następnie woła odpowiedni parser
+        3. Dodaje obiekty do ich rodziców. Jeśli trzeba to tworzy rodzica
 
     Struktury to: bloki, strony, pytania
 
