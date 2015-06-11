@@ -1,6 +1,18 @@
 from lxml import etree
 from tools import build_precode, find_parent
 
+import datetime
+
+
+def unix_time(dt):
+
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    delta = dt - epoch
+
+    return delta.total_seconds()
+
+def unix_creatiom_time(dt):
+    return int(unix_time(dt) * 1000)
 
 class SurveyElements():
     """Base of survey structures/elements"""
@@ -62,6 +74,7 @@ class Survey():
     def __init__(self):
         self.childs = []
         self.id = False   # just for a case... and for find_by_id function
+        self.createtime = unix_creatiom_time(datetime.datetime.now())
 
     def __eq__(self, other):
         return self.childs == other.childs and self.id == other.id
@@ -86,6 +99,16 @@ class Survey():
         """survey xml"""
         # TODO: opcjonalnie - procedury, zmienne
         self.xml = etree.Element('survey')
+        self.xml.set('createtime', str(self.createtime))
+        self.xml.set('creator', "CHANGEIT")
+        self.xml.set('exitpage', "")
+        self.xml.set('layoutid', "ShadesOfGray")
+        self.xml.set('localeCode', "pl")
+        self.xml.set('name', "CHANGEIT")
+        self.xml.set('sensitive', "false")
+        self.xml.set('showbar', "false")
+        self.xml.set('time', "60000")
+        self.xml.set('SMSComp',"false")
         for child in self.childs:
             child.to_xml()
             self.xml.append(child.xml)

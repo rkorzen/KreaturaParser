@@ -11,8 +11,6 @@ class TestControlOpen(TestCase):
         c.to_xml()
         result = str(etree.tostring(c.xml, pretty_print=True))
         expected = etree.fromstring('''<control_open id="Q1" length="25" lines="1" mask=".*" name="Q1"
-require="true" results="true" style="">
-<content/>
-</control_open>''')
+require="true" results="true" style=""><content/></control_open>''')
         expected = str(etree.tostring(expected, pretty_print=True))
         self.assertEqual(expected, result)

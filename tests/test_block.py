@@ -1,10 +1,11 @@
-from unittest import TestCase
+# from unittest import TestCase
+from tests.testing_tools import KreaturaTestCase
 from elements import Block
 from lxml import etree
 __author__ = 'KorzeniewskiR'
 
 
-class TestBlock(TestCase):
+class TestBlock(KreaturaTestCase):
 
     def test_class_exist(self):
         b = Block('B1')
