@@ -6,17 +6,10 @@ from elements import Block, Page, Question, Cafeteria, Survey
 
 from lxml import etree
 from doctest import Example
-from lxml.doctestcompare import LXMLOutputChecker
+from tests.testing_tools import KreaturaTestCase
 
 
-class TestParse(TestCase):
-
-    def assertXmlEqual(self, got, want):
-        checker = LXMLOutputChecker()
-        if not checker.check_output(want, got, 4096):
-
-            message = checker.output_difference(Example("", want), got, 4096)
-            raise AssertionError(message)
+class TestParse(KreaturaTestCase):
 
     # region block tests
     def test_block(self):
@@ -690,9 +683,13 @@ endif"""
         expected.to_xml()
         r_xml = etree.tostring(result.xml)
         e_xml = etree.tostring(expected.xml)
+        print(r_xml, e_xml)
+        # r_xml = result.xml
+        # e_xml = expected.xml
 
         self.assertEqual(expected, result)
-        self.assertEqual(e_xml, r_xml)
+        # self.assertEqual(e_xml, r_xml)
+        self.assertXmlEqual(e_xml, r_xml)
 
     def test_page_precode_value_error(self):
         input_ = 'P P0\nPRE if($A1:1 == "1");goto next;endif'
