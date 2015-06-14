@@ -184,18 +184,33 @@ class Question(SurveyElements):
         self.xml = etree.Element('question')
         self.xml.set('id', self.id)
         self.xml.set('name', '')
+
+        # kontrolka z open
         if self.typ is "O":
+            # dodaję kontrolkę tekstową z pytaniem
+            layout = ControlLaout(self.id+'.labelka')
+            layout.content = self.content
+            layout.to_xml()
+            self.xml.append(layout.xml)
+
+            # dodaję kontrolkę/kontrolki open
             if self.cafeteria:
-                for caf in self.cafeteria:
-                    pass
+                for nr, caf in enumerate(self.cafeteria):
+                    if not caf.id:
+                        id_suf = '_' + str(nr+1)
+                    else:
+                        id_suf = '_' + str(caf.id)
+
+                    open_ = ControlOpen(self.id + id_suf)
+                    open_.name = self.id + id_suf + ' | ' + caf.content
+                    open_.to_xml()
+                    self.xml.append(open_.xml)
+
             else:
-                layout = ControlLaout(self.id+'_txt')
+
                 open_ = ControlOpen(self.id)
-
-                layout.to_xml()
+                open_.name = self.id + ' | ' + self.content
                 open_.to_xml()
-
-                self.xml.append(layout.xml)
                 self.xml.append(open_.xml)
 
 
@@ -261,6 +276,7 @@ class ControlLaout(Control):
             self.content = kwargs['content']
         else:
             self.content = False
+
     def to_xml(self):
         Control.to_xml(self)
         self.xml.attrib['id']
@@ -272,17 +288,15 @@ class ControlLaout(Control):
         self.xml.append(content)
 
 
-
-
 class ControlOpen(Control):
     def __init__(self, id, **kwargs):
         Control.__init__(self, id, **kwargs)
         self.tag = 'control_open'
         if 'content' in kwargs:
             self.content = kwargs['content']
-            self.name = self.id + ' | ' + self.content
+            # self.name = self.id + ' | ' + self.content
         else:
-            self.name = self.id
+            # self.name = self.id
             self.content = False
 
         if 'require' in kwargs:
@@ -298,10 +312,10 @@ class ControlOpen(Control):
             s = kwargs['size']
             s = s.split('_')
             self.length = s[0]
-            self.line = s[1]
+            self.lines = s[1]
         else:
             self.length = '25'
-            self.line = '1'
+            self.lines = '1'
 
         if 'mask' in kwargs:
             self.mask = kwargs['mask']
@@ -318,15 +332,17 @@ class ControlOpen(Control):
         else:
             self.style = ''
 
-
-
+        if 'name' in kwargs:
+            self.name = kwargs['name']
+        else:
+            self.name = self.id
 
     # <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/>
     def to_xml(self):
         self.xml = etree.Element(self.tag)
         self.xml.set('id', self.id)
         self.xml.set('length', self.length)
-        self.xml.set('lines', self.line)
+        self.xml.set('lines', self.lines)
         self.xml.set('mask', self.mask)
         self.xml.set('name', self.name)
         self.xml.set('require', self.require)
@@ -334,11 +350,9 @@ class ControlOpen(Control):
         #self.xml.set('rotation', self.rotation)
         self.xml.set('style', self.style)
 
-
         content = etree.Element('content')
         if self.content:
             content.text = self.content
-            print(content.text)
 
         self.xml.append(content)
 
@@ -364,6 +378,9 @@ class Cafeteria():
                self.screenout == other.screenout and
                self.gotonext == other.gotonext
                )
+
+    def __repr__(self):
+        return str(self.id) + ',' + self.content
 
     def to_xml(self):
         pass
