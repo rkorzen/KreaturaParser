@@ -22,7 +22,7 @@ class SurveyElements():
         #self.precode = ''
         self.precode = False
         #self.postcode = ''
-        self.postcode = False
+        self.postcode = ""
         self.rotation = False
         self.random = False
         self.hide = False
@@ -113,6 +113,19 @@ class Survey():
             child.to_xml()
             self.xml.append(child.xml)
 
+        vars = etree.Element('vars')
+        self.xml.append(vars)
+
+        procedures = etree.Element('procedures')
+        procedure = etree.Element('procedure')
+        procedure.set('id', 'PROC')
+        procedure.set('shortdesc', '')
+        procedures.append(procedure)
+
+
+        self.xml.append(procedures)
+
+
 
 class Block(SurveyElements):
     """Block element."""
@@ -156,8 +169,10 @@ class Page(SurveyElements):
         SurveyElements.__init__(self, id_)
         self.hideBackButton = False
 
+
     def to_xml(self):
         """xml representation of Page element"""
+        self.postcode = ""
         self.xml = etree.Element('page')
         self.xml.set('id', self.id)
 
@@ -171,21 +186,50 @@ class Page(SurveyElements):
         self.set_precode()  # SurveyElements method
 
         for child in self.childs:
+
+            child.postocde = self.postcode
             child.to_xml()
+
+            self.postcode = child.postcode
             self.xml.append(child.xml)
 
+        if self.postcode:
+            print("tututut")
+            postcode = etree.Element('postcode')
+            postcode.text = etree.CDATA(self.postcode)
+            self.xml.append(postcode)
 
 class Question(SurveyElements):
     """Question"""
     def to_xml(self):
         """xml representation of Question element"""
-
+        print(self.postcode)
         # TODO: tutaj duużo do zrobienia - wszystkie typy
         self.xml = etree.Element('question')
         self.xml.set('id', self.id)
         self.xml.set('name', '')
 
-        # kontrolka z open
+        # region control_layout
+        if self.typ is "L":
+            layout = ControlLaout(self.id + '.labelka')
+            layout.content = self.content
+            layout.to_xml()
+            self.xml.append(layout.xml)
+
+            if self.cafeteria:
+                for nr, caf in enumerate(self.cafeteria):
+                    if not caf.id:
+                        id_suf = '_' + str(nr+1)
+                    else:
+                        id_suf = '_' + str(caf.id)
+                    layout_ = ControlLaout(self.id + id_suf + '_txt')
+                    layout_.content = caf.content
+                    layout_.to_xml()
+                    self.xml.append(layout_.xml)
+
+        # endregion
+
+        # region control_open
         if self.typ is "O":
             # dodaję kontrolkę tekstową z pytaniem
             layout = ControlLaout(self.id+'.labelka')
@@ -203,15 +247,51 @@ class Question(SurveyElements):
 
                     open_ = ControlOpen(self.id + id_suf)
                     open_.name = self.id + id_suf + ' | ' + caf.content
+                    if self.size:
+                        open_.size = self.size
                     open_.to_xml()
                     self.xml.append(open_.xml)
-
             else:
-
                 open_ = ControlOpen(self.id)
                 open_.name = self.id + ' | ' + self.content
+                if self.size:
+                    open_.size = self.size
                 open_.to_xml()
                 self.xml.append(open_.xml)
+        # endregion
+
+        # region control_single
+        if self.typ == "S":
+            layout = ControlLaout(self.id + '.labelka')
+            layout.content = self.content
+            layout.to_xml()
+
+            self.xml.append(layout.xml)
+
+            single = ControlSingle(self.id)
+            single.cafeteria = self.cafeteria
+            single.content = self.content
+            single.postcode = self.postcode
+            single.to_xml()
+
+            self.xml.append(single.xml)
+        # endregion
+
+        # region control_multi
+        if self.typ == "M":
+            layout = ControlLaout(self.id + '.labelka')
+            layout.content = self.content
+            layout.to_xml()
+
+            self.xml.append(layout.xml)
+
+            single = ControlMulti(self.id)
+            single.cafeteria = self.cafeteria
+            single.content = self.content
+            single.to_xml()
+
+            self.xml.append(single.xml)
+        # endregion
 
 
 class Control():
@@ -241,7 +321,6 @@ class Control():
             self.random = kwargs['randomize']
         else:
             self.random = 'false'
-
 
     def to_xml(self):
         self.xml = etree.Element(self.tag)
@@ -292,57 +371,27 @@ class ControlOpen(Control):
     def __init__(self, id, **kwargs):
         Control.__init__(self, id, **kwargs)
         self.tag = 'control_open'
-        if 'content' in kwargs:
-            self.content = kwargs['content']
-            # self.name = self.id + ' | ' + self.content
-        else:
-            # self.name = self.id
-            self.content = False
 
-        if 'require' in kwargs:
-            self.require = kwargs['require']
-            if self.require:
-                self.require = 'true'
-            else:
-                self.require = 'false'
-        else:
-            self.require = 'true'
+        # default values:
+        self.content = False
+        self.require = 'true'
+        self.size = ['25', '1']
+        self.mask = '.*'
+        self.results = 'true'
+        self.style = ''
+        self.name = self.id
 
-        if 'size' in kwargs:
-            s = kwargs['size']
-            s = s.split('_')
-            self.length = s[0]
-            self.lines = s[1]
-        else:
-            self.length = '25'
-            self.lines = '1'
+        # wartości nadpisane
+        for key in kwargs:
+            if kwargs[key]:
+                setattr(self, key, kwargs[key])
 
-        if 'mask' in kwargs:
-            self.mask = kwargs['mask']
-        else:
-            self.mask = '.*'
-
-        if 'results' in kwargs:
-            self.results = kwargs['results']
-        else:
-            self.results = 'true'
-
-        if 'style' in kwargs:
-            self.style = kwargs['style']
-        else:
-            self.style = ''
-
-        if 'name' in kwargs:
-            self.name = kwargs['name']
-        else:
-            self.name = self.id
-
-    # <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/>
     def to_xml(self):
+        # example: <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/>
         self.xml = etree.Element(self.tag)
         self.xml.set('id', self.id)
-        self.xml.set('length', self.length)
-        self.xml.set('lines', self.lines)
+        self.xml.set('length', self.size[0])
+        self.xml.set('lines', self.size[1])
         self.xml.set('mask', self.mask)
         self.xml.set('name', self.name)
         self.xml.set('require', self.require)
@@ -357,10 +406,78 @@ class ControlOpen(Control):
         self.xml.append(content)
 
 
+class ControlSingle(Control):
+    # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false" require="true" results="true" rotation="false" style="">
+    def __init__(self, id_, **kwargs):
+        self.id = id_
+        self.tag = 'control_single'
+
+        # wartosci domyślne:
+        self.cafeteria = None
+        self.content = ""
+        self.itemlimit = "0"
+        self.layout = 'vertical'
+
+        self.random = "false"
+        self.rotation = "false"
+        self.style = ""
+        self.require = "true"
+        self.results = "true"
+
+        # wartości nadpisane
+        for key in kwargs:
+            if kwargs[key]:
+                print('ustawiam', key, kwargs[key])
+                setattr(self, key, kwargs[key])
+
+    def to_xml(self):
+        self.xml = etree.Element(self.tag)
+        self.xml.set('id', self.id)
+        self.xml.set('itemlimit', self.itemlimit)
+        self.xml.set('layout', self.layout)
+        self.xml.set('name', self.id + ' | ' + self.content)
+        self.xml.set('random', self.random)
+        self.xml.set('require', self.require)
+        self.xml.set('results', self.results)
+        self.xml.set('rotation', self.rotation)
+        self.xml.set('style', self.style)
+
+        """Sprawdzenie, czy ma kafeterię zostawiam tutaj. Nie chcę tego robić w init
+        ponieważ dopuszczam różne możliwości ustawiania atrybutu:
+          + poprzez kwargs
+          + poprzez bezpośrednie odwołania
+        """
+        if not self.cafeteria:
+            raise ValueError("Brak kafeterii w pytaniu: ", self.id)
+
+        for caf in self.cafeteria:
+            list_item = Cafeteria()
+            list_item.id = caf.id
+            list_item.content = caf.content
+            list_item.to_xml()
+
+            self.xml.append(list_item.xml)
+            if caf.screenout:
+                self.postcode = self.postcode + """
+if (${0}:{1} == "1")
+#OUT = "1"
+goto KONKURS
+else
+endif
+""".format(self.id, caf.id)
+
+class ControlMulti(ControlSingle):
+    # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false" require="true" results="true" rotation="false" style="">
+    def __init__(self, id_, **kwargs):
+        ControlSingle.__init__(self, id_, **kwargs)
+        self.tag = 'control_multi'
+
+
 class Cafeteria():
     """List element - to np cafeteria, statements"""
 
     def __init__(self):
+        self.tag = 'list_item'
         self.id = None
         self.content = ""
         self.hide = None
@@ -383,6 +500,12 @@ class Cafeteria():
         return str(self.id) + ',' + self.content
 
     def to_xml(self):
-        pass
+        self.xml = etree.Element('list_item')
+        self.xml.set('id', self.id)
+        self.xml.set('name', "")
+        self.xml.set('style', "")
+        content = etree.Element('content')
+        content.text = self.content
+        self.xml.append(content)
 
 

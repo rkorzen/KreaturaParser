@@ -1,11 +1,7 @@
-from unittest import TestCase, main
-
+from unittest import main
 from kparser import parse
 from elements import Block, Page, Question, Cafeteria, Survey
-# from tools import show_attr, find_by_id
-
 from lxml import etree
-from doctest import Example
 from tests.testing_tools import KreaturaTestCase
 
 
@@ -648,7 +644,8 @@ endif"""
         self.assertEqual(survey, result)
     # endregion
 
-    # region to xml
+
+class TestParseToXmlBlock(KreaturaTestCase):
     def test_block_with_precode_to_xml(self):
         input_ = 'B B0\nPRE if($A1:1 == "1");goto next;else;endif'
 
@@ -671,6 +668,8 @@ endif"""
         survey = parse(input_)
         self.assertRaises(ValueError, survey.to_xml)
 
+
+class TestParseToXmlPage(KreaturaTestCase):
     def test_page_with_precode_to_xml(self):
         input_ = 'P P0\nPRE if($A1:1 == "1");goto next;else;endif'
 
@@ -695,8 +694,8 @@ endif"""
         survey = parse(input_)
         self.assertRaises(ValueError, survey.to_xml)
 
-    # endregion
 
+class TestParseToXmlOpen(KreaturaTestCase):
     def test_control_open_xml(self):
         line = "Q O Q1 COS"
         survey = parse(line)
@@ -740,6 +739,11 @@ endif"""
                                        </question>
                                  </page>
                           </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
@@ -800,6 +804,11 @@ endif"""
                                        </question>
                                  </page>
                           </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
@@ -860,10 +869,333 @@ B"""
                                        </question>
                                  </page>
                           </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_control_open_size(self):
+        line = "Q O90_4 Q1 COS"
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_open id="Q1"
+                                                               length="90"
+                                                               lines="4"
+                                                               mask=".*"
+                                                               require="true"
+                                                               results="true"
+                                                               style=""
+                                                               name="Q1 | COS">
+                                                               <content></content>
+                                                 </control_open>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
 
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+class TestParseToXmlControlLayout(KreaturaTestCase):
+    def test_control_layout_xml(self):
+        line = "Q L Q1 COS"
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_controls_layout_xml(self):
+        line = """Q L Q1 COS
+A
+B"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_layout id="Q1_1_txt"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>A</content>
+                                                 </control_layout>
+                                                 <control_layout id="Q1_2_txt"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>B</content>
+                                                 </control_layout>
+
+
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+class TestParseToXmlControlSingle(KreaturaTestCase):
+    def test_control_single_xml(self):
+        line = """Q S Q1 COS
+A"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_control_single_xml_screenout(self):
+        line = """Q S Q1 COS
+A --so"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 <postcode>
+<![CDATA[if ($Q1:1 == "1")
+  #OUT = "1"
+  goto KONKURS
+else
+endif]]></postcode>
+                                 </page>
+                          </block>
+                        <vars/>
+                        <procedures>
+                        <procedure id="PROC" shortdesc=""/>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+class TestParseToXmlControlMulti(KreaturaTestCase):
+    def test_control_multi_xml(self):
+        line = """Q M Q1 COS
+A"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_multi id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_multi>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
 
 
 if __name__ == "__main__":

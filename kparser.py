@@ -7,9 +7,8 @@ Main module for Kreatura Parser Project.
 The main function is parse
 
 """
-
-
 import re
+from lxml import etree
 from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser
 from elements import Question, Survey
 # from lxml import etree
@@ -271,7 +270,6 @@ def parse(text_input):
                albo dla kafeterii stwierdzen (statements), jeśli akurat je zbieramy.
 
                To jest potrzebne do wyliczania filtrow screenout i gotonext
-
             """
             if not statement.id:
                 if not collect_statements:
@@ -334,20 +332,23 @@ def parse(text_input):
             collect_statements = False
             # current_page = None
         # endregion
+
     return survey
 
-# text = '''B B0
-# Q S Q1 A
-# 1 a
-#
-# Q S Q2 B
-# PRE if ($Q1:1 == "1");else;goto next;endif
-# '''
-# p = parse(text)
-# p.to_xml()
-# import sys
-# x = p.xml
-# print(x)
-# #x = etree.ElementTree(x)
-# with open('test.xml', 'wb') as f:
-#     f.write(etree.tostring(x, pretty_print=True))
+text = '''B B0
+Q S Q1 A
+1 a
+2 b
+
+Q S Q2 B
+1 a --hide:$Q1{0} == "1"
+2 b
+'''
+p = parse(text)
+p.to_xml()
+import sys
+x = p.xml
+
+#x = etree.ElementTree(x)
+with open('test.xml', 'wb') as f:
+    f.write(etree.tostring(x, pretty_print=True))

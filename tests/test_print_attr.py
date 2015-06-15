@@ -23,9 +23,27 @@ class TestPrintAttr(TestCase):
         survey = parse(input_)
         b = survey.childs[0]
         result = show_attr(b)
+#          expected = sorted('''statements = []
+# rotation = False
+# postcode = False
+# random = False
+# childs = []
+# typ = False
+# cafeteria = []
+# hide = False
+# dontknow = False
+# id = B0
+# precode = False
+# size = []
+# parent_id = False
+# content = False
+# xml = False
+# quoted = False'''.splitlines())
+
+        # zmiana postcode - z false na ""
         expected = sorted('''statements = []
 rotation = False
-postcode = False
+postcode = '
 random = False
 childs = []
 typ = False
@@ -39,6 +57,7 @@ parent_id = False
 content = False
 xml = False
 quoted = False'''.splitlines())
+
         self.assertEqual(expected, result)
 
 

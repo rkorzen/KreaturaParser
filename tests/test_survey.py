@@ -51,7 +51,12 @@ class TestSurvey(KreaturaTestCase):
                            name="CHANGEIT"
                            sensitive="false"
                            showbar="false"
-                           time="60000"></survey>'''.format(epoch_time))
+                           time="60000">
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+                   </survey>'''.format(epoch_time))
 
         self.assertXmlEqual(got, want)
 
@@ -81,6 +86,11 @@ class TestSurvey(KreaturaTestCase):
                            time="60000">
                            <block id="B1" name="" quoted="false" random="false" rotation="false">
                            <block id="B2" name="" quoted="false" random="false" rotation="false"/>
-                           </block></survey>'''.format(epoch_time))
+                           </block>
+                           <vars></vars>
+                           <procedures>
+                            <procedure id="PROC" shortdesc=""></procedure>
+                           </procedures>
+</survey>'''.format(epoch_time))
         self.assertXmlEqual(etree.tostring(surv.xml), etree.tostring(xml_expc))
 
