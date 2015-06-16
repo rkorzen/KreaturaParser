@@ -640,6 +640,8 @@ endif"""
         survey = Survey()
         survey.append(b)
         result = parse(input_)
+        print(result.childs[0].childs[0].postcode)
+        print(result.childs[0].childs[0].postcode)
 
         self.assertEqual(survey, result)
     # endregion
@@ -928,6 +930,7 @@ B"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+
 class TestParseToXmlControlLayout(KreaturaTestCase):
     def test_control_layout_xml(self):
         line = "Q L Q1 COS"
@@ -1024,6 +1027,7 @@ B"""
 
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
+
 
 class TestParseToXmlControlSingle(KreaturaTestCase):
     def test_control_single_xml(self):
@@ -1128,8 +1132,8 @@ A --so"""
                                        </question>
                                  <postcode>
 <![CDATA[if ($Q1:1 == "1")
-  #OUT = "1"
-  goto KONKURS
+#OUT = "1"
+goto KONKURS
 else
 endif]]></postcode>
                                  </page>
@@ -1140,6 +1144,201 @@ endif]]></postcode>
                         </procedures>
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
+
+    def test_control_single_xml_goto_next(self):
+        line = """Q S Q1 COS
+A --gn
+
+Q S Q2 COS
+A"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+                                 <page id="Q2_p"
+                                       hideBackButton="false"
+                                       name="">
+<precode>
+<![CDATA[if ($Q1:1 == "1")
+    goto next
+else
+endif]]>
+</precode>
+                                       <question id="Q2"
+                                                 name="">
+                                                 <control_layout id="Q2.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q2"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q2 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+
+                          </block>
+                        <vars/>
+                        <procedures>
+                        <procedure id="PROC" shortdesc=""/>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_control_single_xml_2_goto_next(self):
+        line = """Q S Q1 COS
+A --gn
+B --so
+
+Q S Q2 COS
+A"""
+
+        line = """Q S Q1 COS
+A --gn
+B --so"""
+
+
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                                 <list_item id="2" name="" style="">
+                                                                    <content>B</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+                                 <page id="Q2_p"
+                                       hideBackButton="false"
+                                       name="">
+<precode>
+<![CDATA[if ($Q1:1 == "1")
+    goto next
+else
+endif
+
+if ($Q1:2 == "1")
+    goto next
+else
+endif]]>
+</precode>
+                                       <question id="Q2"
+                                                 name="">
+                                                 <control_layout id="Q2.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q2"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q2 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+
+                          </block>
+                        <vars/>
+                        <procedures>
+                        <procedure id="PROC" shortdesc=""/>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+
 
 class TestParseToXmlControlMulti(KreaturaTestCase):
     def test_control_multi_xml(self):

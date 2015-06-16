@@ -126,7 +126,6 @@ class Survey():
         self.xml.append(procedures)
 
 
-
 class Block(SurveyElements):
     """Block element."""
 
@@ -139,21 +138,18 @@ class Block(SurveyElements):
         self.xml = etree.Element('block')
         self.xml.set('id', self.id)
         self.xml.set('name', '')
+        self.xml.set('quoted', 'false')
+        self.xml.set('random', 'false')
+        self.xml.set('rotation', 'false')
 
         if self.quoted:
             self.xml.set('quoted', 'true')
-        else:
-            self.xml.set('quoted', 'false')
 
         if self.random:
             self.xml.set('random', 'true')
-        else:
-            self.xml.set('random', 'false')
 
         if self.rotation:
             self.xml.set('rotation', 'true')
-        else:
-            self.xml.set('rotation', 'false')
 
         self.set_precode()  # SurveyElements method
 
@@ -168,42 +164,50 @@ class Page(SurveyElements):
     def __init__(self, id_):
         SurveyElements.__init__(self, id_)
         self.hideBackButton = False
-
+        # self.postcode = ""
 
     def to_xml(self):
         """xml representation of Page element"""
-        self.postcode = ""
+        # self.postcode = ""
         self.xml = etree.Element('page')
         self.xml.set('id', self.id)
-
+        self.xml.set('hideBackButton', 'false')
+        self.xml.set('name', '')
+        # print(self.precode)
         if self.hideBackButton:
             self.xml.set('hideBackButton', 'true')
-        else:
-            self.xml.set('hideBackButton', 'false')
-
-        self.xml.set('name', '')
 
         self.set_precode()  # SurveyElements method
 
         for child in self.childs:
-
+            # ustawiam postcode dziecka na to co mamy
             child.postocde = self.postcode
+
+            # metoda xml tworzy atrybut xml z odpowiednią zawartoscia
+            # jej wywołanie wpływa jednak także na .postcode
+            # przekazywany jest on aż do poziomu kafeterii i potem idzie w góre
             child.to_xml()
 
+            # aktualizuję postcode strony tym  co zebrane w głębi
             self.postcode = child.postcode
             self.xml.append(child.xml)
 
+        # print("jestem tu: ". self.postcode)
         if self.postcode:
-            print("tututut")
+            # drukowanie postcodu do xmla ma sens tylko w przypadku stron i bloków
+            # w tym przypadku chodzi o postcode strony tworzony na podstawie
+            # jego dzieci
             postcode = etree.Element('postcode')
             postcode.text = etree.CDATA(self.postcode)
+
             self.xml.append(postcode)
+
 
 class Question(SurveyElements):
     """Question"""
     def to_xml(self):
         """xml representation of Question element"""
-        print(self.postcode)
+
         # TODO: tutaj duużo do zrobienia - wszystkie typy
         self.xml = etree.Element('question')
         self.xml.set('id', self.id)
@@ -270,9 +274,10 @@ class Question(SurveyElements):
 
             single = ControlSingle(self.id)
             single.cafeteria = self.cafeteria
-            single.content = self.content
+            single.name = self.id + ' | ' + self.content
             single.postcode = self.postcode
             single.to_xml()
+            self.postcode = single.postcode
 
             self.xml.append(single.xml)
         # endregion
@@ -285,18 +290,23 @@ class Question(SurveyElements):
 
             self.xml.append(layout.xml)
 
-            single = ControlMulti(self.id)
-            single.cafeteria = self.cafeteria
-            single.content = self.content
-            single.to_xml()
+            multi = ControlMulti(self.id)
+            multi.cafeteria = self.cafeteria
+            multi.name = self.id + ' | ' + self.content
+            multi.postcode = self.postcode
+            multi.to_xml()
+            self.postcode = multi.postcode
 
-            self.xml.append(single.xml)
+            self.xml.append(multi.xml)
         # endregion
+
+        if self.typ == "N":
+            pass
 
 
 class Control():
-    def __init__(self, id, **kwargs):
-        self.id = id
+    def __init__(self, id_, **kwargs):
+        self.id = id_
         self.xml = False
         self.tag = None
         self.layout = False
@@ -368,8 +378,8 @@ class ControlLaout(Control):
 
 
 class ControlOpen(Control):
-    def __init__(self, id, **kwargs):
-        Control.__init__(self, id, **kwargs)
+    def __init__(self, id_, **kwargs):
+        Control.__init__(self, id_, **kwargs)
         self.tag = 'control_open'
 
         # default values:
@@ -414,7 +424,6 @@ class ControlSingle(Control):
 
         # wartosci domyślne:
         self.cafeteria = None
-        self.content = ""
         self.itemlimit = "0"
         self.layout = 'vertical'
 
@@ -427,15 +436,17 @@ class ControlSingle(Control):
         # wartości nadpisane
         for key in kwargs:
             if kwargs[key]:
-                print('ustawiam', key, kwargs[key])
                 setattr(self, key, kwargs[key])
 
     def to_xml(self):
+
         self.xml = etree.Element(self.tag)
         self.xml.set('id', self.id)
         self.xml.set('itemlimit', self.itemlimit)
         self.xml.set('layout', self.layout)
-        self.xml.set('name', self.id + ' | ' + self.content)
+
+        # self.name powinno być ustawione w question przed wywołaniem metody to_xml()
+        self.xml.set('name', self.name)
         self.xml.set('random', self.random)
         self.xml.set('require', self.require)
         self.xml.set('results', self.results)
@@ -453,6 +464,7 @@ class ControlSingle(Control):
         for caf in self.cafeteria:
             list_item = Cafeteria()
             list_item.id = caf.id
+            # list_item.postcode = self.postcode
             list_item.content = caf.content
             list_item.to_xml()
 
@@ -466,11 +478,52 @@ else
 endif
 """.format(self.id, caf.id)
 
+
 class ControlMulti(ControlSingle):
     # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false" require="true" results="true" rotation="false" style="">
     def __init__(self, id_, **kwargs):
         ControlSingle.__init__(self, id_, **kwargs)
         self.tag = 'control_multi'
+
+
+class ControlNumber(Control):
+    # example min: <control_number float="false" id="Q2" mask=".*" name="" require="true" results="true" style="">
+    # example max: <control_number float="true" id="Q2" mask=".*" max="99.0" maxsize="2" min="1.0" name="" require="true" results="true" style="">
+
+    def __init__(self, id_, **kwargs):
+        Control.__init__(self, id_, **kwargs)
+        self.float = "false"
+        self.mask = ".*"
+        self.content = ""
+        self.require = 'true'
+        self.results = 'true'
+        self.style = ""
+
+        self.max = None
+        self.maxsize = None
+        self.min = None
+
+    def to_xml(self):
+        self.name = self.id + ' | ' + self.content
+        self.xml = etree.Element('control_number')
+        self.xml.set('id', self.id)
+        self.xml.set('float', self.float)
+        self.xml.set('mask', self.mask)
+        self.xml.set('name', self.name)
+        self.xml.set('require', self.require)
+        self.xml.set('results', self.results)
+        self.xml.set('style', self.style)
+
+        if self.max:
+            self.xml.set('max', self.max)
+        if self.min:
+            self.xml.set('min', self.min)
+        if self.maxsize:
+            self.xml.set('maxsize', self.maxsize)
+
+        # w sumie chyna nigdy nie użyłem wartości wpisanej domyślnie w control_number
+        # gdyby była taka potrzeba.. to coś tu trzeba będzie zmienic
+        content = etree.SubElement(self.xml, 'content')
 
 
 class Cafeteria():

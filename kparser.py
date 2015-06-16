@@ -14,6 +14,8 @@ from elements import Question, Survey
 # from lxml import etree
 
 
+
+
 def recognize(line):
     """text -> text
 
@@ -144,10 +146,17 @@ def parse(text_input):
     Struktury to: bloki, strony, pytania
 
 
+
     """
 
-    # survey = []
+#    # TODO: Źle parsuje kafeterię - ucina elementy, gdy jest więcej niż dwa znaczniki
+#    np: """Q S Q1 COS
+# A --gn
+# B --so"""
+
     survey = Survey()
+
+    next_page_precode = [None, None]
 
     # ustawienia początkowe
     current_element = None
@@ -218,6 +227,12 @@ def parse(text_input):
             # endregion
 
             current_page = page_parser(line)
+            print('AA', next_page_precode)
+            if next_page_precode[0] != None:
+                print('AAA')
+            if current_page.id != next_page_precode[0] and next_page_precode[0] is not None:
+                current_page.precode = next_page_precode[1]
+                next_page_precode = [None, None]
 
             if not current_block:
                 current_block = block_parser("B Default")
@@ -260,12 +275,19 @@ def parse(text_input):
 
             current_page.childs.append(current_question)
             current_element = current_question
+
+            # print('AA', next_page_precode)
+
+            if current_page.id != next_page_precode[0] and next_page_precode[0] is not None:
+                current_page.precode = next_page_precode[1]
+                next_page_precode = [None, None]
+
         # endregion
 
         # region cafeteria
         if structure == "CAFETERIA":
             statement = cafeteria_parser(line)
-
+            print('Statement', statement)
             """jeśli nie ma numeru kafeterii to nadajemy go - albo dla kafeterii odpowiedzi (cafeteria),
                albo dla kafeterii stwierdzen (statements), jeśli akurat je zbieramy.
 
@@ -287,18 +309,27 @@ def parse(text_input):
             """
 
             if statement.screenout:
-                if current_page.postcode:
-                    current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                        current_question.id, statement.id
-                    )
-                else:
-                    current_page.postcode = '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                        current_question.id, statement.id
-                    )
+                current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                    current_question.id, statement.id
+                )
+                # if current_page.postcode:
+                #     current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                #         current_question.id, statement.id
+                #     )
+                # else:
+                #     current_page.postcode = '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+                #         current_question.id, statement.id
+                #     )
 
             if statement.gotonext:
-                current_page.postcode += '''if ({0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''
+                # print("statement", statement)
+                # goto next musimy dać na następnej stronie
 
+                if next_page_precode[0] is None:
+                    next_page_precode = [current_page.id, '''if (${0}:{1} == "1");  goto next;else;endif'''.format(current_question.id, statement.id)]
+                else:
+                    next_page_precode[1] += ''';;if (${0}:{1} == "1");  goto next;else;endif'''.format(current_question.id, statement.id)
+                    print('CC', next_page_precode)
             if collect_statements:
                 current_question.statements.append(statement)
             else:
@@ -335,20 +366,20 @@ def parse(text_input):
 
     return survey
 
-text = '''B B0
-Q S Q1 A
-1 a
-2 b
-
-Q S Q2 B
-1 a --hide:$Q1{0} == "1"
-2 b
-'''
-p = parse(text)
-p.to_xml()
-import sys
-x = p.xml
-
-#x = etree.ElementTree(x)
-with open('test.xml', 'wb') as f:
-    f.write(etree.tostring(x, pretty_print=True))
+# input_ = """Q S Q1 COS
+# A --so"""
+#
+# text = '''B B0
+# Q S Q1 A
+# 1 a
+# 2 b
+#
+# Q S Q2 B
+# 1 a --hide:$Q1{0} == "1"
+# 2 b
+# '''
+# p = parse(input_)
+# p.to_xml()
+#
+# with open('test.xml', 'wb') as f:
+#     f.write(etree.tostring(p.xml, pretty_print=True))

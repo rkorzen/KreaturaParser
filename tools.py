@@ -8,7 +8,13 @@ def show_attr(element):
     attrs = element.__dict__
 
     for key in attrs.keys():
-        out += "{0} = {1}\n".format(key, attrs[key])
+        if attrs[key] is None:
+            value = "None"
+        elif attrs[key] == "":
+            value = '""'
+        else:
+            value = attrs[key]
+        out += "{0} = {1}\n".format(key, value)
 
     out = sorted(out.splitlines())
 

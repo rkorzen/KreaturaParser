@@ -37,5 +37,6 @@ B B4"""
         expected = '''B0\n\tB1\n\tB2\n\t\tB3\n\tP1\n\t\tQ1\nB4'''
         self.assertEqual(expected, result)
 
+
 if __name__ == '__main__':
     main()
