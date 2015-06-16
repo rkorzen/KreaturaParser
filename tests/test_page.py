@@ -1,5 +1,5 @@
 from unittest import TestCase
-from elements import Page, Question
+from elements import Page
 from lxml import etree
 
 __author__ = 'KorzeniewskiR'

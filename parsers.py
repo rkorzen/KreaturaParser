@@ -183,21 +183,3 @@ END PROGRAM"""
     # print(out)
 
     return out
-
-# input_ = """B B0
-# BEGIN PROGRAM
-# for i in range(2):
-#     print('P P{0}'.format(i))
-#
-# END PROGRAM
-#
-# B B1
-# BEGIN PROGRAM
-# for i in range(2):
-#     print('P Q{0}'.format(i))
-#
-# END PROGRAM
-# """
-#
-# program_parser(input_)
-

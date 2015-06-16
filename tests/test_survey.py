@@ -93,4 +93,3 @@ class TestSurvey(KreaturaTestCase):
                            </procedures>
 </survey>'''.format(epoch_time))
         self.assertXmlEqual(etree.tostring(surv.xml), etree.tostring(xml_expc))
-

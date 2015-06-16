@@ -1,4 +1,3 @@
-from unittest import TestCase
 from elements import ControlOpen
 from lxml import etree
 from tests.testing_tools import KreaturaTestCase

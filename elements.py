@@ -11,17 +11,19 @@ def unix_time(dt):
 
     return delta.total_seconds()
 
+
 def unix_creatiom_time(dt):
     return int(unix_time(dt) * 1000)
 
-class SurveyElements():
+
+class SurveyElements:
     """Base of survey structures/elements"""
 
     def __init__(self, id_):
         self.id = id_
-        #self.precode = ''
+        # self.precode = ''
         self.precode = False
-        #self.postcode = ''
+        # self.postcode = ''
         self.postcode = ""
         self.rotation = False
         self.random = False
@@ -65,7 +67,7 @@ class SurveyElements():
                 raise ValueError("Błąd w precode elementu {0}, {1}".format(self.id, e))
 
 
-class Survey():
+class Survey:
     """
     Survey contain childs
     Survey have s method to add a block element to his parent
@@ -75,6 +77,7 @@ class Survey():
         self.childs = []
         self.id = False   # just for a case... and for find_by_id function
         self.createtime = unix_creatiom_time(datetime.datetime.now())
+        self.xml = False
 
     def __eq__(self, other):
         return self.childs == other.childs and self.id == other.id
@@ -108,20 +111,19 @@ class Survey():
         self.xml.set('sensitive', "false")
         self.xml.set('showbar', "false")
         self.xml.set('time', "60000")
-        self.xml.set('SMSComp',"false")
+        self.xml.set('SMSComp', "false")
         for child in self.childs:
             child.to_xml()
             self.xml.append(child.xml)
 
-        vars = etree.Element('vars')
-        self.xml.append(vars)
+        vars_ = etree.Element('vars')
+        self.xml.append(vars_)
 
         procedures = etree.Element('procedures')
         procedure = etree.Element('procedure')
         procedure.set('id', 'PROC')
         procedure.set('shortdesc', '')
         procedures.append(procedure)
-
 
         self.xml.append(procedures)
 
@@ -304,33 +306,23 @@ class Question(SurveyElements):
             pass
 
 
-class Control():
+class Control:
     def __init__(self, id_, **kwargs):
         self.id = id_
         self.xml = False
         self.tag = None
         self.layout = False
-        self.style = False
-
-        if 'require' in kwargs:
-            self.require = kwargs['require']
-        else:
-            self.require = "true"
-
-        if 'hide' in kwargs:
-            self.hide = kwargs['hide']
-        else:
-            self.hide = False
-
-        if 'rotation' in kwargs:
-            self.rotation = kwargs['rotation']
-        else:
-            self.rotation = 'false'
-
-        if 'random' in kwargs:
-            self.random = kwargs['randomize']
-        else:
-            self.random = 'false'
+        self.style = ""
+        self.require = "true"
+        self.hide = False
+        self.rotation = 'false'
+        self.random = 'false'
+        self.name = None
+        self.results = 'true'
+        self.cafeteria = []
+        for key in kwargs:
+            if kwargs[key]:
+                setattr(self, key, kwargs[key])
 
     def to_xml(self):
         self.xml = etree.Element(self.tag)
@@ -359,7 +351,7 @@ class Control():
 
 class ControlLaout(Control):
     def __init__(self, id_, **kwargs):
-        Control.__init__(self, id_,**kwargs)
+        Control.__init__(self, id_, **kwargs)
         self.tag = 'control_layout'
         if 'content' in kwargs:
             self.content = kwargs['content']
@@ -368,7 +360,7 @@ class ControlLaout(Control):
 
     def to_xml(self):
         Control.to_xml(self)
-        self.xml.attrib['id']
+        # self.xml.attrib['id']
 
         content = etree.Element('content')
         if self.content:
@@ -397,7 +389,8 @@ class ControlOpen(Control):
                 setattr(self, key, kwargs[key])
 
     def to_xml(self):
-        # example: <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false" style="" name="Q1 COS"/>
+        # example: <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false"
+        # style="" name="Q1 COS"/>
         self.xml = etree.Element(self.tag)
         self.xml.set('id', self.id)
         self.xml.set('length', self.size[0])
@@ -406,7 +399,7 @@ class ControlOpen(Control):
         self.xml.set('name', self.name)
         self.xml.set('require', self.require)
         self.xml.set('results', self.results)
-        #self.xml.set('rotation', self.rotation)
+        # self.xml.set('rotation', self.rotation)
         self.xml.set('style', self.style)
 
         content = etree.Element('content')
@@ -417,22 +410,16 @@ class ControlOpen(Control):
 
 
 class ControlSingle(Control):
-    # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false" require="true" results="true" rotation="false" style="">
+    # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false"
+    # require="true" results="true" rotation="false" style="">
     def __init__(self, id_, **kwargs):
-        self.id = id_
+        Control.__init__(self, id_, **kwargs)
+
+        # self.id = id_
         self.tag = 'control_single'
-
-        # wartosci domyślne:
-        self.cafeteria = None
+        if not self.layout:
+            self.layout = 'vertical'
         self.itemlimit = "0"
-        self.layout = 'vertical'
-
-        self.random = "false"
-        self.rotation = "false"
-        self.style = ""
-        self.require = "true"
-        self.results = "true"
-
         # wartości nadpisane
         for key in kwargs:
             if kwargs[key]:
@@ -458,29 +445,31 @@ class ControlSingle(Control):
           + poprzez kwargs
           + poprzez bezpośrednie odwołania
         """
-        if not self.cafeteria:
-            raise ValueError("Brak kafeterii w pytaniu: ", self.id)
+        if self.cafeteria:
 
-        for caf in self.cafeteria:
-            list_item = Cafeteria()
-            list_item.id = caf.id
-            # list_item.postcode = self.postcode
-            list_item.content = caf.content
-            list_item.to_xml()
+            for caf in self.cafeteria:
+                list_item = Cafeteria()
+                list_item.id = caf.id
+                # list_item.postcode = self.postcode
+                list_item.content = caf.content
+                list_item.to_xml()
 
-            self.xml.append(list_item.xml)
-            if caf.screenout:
-                self.postcode = self.postcode + """
+                self.xml.append(list_item.xml)
+                if caf.screenout:
+                    self.postcode += """
 if (${0}:{1} == "1")
 #OUT = "1"
 goto KONKURS
 else
 endif
 """.format(self.id, caf.id)
+        else:
+            raise ValueError("Brak kafeterii w pytaniu: ", self.id)
 
 
 class ControlMulti(ControlSingle):
-    # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false" require="true" results="true" rotation="false" style="">
+    # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false"
+    # require="true" results="true" rotation="false" style="">
     def __init__(self, id_, **kwargs):
         ControlSingle.__init__(self, id_, **kwargs)
         self.tag = 'control_multi'
@@ -488,7 +477,8 @@ class ControlMulti(ControlSingle):
 
 class ControlNumber(Control):
     # example min: <control_number float="false" id="Q2" mask=".*" name="" require="true" results="true" style="">
-    # example max: <control_number float="true" id="Q2" mask=".*" max="99.0" maxsize="2" min="1.0" name="" require="true" results="true" style="">
+    # example max: <control_number float="true" id="Q2" mask=".*" max="99.0" maxsize="2" min="1.0" name=""
+    # require="true" results="true" style="">
 
     def __init__(self, id_, **kwargs):
         Control.__init__(self, id_, **kwargs)
@@ -526,7 +516,7 @@ class ControlNumber(Control):
         content = etree.SubElement(self.xml, 'content')
 
 
-class Cafeteria():
+class Cafeteria:
     """List element - to np cafeteria, statements"""
 
     def __init__(self):
@@ -538,6 +528,7 @@ class Cafeteria():
         self.other = False
         self.screenout = False
         self.gotonext = False
+        self.xml = None
 
     def __eq__(self, other):
         return(self.id == other.id and
@@ -560,5 +551,3 @@ class Cafeteria():
         content = etree.Element('content')
         content.text = self.content
         self.xml.append(content)
-
-

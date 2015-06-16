@@ -2,10 +2,12 @@ from unittest import TestCase
 from tools import show_attr
 __author__ = 'KorzeniewskiR'
 
+
 class Test(object):
     pass
 
-class TestShow_attr(TestCase):
+
+class TestShowAttr(TestCase):
 
     def test_show_attr(self):
         ob = Test()

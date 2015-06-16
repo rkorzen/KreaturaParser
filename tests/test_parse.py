@@ -1242,8 +1242,6 @@ B --gn
 Q S Q2 COS
 A"""
 
-
-
         survey = parse(line)
         survey.to_xml()
         got = etree.tostring(survey.xml)
@@ -1334,7 +1332,6 @@ endif]]>
                         </procedures>
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
-
 
 
 class TestParseToXmlControlMulti(KreaturaTestCase):

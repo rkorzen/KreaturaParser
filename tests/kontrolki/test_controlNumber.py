@@ -11,6 +11,7 @@ class TestControlNumber(KreaturaTestCase):
         c.content = 'test'
         c.to_xml()
         got = etree.tostring(c.xml)
-        want = '''<control_number float="false" id="Q2" mask=".*" name="Q2 | test" require="true" results="true" style=""><content/></control_number>'''
+        want = '''<control_number float="false" id="Q2" mask=".*" name="Q2 | test" require="true" results="true"
+style=""><content/></control_number>'''
 
         self.assertXmlEqual(got, want)

@@ -21,4 +21,3 @@ class TestBuildPrecode(TestCase):
     def test_value_error(self):
         input_ = 'if (cos);endif'
         self.assertRaises(ValueError, build_precode, input_, 'precode')
-

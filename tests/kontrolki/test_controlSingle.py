@@ -15,7 +15,8 @@ class TestControlSingle(KreaturaTestCase):
         single.name = "test"
         single.to_xml()
         got = etree.tostring(single.xml)
-        want = '''<control_single id="Q1" itemlimit="0" layout="vertical" name="test" random="false" require="true" results="true" rotation="false" style=""><list_item id="1" name="" style=""><content>A</content></list_item></control_single>'''
+        want = '''<control_single id="Q1" itemlimit="0" layout="vertical" name="test" random="false" require="true"
+        results="true" rotation="false" style=""><list_item id="1" name="" style=""><content>A</content></list_item>
+        </control_single>'''
 
         self.assertXmlEqual(got, want)
-

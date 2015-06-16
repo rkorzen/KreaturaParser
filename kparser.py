@@ -8,12 +8,9 @@ The main function is parse
 
 """
 import re
-from lxml import etree
 from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser
 from elements import Question, Survey
 # from lxml import etree
-
-
 
 
 def recognize(line):
@@ -86,7 +83,7 @@ def recognize(line):
     if comment_line_patrn.match(line):
         return "COMMENT"
 
-    caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/\:#\$\[\]\w\d\{\} \";' =]+))?( --so| --gn)?$")
+    caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
     if caf_patrn.match(line):
         return "CAFETERIA"
@@ -228,9 +225,9 @@ def parse(text_input):
             # endregion
 
             current_page = page_parser(line)
-            print('AA', next_page_precode)
-            if next_page_precode[0] != None:
-                print('AAA')
+            # print('AA', next_page_precode)
+            # if next_page_precode[0] is not None:
+            #     print('AAA')
             if current_page.id != next_page_precode[0] and next_page_precode[0] is not None:
                 current_page.precode = next_page_precode[1]
                 next_page_precode = [None, None]
@@ -314,23 +311,17 @@ def parse(text_input):
                 current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
                     current_question.id, statement.id
                 )
-                # if current_page.postcode:
-                #     current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                #         current_question.id, statement.id
-                #     )
-                # else:
-                #     current_page.postcode = '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                #         current_question.id, statement.id
-                #     )
 
             if statement.gotonext:
                 # print("statement", statement)
                 # goto next musimy dać na następnej stronie
 
                 if next_page_precode[0] is None:
-                    next_page_precode = [current_page.id, '''if (${0}:{1} == "1");  goto next;else;endif'''.format(current_question.id, statement.id)]
+                    next_page_precode = [current_page.id, '''if (${0}:{1} == "1");  goto next;else;endif'''.format(
+                        current_question.id, statement.id)]
                 else:
-                    next_page_precode[1] += ''';;if (${0}:{1} == "1");  goto next;else;endif'''.format(current_question.id, statement.id)
+                    next_page_precode[1] += ''';;if (${0}:{1} == "1");  goto next;else;endif'''.format(
+                        current_question.id, statement.id)
                     # print('CC', next_page_precode)
             if collect_statements:
                 current_question.statements.append(statement)
@@ -368,23 +359,8 @@ def parse(text_input):
 
     return survey
 
-input_ = """Q S Q1 COS
-A --so
-B --so"""
-
-parse(input_)
+# input_ = """Q S Q1 COS
+# A --so
+# B --so"""
 #
-# text = '''B B0
-# Q S Q1 A
-# 1 a
-# 2 b
-#
-# Q S Q2 B
-# 1 a --hide:$Q1{0} == "1"
-# 2 b
-# '''
-# p = parse(input_)
-# p.to_xml()
-#
-# with open('test.xml', 'wb') as f:
-#     f.write(etree.tostring(p.xml, pretty_print=True))
+# parse(input_)
