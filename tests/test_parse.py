@@ -1237,14 +1237,11 @@ endif]]>
     def test_control_single_xml_2_goto_next(self):
         line = """Q S Q1 COS
 A --gn
-B --so
+B --gn
 
 Q S Q2 COS
 A"""
 
-        line = """Q S Q1 COS
-A --gn
-B --so"""
 
 
         survey = parse(line)

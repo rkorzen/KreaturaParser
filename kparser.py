@@ -87,7 +87,8 @@ def recognize(line):
         return "COMMENT"
 
     caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/\:#\$\[\]\w\d\{\} \";' =]+))?( --so| --gn)?$")
-    if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
+    # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
+    if caf_patrn.match(line):
         return "CAFETERIA"
 
     blanck_pattern = re.compile("^$")
@@ -286,8 +287,9 @@ def parse(text_input):
 
         # region cafeteria
         if structure == "CAFETERIA":
+            print(line)
             statement = cafeteria_parser(line)
-            print('Statement', statement)
+            # print('Statement', statement)
             """jeśli nie ma numeru kafeterii to nadajemy go - albo dla kafeterii odpowiedzi (cafeteria),
                albo dla kafeterii stwierdzen (statements), jeśli akurat je zbieramy.
 
@@ -329,7 +331,7 @@ def parse(text_input):
                     next_page_precode = [current_page.id, '''if (${0}:{1} == "1");  goto next;else;endif'''.format(current_question.id, statement.id)]
                 else:
                     next_page_precode[1] += ''';;if (${0}:{1} == "1");  goto next;else;endif'''.format(current_question.id, statement.id)
-                    print('CC', next_page_precode)
+                    # print('CC', next_page_precode)
             if collect_statements:
                 current_question.statements.append(statement)
             else:
@@ -366,8 +368,11 @@ def parse(text_input):
 
     return survey
 
-# input_ = """Q S Q1 COS
-# A --so"""
+input_ = """Q S Q1 COS
+A --so
+B --so"""
+
+parse(input_)
 #
 # text = '''B B0
 # Q S Q1 A
