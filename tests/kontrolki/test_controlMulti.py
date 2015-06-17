@@ -15,7 +15,8 @@ class TestControlMulti(KreaturaTestCase):
         single.name = "test"
         single.to_xml()
         got = etree.tostring(single.xml)
-        want = '''<control_multi id="Q1" itemlimit="0" layout="vertical" name="test" random="false" require="true" results="true" rotation="false" style=""><list_item id="1" name="" style=""><content>A</content></list_item></control_multi>'''
+        want = '''<control_multi id="Q1" itemlimit="0" layout="vertical" name="test" random="false" require="true"
+        results="true" rotation="false" style=""><list_item id="1" name="" style=""><content>A</content></list_item>
+        </control_multi>'''
 
         self.assertXmlEqual(got, want)
-

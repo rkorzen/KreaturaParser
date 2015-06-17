@@ -47,7 +47,7 @@ class TestBlockRecognize(TestCase):
     def test_block_to_many_parents(self):
         line = 'B B0 B1 B2 B3'
         result = recognize(line)
-        self.assertEqual(None, result)
+        self.assertEqual("CAFETERIA", result)
 
 
 class TestPageRecognize(TestCase):

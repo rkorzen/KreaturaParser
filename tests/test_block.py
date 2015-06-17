@@ -16,7 +16,9 @@ class TestBlock(KreaturaTestCase):
         self.assertEqual('B1', b.id)
 
     def test_build_xml(self):
-        e_xml = etree.tostring(etree.fromstring('<block id="B1" name="" quoted="false" random="false" rotation="false"><block id="B2" name="" quoted="false" random="false" rotation="false"></block></block>'))
+        e_xml = etree.tostring(etree.fromstring('<block id="B1" name="" quoted="false" random="false" rotation="false">'
+                                                '<block id="B2" name="" quoted="false" random="false" rotation="false">'
+                                                '</block></block>'))
         b1 = Block('B1')
         b2 = Block('B2')
         b1.childs.append(b2)
@@ -24,4 +26,3 @@ class TestBlock(KreaturaTestCase):
 
         xml = etree.tostring(b1.xml)
         self.assertEqual(e_xml, xml)
-

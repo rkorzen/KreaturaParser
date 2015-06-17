@@ -10,7 +10,6 @@ from lxml.doctestcompare import LXMLOutputChecker
 # print(NOPARSE_MARKUP)
 
 
-
 class KreaturaTestCase(TestCase):
 
     def assertXmlEqual(self, got, want):

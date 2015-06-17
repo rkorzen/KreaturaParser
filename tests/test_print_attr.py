@@ -3,7 +3,7 @@ from tools import show_attr
 __author__ = 'KorzeniewskiR'
 
 
-class SomeObject():
+class SomeObject:
     def __init__(self):
         self.x = 'x'
         self.y = 'y'
@@ -23,25 +23,6 @@ class TestPrintAttr(TestCase):
         survey = parse(input_)
         b = survey.childs[0]
         result = show_attr(b)
-
-        #self.assertEqual()
-
-#          expected = sorted('''statements = []
-# rotation = False
-# postcode = False
-# random = False
-# childs = []
-# typ = False
-# cafeteria = []
-# hide = False
-# dontknow = False
-# id = B0
-# precode = False
-# size = []
-# parent_id = False
-# content = False
-# xml = False
-# quoted = False'''.splitlines())
 
         # zmiana postcode - z false na ""
         expected = sorted('''statements = []

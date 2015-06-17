@@ -1237,14 +1237,10 @@ endif]]>
     def test_control_single_xml_2_goto_next(self):
         line = """Q S Q1 COS
 A --gn
-B --so
+B --gn
 
 Q S Q2 COS
 A"""
-
-        line = """Q S Q1 COS
-A --gn
-B --so"""
 
         survey = parse(line)
         survey.to_xml()
@@ -1336,9 +1332,8 @@ endif]]>
                         </procedures>
                     </survey>'''.format(survey.createtime)
 
-        etree.tostring(x, pretty_print=True)
+        # etree.tostring(x, pretty_print=True)
         self.assertXmlEqual(got, want)
-
 
 
 class TestParseToXmlControlMulti(KreaturaTestCase):
