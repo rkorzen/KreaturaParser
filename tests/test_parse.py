@@ -1246,7 +1246,6 @@ A"""
 A --gn
 B --so"""
 
-
         survey = parse(line)
         survey.to_xml()
         got = etree.tostring(survey.xml)
@@ -1336,6 +1335,8 @@ endif]]>
                         <procedure id="PROC" shortdesc=""/>
                         </procedures>
                     </survey>'''.format(survey.createtime)
+
+        etree.tostring(x, pretty_print=True)
         self.assertXmlEqual(got, want)
 
 
