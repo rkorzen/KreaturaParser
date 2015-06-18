@@ -636,13 +636,9 @@ else
 endif"""
         b = Block('Default')
         b.childs.append(p)
-
         survey = Survey()
         survey.append(b)
         result = parse(input_)
-        print(result.childs[0].childs[0].postcode)
-        print(result.childs[0].childs[0].postcode)
-
         self.assertEqual(survey, result)
     # endregion
 
@@ -1145,6 +1141,76 @@ endif]]></postcode>
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_control_single_xml_2_screenouts(self):
+        line = """Q S Q1 COS
+A --so
+B --so"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                                 <list_item id="2" name="" style="">
+                                                                    <content>B</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 <postcode>
+<![CDATA[if ($Q1:1 == "1")
+#OUT = "1"
+goto KONKURS
+else
+endif
+
+if ($Q1:2 == "1")
+#OUT = "1"
+goto KONKURS
+else
+endif]]></postcode>
+                                 </page>
+                          </block>
+                        <vars/>
+                        <procedures>
+                        <procedure id="PROC" shortdesc=""/>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
     def test_control_single_xml_goto_next(self):
         line = """Q S Q1 COS
 A --gn
@@ -1232,6 +1298,277 @@ endif]]>
                         <procedure id="PROC" shortdesc=""/>
                         </procedures>
                     </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_control_single_xml_goto_next_without_next_page(self):
+        line = """Q S Q1 COS
+A --gn"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars/>
+                        <procedures>
+                        <procedure id="PROC" shortdesc=""/>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_control_single_xml_goto_next_with_block_as_next_el(self):
+        line = """Q S Q1 COS
+A --gn
+
+B B0
+Q L Q2 COS
+"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''  <survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+    <block id="Default" name="" quoted="false" random="false" rotation="false">
+      <page hideBackButton="false" id="Q1_p" name="">
+        <question id="Q1" name="">
+          <control_layout id="Q1.labelka" layout="default" style="">
+            <content>COS</content>
+          </control_layout>
+          <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 | COS" random="false" require="true" results="true" rotation="false" style="">
+            <list_item id="1" name="" style="">
+              <content>A</content>
+            </list_item>
+          </control_single>
+        </question>
+      </page>
+    </block>
+    <block id="B0" name="" quoted="false" random="false" rotation="false">
+        <precode>if ($Q1:1 == &quot;1&quot;)
+    goto next
+else
+endif</precode>
+     <page hideBackButton="false" id="Q2_p" name="">
+        <question id="Q2" name="">
+          <control_layout id="Q2.labelka" layout="default" style="">
+            <content>COS</content>
+          </control_layout>
+        </question>
+      </page>
+    </block>
+    <vars></vars>
+    <procedures>
+      <procedure id="PROC" shortdesc=""></procedure>
+    </procedures>
+  </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def text_control_single_goto_next_without_next_page(self):
+        line = """Q S Q1 COS
+A --gn"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                                 <list_item id="2" name="" style="">
+                                                                    <content>B</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 <postcode>
+<![CDATA[if ($Q1:1 == "1")
+#OUT = "1"
+goto KONKURS
+else
+endif
+
+if ($Q1:2 == "1")
+#OUT = "1"
+goto KONKURS
+else
+endif]]></postcode>
+                                 </page>
+                          </block>
+                        <vars/>
+                        <procedures>
+                        <procedure id="PROC" shortdesc=""/>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_control_single_goto_next_and_screenout(self):
+        line = """Q S Q1 COS
+A --gn
+B --so
+
+Q S Q2 COS
+A"""
+
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                                 <list_item id="2" name="" style="">
+                                                                    <content>B</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+<postcode>
+<![CDATA[if ($Q1:2 == "1")
+#OUT = "1"
+goto KONKURS
+else
+endif]]>
+</postcode>
+                                 </page>
+                                 <page id="Q2_p"
+                                       hideBackButton="false"
+                                       name="">
+<precode>
+<![CDATA[if ($Q1:1 == "1")
+    goto next
+else
+endif]]>
+</precode>
+                                       <question id="Q2"
+                                                 name="">
+                                                 <control_layout id="Q2.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q2"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q2 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+
+                          </block>
+                        <vars/>
+                        <procedures>
+                        <procedure id="PROC" shortdesc=""/>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+
+        # etree.tostring(x, pretty_print=True)
         self.assertXmlEqual(got, want)
 
     def test_control_single_xml_2_goto_next(self):
@@ -1392,6 +1729,291 @@ A"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+
+class TestParseToXmlControlNumber(KreaturaTestCase):
+    def test_control_open_xml(self):
+        line = "Q N Q1 COS"
+        survey = parse(line)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_number id="Q1"
+                                                               float="false"
+                                                               mask=".*"
+                                                               require="true"
+                                                               results="true"
+                                                               style=""
+                                                               name="Q1 | COS">
+                                                               <content></content>
+                                                 </control_number>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_controls_open_xml(self):
+        line = """Q N Q1 COS
+A
+B"""
+        survey = parse(line)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_number id="Q1_1"
+                                                               float="false"
+                                                               mask=".*"
+                                                               require="true"
+                                                               results="true"
+                                                               style=""
+                                                               name="Q1_1 | A">
+                                                               <content></content>
+                                                 </control_number>
+                                                 <control_number id="Q1_2"
+                                                               float="false"
+                                                               mask=".*"
+                                                               require="true"
+                                                               results="true"
+                                                               style=""
+                                                               name="Q1_2 | B">
+                                                               <content></content>
+                                                 </control_number>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_controls_open_xml_explicite_id(self):
+        line = """Q N Q1 COS
+7 A
+8 B"""
+        survey = parse(line)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_number id="Q1_7"
+                                                               float="false"
+                                                               mask=".*"
+                                                               require="true"
+                                                               results="true"
+                                                               style=""
+                                                               name="Q1_7 | A">
+                                                               <content></content>
+                                                 </control_number>
+                                                 <control_number id="Q1_8"
+                                                               float="false"
+                                                               mask=".*"
+                                                               require="true"
+                                                               results="true"
+                                                               style=""
+                                                               name="Q1_8 | B">
+                                                               <content></content>
+                                                 </control_number>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+
+class TestJsTables(KreaturaTestCase):
+    def setUp(self):
+        self.line = '''Q T Q1 COS
+1 CAF A
+_
+1 STW A'''
+
+        self.survey = parse(self.line)
+        self.creationtime = self.survey.createtime
+
+    def test_table(self):
+        #                root  block     page
+        question = self.survey.childs[0].childs[0].childs[0]
+
+        caf = [Cafeteria(**{'id': '1', 'content': 'CAF A'})]
+        stw = [Cafeteria(**{'id': '1', 'content': 'STW A'})]
+
+        self.assertEqual(question.cafeteria, caf)
+        self.assertEqual(question.statements, stw)
+
+    def test_table_xml(self):
+
+        self.survey.to_xml()
+        got = etree.tostring(self.survey.xml, pretty_print=True)
+        want = '''
+<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+<block id="Default" name="" quoted="false" random="false" rotation="false">
+<page hideBackButton="false" id="Q1_p" name="">
+<precode></precode>
+<question id="Q1_q" name="">
+<control_layout id="Q1trescPytania" layout="default" style="">
+<content>COS</content>
+</control_layout>
+<control_layout id="Q1_1t" layout="default" style="">
+<content>1 STW A</content>
+</control_layout>
+<control_single id="Q1_1" layout="vertical" name="Q1_1 | 1 STW A" random="false" require="true" results="true" rotation="false" style="">
+<list_item id="1" connected="">
+<content>CAF A</content>
+</list_item>
+</control_single>
+<control_layout id="Q1tableJs" layout="default" style="">
+<content>&lt;link rel="stylesheet" href="public/tables.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+jQuery(document).ready(function(){{
+// ustawienia:
+// wspolny prefix kontrolek
+// zwróć uwagę by nie zaczynało się tak id page/question
+t = new Table("Q1_");
+// jeśli ma być transpozycja, odkomentuj poniższe
+//t.transposition();
+// jeśli nie ma być randoma, zakomentuj to
+t.shuffle();
+t.print();
+}});
+&lt;/script&gt;
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+</control_layout>
+</question>
+<postcode></postcode>
+</page>
+</block>
+</survey>
+'''.format(self.creationtime)
+
+        self.assertXmlEqual(got, want)
+
+    def test_cos(self):
+        xml = '''<content>&lt;link rel="stylesheet" href="public/tables.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+jQuery(document).ready(function(){{
+// ustawienia:
+// wspolny prefix kontrolek
+// zwróć uwagę by nie zaczynało się tak id page/question
+t = new Table("Q1_");
+// jeśli ma być transpozycja, odkomentuj poniższe
+//t.transposition();
+// jeśli nie ma być randoma, zakomentuj to
+t.shuffle();
+t.print();
+}});
+&lt;/script&gt;
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>'''
+
+        xml2 = '''<content>&lt;link rel="stylesheet" href="public/tables.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+jQuery(document).ready(function(){{
+// ustawienia:
+// wspolny prefix kontrolek
+// zwróć uwagę by nie zaczynało się tak id page/question
+t = new Table("Q1_");
+// jeśli ma być transpozycja, odkomentuj poniższe
+//t.transposition();
+// jeśli nie ma być randoma, zakomentuj to
+t.shuffle();
+t.print();
+}});
+&lt;/script&gt;
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>'''
+
+        self.assertXmlEqual(xml, xml2)
 
 if __name__ == "__main__":
     main()

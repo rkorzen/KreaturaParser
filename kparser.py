@@ -9,8 +9,9 @@ The main function is parse
 """
 import re
 from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser
-from elements import Question, Survey
-# from lxml import etree
+from elements import Question, Survey, Page, Block
+from lxml import etree
+from bs4 import BeautifulSoup
 
 
 def recognize(line):
@@ -228,9 +229,10 @@ def parse(text_input):
             # print('AA', next_page_precode)
             # if next_page_precode[0] is not None:
             #     print('AAA')
-            if current_page.id != next_page_precode[0] and next_page_precode[0] is not None:
-                current_page.precode = next_page_precode[1]
-                next_page_precode = [None, None]
+
+            # if current_page.id != next_page_precode[0] and next_page_precode[0] is not None:
+            #     current_page.precode = next_page_precode[1]
+            #     next_page_precode = [None, None]
 
             if not current_block:
                 current_block = block_parser("B Default")
@@ -284,7 +286,7 @@ def parse(text_input):
 
         # region cafeteria
         if structure == "CAFETERIA":
-            print(line)
+            # print(line)
             statement = cafeteria_parser(line)
             # print('Statement', statement)
             """jeśli nie ma numeru kafeterii to nadajemy go - albo dla kafeterii odpowiedzi (cafeteria),
@@ -357,10 +359,27 @@ def parse(text_input):
             # current_page = None
         # endregion
 
+        if isinstance(current_element, Page) or isinstance(current_element, Block):
+            if current_element.id != next_page_precode[0] and next_page_precode[0] is not None:
+                current_element.precode = next_page_precode[1]
+                next_page_precode = [None, None]
+
     return survey
 
-# input_ = """Q S Q1 COS
-# A --so
-# B --so"""
-#
-# parse(input_)
+
+if __name__ == "__main__":
+    input_ = """Q T Q7 COS
+1 a
+2 b
+_
+1 stw a
+2 stw b
+"""
+
+    survey = parse(input_)
+    survey.to_xml()
+    x = etree.tostring(survey.xml)
+    with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+        f.write(x)
+    #print(BeautifulSoup(x).prettify(formatter="xml"))
+

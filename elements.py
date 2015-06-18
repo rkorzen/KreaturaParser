@@ -5,14 +5,12 @@ import datetime
 
 
 def unix_time(dt):
-
     epoch = datetime.datetime.utcfromtimestamp(0)
     delta = dt - epoch
-
     return delta.total_seconds()
 
-
-def unix_creatiom_time(dt):
+def unix_creation_time(dt):
+    """Czas utworzenia - ms epoch time - coś analogicznego do tworzonego w kreaturze"""
     return int(unix_time(dt) * 1000)
 
 
@@ -76,7 +74,7 @@ class Survey:
     def __init__(self):
         self.childs = []
         self.id = False   # just for a case... and for find_by_id function
-        self.createtime = unix_creatiom_time(datetime.datetime.now())
+        self.createtime = unix_creation_time(datetime.datetime.now())
         self.xml = False
 
     def __eq__(self, other):
@@ -215,12 +213,17 @@ class Question(SurveyElements):
         self.xml.set('id', self.id)
         self.xml.set('name', '')
 
+        layout = ControlLaout(self.id + '.labelka')
+        layout.content = self.content
+        layout.to_xml()
+        self.xml.append(layout.xml)
+
         # region control_layout
         if self.typ is "L":
-            layout = ControlLaout(self.id + '.labelka')
-            layout.content = self.content
-            layout.to_xml()
-            self.xml.append(layout.xml)
+            # layout = ControlLaout(self.id + '.labelka')
+            # layout.content = self.content
+            # layout.to_xml()
+            # self.xml.append(layout.xml)
 
             if self.cafeteria:
                 for nr, caf in enumerate(self.cafeteria):
@@ -238,10 +241,10 @@ class Question(SurveyElements):
         # region control_open
         if self.typ is "O":
             # dodaję kontrolkę tekstową z pytaniem
-            layout = ControlLaout(self.id+'.labelka')
-            layout.content = self.content
-            layout.to_xml()
-            self.xml.append(layout.xml)
+            # layout = ControlLaout(self.id+'.labelka')
+            # layout.content = self.content
+            # layout.to_xml()
+            # self.xml.append(layout.xml)
 
             # dodaję kontrolkę/kontrolki open
             if self.cafeteria:
@@ -268,11 +271,10 @@ class Question(SurveyElements):
 
         # region control_single
         if self.typ == "S":
-            layout = ControlLaout(self.id + '.labelka')
-            layout.content = self.content
-            layout.to_xml()
-
-            self.xml.append(layout.xml)
+            # layout = ControlLaout(self.id + '.labelka')
+            # layout.content = self.content
+            # layout.to_xml()
+            # self.xml.append(layout.xml)
 
             single = ControlSingle(self.id)
             single.cafeteria = self.cafeteria
@@ -286,11 +288,10 @@ class Question(SurveyElements):
 
         # region control_multi
         if self.typ == "M":
-            layout = ControlLaout(self.id + '.labelka')
-            layout.content = self.content
-            layout.to_xml()
-
-            self.xml.append(layout.xml)
+            # layout = ControlLaout(self.id + '.labelka')
+            # layout.content = self.content
+            # layout.to_xml()
+            # self.xml.append(layout.xml)
 
             multi = ControlMulti(self.id)
             multi.cafeteria = self.cafeteria
@@ -302,8 +303,29 @@ class Question(SurveyElements):
             self.xml.append(multi.xml)
         # endregion
 
+        # region control_number
         if self.typ == "N":
-            pass
+            if self.cafeteria:
+                for nr, caf in enumerate(self.cafeteria):
+                    if not caf.id:
+                        id_suf = '_' + str(nr+1)
+                    else:
+                        id_suf = '_' + str(caf.id)
+
+                    open_ = ControlNumber(self.id + id_suf)
+                    open_.name = self.id + id_suf + ' | ' + caf.content
+                    if self.size:
+                        open_.size = self.size
+                    open_.to_xml()
+                    self.xml.append(open_.xml)
+            else:
+                open_ = ControlNumber(self.id)
+                open_.name = self.id + ' | ' + self.content
+                if self.size:
+                    open_.size = self.size
+                open_.to_xml()
+                self.xml.append(open_.xml)
+        # endregion
 
 
 class Control:
@@ -320,6 +342,8 @@ class Control:
         self.name = None
         self.results = 'true'
         self.cafeteria = []
+        self.statements = []
+        self.xml = ""
         for key in kwargs:
             if kwargs[key]:
                 setattr(self, key, kwargs[key])
@@ -327,14 +351,6 @@ class Control:
     def to_xml(self):
         self.xml = etree.Element(self.tag)
         self.xml.attrib['id'] = self.id
-        # el_control = ET.Element(self.type)
-        # el_control.attrib['id'] = self.id
-        # el_control.attrib['length'] = self.length
-        # el_control.attrib['line'] = self.line
-        # el_control.attrib['mask'] = self.mask
-        # el_control.attrib['require'] = self.require
-        # el_control.attrib['results'] = self.results
-        # el_control.attrib['rotation'] = self.rotation
 
         if self.layout:
             self.xml.attrib['layout'] = self.layout
@@ -345,8 +361,6 @@ class Control:
             self.xml.set('style', self.style)
         else:
             self.xml.set('style', '')
-
-        # el_control.attrib['name'] = self.name
 
 
 class ControlLaout(Control):
@@ -360,7 +374,6 @@ class ControlLaout(Control):
 
     def to_xml(self):
         Control.to_xml(self)
-        # self.xml.attrib['id']
 
         content = etree.Element('content')
         if self.content:
@@ -399,7 +412,6 @@ class ControlOpen(Control):
         self.xml.set('name', self.name)
         self.xml.set('require', self.require)
         self.xml.set('results', self.results)
-        # self.xml.set('rotation', self.rotation)
         self.xml.set('style', self.style)
 
         content = etree.Element('content')
@@ -414,12 +426,12 @@ class ControlSingle(Control):
     # require="true" results="true" rotation="false" style="">
     def __init__(self, id_, **kwargs):
         Control.__init__(self, id_, **kwargs)
-
-        # self.id = id_
         self.tag = 'control_single'
+
         if not self.layout:
             self.layout = 'vertical'
         self.itemlimit = "0"
+
         # wartości nadpisane
         for key in kwargs:
             if kwargs[key]:
@@ -450,7 +462,6 @@ class ControlSingle(Control):
             for caf in self.cafeteria:
                 list_item = Cafeteria()
                 list_item.id = caf.id
-                # list_item.postcode = self.postcode
                 list_item.content = caf.content
                 list_item.to_xml()
 
@@ -484,17 +495,17 @@ class ControlNumber(Control):
         Control.__init__(self, id_, **kwargs)
         self.float = "false"
         self.mask = ".*"
-        self.content = ""
-        self.require = 'true'
-        self.results = 'true'
-        self.style = ""
+        # self.content = ""
+        # self.require = 'true'
+        # self.results = 'true'
+        # self.style = ""
 
         self.max = None
         self.maxsize = None
         self.min = None
 
     def to_xml(self):
-        self.name = self.id + ' | ' + self.content
+        # self.name = self.id + ' | ' + self.content
         self.xml = etree.Element('control_number')
         self.xml.set('id', self.id)
         self.xml.set('float', self.float)
@@ -519,7 +530,7 @@ class ControlNumber(Control):
 class Cafeteria:
     """List element - to np cafeteria, statements"""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.tag = 'list_item'
         self.id = None
         self.content = ""
@@ -529,6 +540,10 @@ class Cafeteria:
         self.screenout = False
         self.gotonext = False
         self.xml = None
+
+        for key in kwargs:
+            if kwargs[key]:
+                setattr(self, key, kwargs[key])
 
     def __eq__(self, other):
         return(self.id == other.id and
@@ -551,3 +566,40 @@ class Cafeteria:
         content = etree.Element('content')
         content.text = self.content
         self.xml.append(content)
+
+
+class CallsForScripts:
+    def __init__(self, id_, typ_, **kwargs):
+        self.id = id_
+        self.typ = typ_
+
+    def js_table(self):
+
+        control = '''<control_layout id="{0}tableJs" layout="default" style="">
+<content>
+&lt;link rel="stylesheet" href="public/tables.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+
+jQuery(document).ready(function(){{
+// ustawienia:
+
+// wspolny prefix kontrolek
+// zwróć uwagę by nie zaczynało się tak id page/question
+t = new Table("{0}_");
+
+// jeśli ma być transpozycja, odkomentuj poniższe
+//t.transposition();
+
+// jeśli nie ma być randoma, zakomentuj to
+t.shuffle();
+
+t.print();
+}});
+&lt;/script&gt;
+
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+</control_layout>'''.format(self.id)
+
+        return etree.fromstring(control)
