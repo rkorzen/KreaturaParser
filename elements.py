@@ -574,7 +574,7 @@ class CallsForScripts:
         self.typ = typ_
 
     def js_table(self):
-
+        """Xml kontrolki z wywołaniem skryptów tabelki js"""
         control = '''<control_layout id="{0}tableJs" layout="default" style="">
 <content>
 &lt;link rel="stylesheet" href="public/tables.css" type="text/css"&gt;
