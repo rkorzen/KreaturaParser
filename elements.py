@@ -213,10 +213,29 @@ class Question(SurveyElements):
         self.xml.set('id', self.id)
         self.xml.set('name', '')
 
+        # region special markers
+        # w pytaniach mogą być ukryte specjalne znaczniki
+        # np --multi - musze to uwzlędnić
+
+        special_markers = []
+        if '--multi' in self.content:
+            special_markers.append('multi')
+            self.content = self.content.replace('--multi', '')
+        # endregion
+
         layout = ControlLaout(self.id + '.labelka')
         layout.content = self.content
         layout.to_xml()
         self.xml.append(layout.xml)
+
+        # region sprawdzamy id stwierdzen i kafeterii
+        temp_ids = []
+        for caf in self.cafeteria:
+            if caf.id in temp_ids:
+                raise ValueError('Przynajmniej dwie odpowiedzi mają to samo id w pytaniu', self.id)
+            else:
+                temp_ids.append(caf.id)
+        # endregion
 
         # region control_layout
         if self.typ is "L":
@@ -271,10 +290,8 @@ class Question(SurveyElements):
 
         # region control_single
         if self.typ == "S":
-            # layout = ControlLaout(self.id + '.labelka')
-            # layout.content = self.content
-            # layout.to_xml()
-            # self.xml.append(layout.xml)
+            if self.cafeteria == []:
+                raise ValueError("Brak kafeterii w pytaniu ", self.id )
 
             single = ControlSingle(self.id)
             single.cafeteria = self.cafeteria
@@ -288,10 +305,8 @@ class Question(SurveyElements):
 
         # region control_multi
         if self.typ == "M":
-            # layout = ControlLaout(self.id + '.labelka')
-            # layout.content = self.content
-            # layout.to_xml()
-            # self.xml.append(layout.xml)
+            if self.cafeteria == []:
+                raise ValueError("Brak kafeterii w pytaniu ", self.id)
 
             multi = ControlMulti(self.id)
             multi.cafeteria = self.cafeteria
@@ -325,6 +340,39 @@ class Question(SurveyElements):
                     open_.size = self.size
                 open_.to_xml()
                 self.xml.append(open_.xml)
+        # endregion
+
+        # region js tables
+        if self.typ == "T":
+            if self.statements == []:
+                raise ValueError("Brak stwierdzen w pytaniu ", self.id, "Być może zapomniałeś o _, "
+                                                                        "albo chciales zastosowac inny typ pytania")
+
+            for stwierdzenie in self.statements:
+
+                el_id = self.id + '_' + stwierdzenie.id
+
+                layout = ControlLaout(el_id + '_txt')
+                layout.content = stwierdzenie.content
+                layout.to_xml()
+                self.xml.append(layout.xml)
+
+                if 'multi' in special_markers:
+                    control = ControlMulti(el_id)
+                else:
+                    control = ControlSingle(el_id)
+
+                control.cafeteria = self.cafeteria
+                control.name = el_id + ' | ' + stwierdzenie.content
+
+                # nie wiem na razie jak tu powinno być z postcodem
+                control.postcode = self.postcode
+
+                control.to_xml()
+                self.xml.append(control.xml)
+
+            script_call = ScriptsCalls(self.id, self.typ).js_table()
+            self.xml.append(script_call)
         # endregion
 
 
@@ -459,10 +507,24 @@ class ControlSingle(Control):
         """
         if self.cafeteria:
 
+            caf_hide_pattern = "" # na poczatek pusty hide pattern
             for caf in self.cafeteria:
                 list_item = Cafeteria()
                 list_item.id = caf.id
                 list_item.content = caf.content
+
+                # hide pattern ustawiony dla jednego elementu kafeterii
+                # obowiazuje tez dla kolejnych
+                # chyba, ze zostanie zmieniony
+                # stąd sprawdzam czy jest caf.hide
+                # i jesli jest to aktualizuje caf_hide_pattern
+
+                if caf.hide:
+                    caf_hide_pattern = caf.hide
+
+                if caf_hide_pattern:
+                    list_item.hide = caf_hide_pattern
+
                 list_item.to_xml()
 
                 self.xml.append(list_item.xml)
@@ -566,9 +628,11 @@ class Cafeteria:
         content = etree.Element('content')
         content.text = self.content
         self.xml.append(content)
-
-
-class CallsForScripts:
+        if self.hide:
+            hide = etree.Element('hide')
+            hide.text = etree.CDATA(self.hide.format(self.id))
+            self.xml.append(hide)
+class ScriptsCalls:
     def __init__(self, id_, typ_, **kwargs):
         self.id = id_
         self.typ = typ_
