@@ -40,7 +40,8 @@ size = []
 parent_id = False
 content = False
 xml = False
-quoted = False'''.splitlines())
+quoted = False
+warnings = []'''.splitlines())
 
         self.assertEqual(expected, result)
 

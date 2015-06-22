@@ -1,3 +1,4 @@
+import re
 from lxml import etree
 from tools import build_precode, find_parent
 
@@ -35,6 +36,7 @@ class SurveyElements:
         self.content = False
         self.dontknow = False
         self.xml = False
+        self.warnings = []
 
     def __eq__(self, other):
         return (self.id == other.id and
@@ -72,6 +74,7 @@ class Survey:
     """
 
     def __init__(self):
+        self.warnings = []
         self.childs = []
         self.id = False   # just for a case... and for find_by_id function
         self.createtime = unix_creation_time(datetime.datetime.now())
@@ -111,7 +114,9 @@ class Survey:
         self.xml.set('time', "60000")
         self.xml.set('SMSComp', "false")
         for child in self.childs:
+            child.warnings = self.warnings
             child.to_xml()
+            self.warnings = child.warnings
             self.xml.append(child.xml)
 
         vars_ = etree.Element('vars')
@@ -154,7 +159,9 @@ class Block(SurveyElements):
         self.set_precode()  # SurveyElements method
 
         for child in self.childs:
+            child.warnings = self.warnings
             child.to_xml()
+            self.warnings = child.warnings
             self.xml.append(child.xml)
 
 
@@ -183,6 +190,8 @@ class Page(SurveyElements):
             # ustawiam postcode dziecka na to co mamy
             child.postocde = self.postcode
 
+            # przekazuje warningi
+            child.warnings = self.warnings
             # metoda xml tworzy atrybut xml z odpowiednią zawartoscia
             # jej wywołanie wpływa jednak także na .postcode
             # przekazywany jest on aż do poziomu kafeterii i potem idzie w góre
@@ -190,6 +199,7 @@ class Page(SurveyElements):
 
             # aktualizuję postcode strony tym  co zebrane w głębi
             self.postcode = child.postcode
+            self.warnings = child.warnings
             self.xml.append(child.xml)
 
         # print("jestem tu: ". self.postcode)
@@ -206,7 +216,10 @@ class Page(SurveyElements):
 class Question(SurveyElements):
     """Question"""
     def to_xml(self):
-        """xml representation of Question element"""
+        """xml representation of Question element
+
+        Tu najwięcej się dzieje
+        """
 
         # TODO: tutaj duużo do zrobienia - wszystkie typy
         self.xml = etree.Element('question')
@@ -218,9 +231,27 @@ class Question(SurveyElements):
         # np --multi - musze to uwzlędnić
 
         special_markers = []
+        # multi - np do gridów, tabel
         if '--multi' in self.content:
             special_markers.append('multi')
             self.content = self.content.replace('--multi', '')
+
+        # obrazki zamiast kafeterii
+        if '--images' in self.content:
+            special_markers.append('images')
+            self.content = self.content.replace('--images', '')
+
+        if '--listcolumn' in self.content:
+            pattern = re.compile( '--listcolumn(-\d+){0,1}')
+            list_column = pattern.search(self.content).group()
+
+            special_markers.append(list_column.replace('--', ''))
+            self.content = self.content.replace(list_column, '')
+
+        if '--dezaktywacja' in self.content:
+            special_markers.append("dezaktywacja")
+            self.content = self.content.replace('--dezaktywacja', '')
+
         # endregion
 
         layout = ControlLaout(self.id + '.labelka')
@@ -239,10 +270,6 @@ class Question(SurveyElements):
 
         # region control_layout
         if self.typ is "L":
-            # layout = ControlLaout(self.id + '.labelka')
-            # layout.content = self.content
-            # layout.to_xml()
-            # self.xml.append(layout.xml)
 
             if self.cafeteria:
                 for nr, caf in enumerate(self.cafeteria):
@@ -259,11 +286,6 @@ class Question(SurveyElements):
 
         # region control_open
         if self.typ is "O":
-            # dodaję kontrolkę tekstową z pytaniem
-            # layout = ControlLaout(self.id+'.labelka')
-            # layout.content = self.content
-            # layout.to_xml()
-            # self.xml.append(layout.xml)
 
             # dodaję kontrolkę/kontrolki open
             if self.cafeteria:
@@ -285,37 +307,63 @@ class Question(SurveyElements):
                 if self.size:
                     open_.size = self.size
                 open_.to_xml()
+
                 self.xml.append(open_.xml)
+                if 'dezaktywacja' in special_markers:
+                    script_call = ScriptsCalls(self.id)
+                    script_call.dezaktywacja_opena()
+
+                    self.xml.append(script_call.to_xml())
+
+
         # endregion
 
-        # region control_single
-        if self.typ == "S":
+        # region control_single/multi
+        if self.typ == "S" or self.typ =="M":
             if self.cafeteria == []:
                 raise ValueError("Brak kafeterii w pytaniu ", self.id )
 
-            single = ControlSingle(self.id)
-            single.cafeteria = self.cafeteria
-            single.name = self.id + ' | ' + self.content
-            single.postcode = self.postcode
-            single.to_xml()
-            self.postcode = single.postcode
+            if self.typ == "S":
+                control = ControlSingle(self.id)
+            else:
+                control = ControlMulti(self.id)
 
-            self.xml.append(single.xml)
-        # endregion
+            control.cafeteria = self.cafeteria
+            control.name = self.id + ' | ' + self.content
+            control.postcode = self.postcode
+            control.to_xml()
+            self.postcode = control.postcode
 
-        # region control_multi
-        if self.typ == "M":
-            if self.cafeteria == []:
-                raise ValueError("Brak kafeterii w pytaniu ", self.id)
+            self.xml.append(control.xml)
 
-            multi = ControlMulti(self.id)
-            multi.cafeteria = self.cafeteria
-            multi.name = self.id + ' | ' + self.content
-            multi.postcode = self.postcode
-            multi.to_xml()
-            self.postcode = multi.postcode
+            # obrazki zamiast kafeterii
+            if 'images' in special_markers:
 
-            self.xml.append(multi.xml)
+                script_call = ScriptsCalls(self.id)
+                script_call.obrazki_zamiast_kafeterii()
+
+                self.xml.append(script_call.to_xml())
+
+            # listcolumn
+            for el in special_markers:
+                if el.startswith('listcolumn'):
+
+                    # sprawdzam ile column
+                    try:
+                        columns = el.split('-')[1]
+                    except IndexError:
+                        columns = 2
+
+                    # jeśli mamy podejrzanie dużo kolumn to warto o tym poinformować
+                    if int(columns) > 3:
+                        self.warnings.append("W pytaniu " + self.id + " wskazana liczba kolumn ma być większa niż 3."
+                                                                      " Nie za szeroko?" )
+
+                    script_call = ScriptsCalls(self.id, **{'columns': columns})
+                    script_call.list_column()
+
+                    self.xml.append(script_call.to_xml())
+
         # endregion
 
         # region control_number
@@ -354,6 +402,9 @@ class Question(SurveyElements):
 
                 layout = ControlLaout(el_id + '_txt')
                 layout.content = stwierdzenie.content
+                if stwierdzenie.hide:
+                    layout.hide = stwierdzenie.hide.format(stwierdzenie.id)
+
                 layout.to_xml()
                 self.xml.append(layout.xml)
 
@@ -365,14 +416,20 @@ class Question(SurveyElements):
                 control.cafeteria = self.cafeteria
                 control.name = el_id + ' | ' + stwierdzenie.content
 
+                if stwierdzenie.hide:
+                    control.hide = stwierdzenie.hide.format(stwierdzenie.id)
+
                 # nie wiem na razie jak tu powinno być z postcodem
                 control.postcode = self.postcode
 
                 control.to_xml()
                 self.xml.append(control.xml)
 
-            script_call = ScriptsCalls(self.id, self.typ).js_table()
-            self.xml.append(script_call)
+            script_call = ScriptsCalls(self.id)
+            script_call.js_table()
+            # script_call = script_call.to_xml()
+            self.xml.append(script_call.to_xml())
+
         # endregion
 
 
@@ -410,6 +467,11 @@ class Control:
         else:
             self.xml.set('style', '')
 
+        if self.hide:
+            hide = etree.Element('hide')
+            hide.text = etree.CDATA(self.hide)
+            self.xml.append(hide)
+
 
 class ControlLaout(Control):
     def __init__(self, id_, **kwargs):
@@ -422,11 +484,9 @@ class ControlLaout(Control):
 
     def to_xml(self):
         Control.to_xml(self)
-
         content = etree.Element('content')
         if self.content:
             content.text = self.content
-
         self.xml.append(content)
 
 
@@ -486,9 +546,9 @@ class ControlSingle(Control):
                 setattr(self, key, kwargs[key])
 
     def to_xml(self):
-
-        self.xml = etree.Element(self.tag)
-        self.xml.set('id', self.id)
+        Control.to_xml(self)
+        # self.xml = etree.Element(self.tag)
+        # self.xml.set('id', self.id)
         self.xml.set('itemlimit', self.itemlimit)
         self.xml.set('layout', self.layout)
 
@@ -528,6 +588,7 @@ class ControlSingle(Control):
                 list_item.to_xml()
 
                 self.xml.append(list_item.xml)
+
                 if caf.screenout:
                     self.postcode += """
 if (${0}:{1} == "1")
@@ -632,18 +693,32 @@ class Cafeteria:
             hide = etree.Element('hide')
             hide.text = etree.CDATA(self.hide.format(self.id))
             self.xml.append(hide)
+
+
 class ScriptsCalls:
-    def __init__(self, id_, typ_, **kwargs):
+    def __init__(self, id_, **kwargs):
         self.id = id_
-        self.typ = typ_
+        # self.typ = typ_
+
+        self.control = etree.Element('control_layout')
+        self.control.set('id', id_+'.js')
+        self.control.set('layout', 'default')
+        self.control.set('style', "")
+
+        self.content = etree.SubElement(self.control, 'content')
+        self.content.text = ""
+
+        for key in kwargs:
+            if kwargs[key]:
+                setattr(self, key, kwargs[key])
 
     def js_table(self):
         """Xml kontrolki z wywołaniem skryptów tabelki js"""
-        control = '''<control_layout id="{0}tableJs" layout="default" style="">
-<content>
-&lt;link rel="stylesheet" href="public/tables.css" type="text/css"&gt;
-&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript'&gt;
+        self.content.text += '''
+<!-- tabela js -->
+<link rel="stylesheet" href="public/tables.css" type="text/css">
+<script type='text/javascript' src='public/tables.js'></script>
+<script type='text/javascript'>
 
 jQuery(document).ready(function(){{
 // ustawienia:
@@ -660,10 +735,42 @@ t.shuffle();
 
 t.print();
 }});
-&lt;/script&gt;
+</script>
 
-&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
-</content>
-</control_layout>'''.format(self.id)
+<!-- custom css -->
+<link rel="stylesheet" href="public/custom.css" type="text/css">
+'''.format(self.id)
 
-        return etree.fromstring(control)
+    def obrazki_zamiast_kafeterii(self):
+        self.content.text += '''
+<!-- Obrazki zamiast kafeterii -->
+<script type='text/javascript'>
+var multiImageControlId = '{0}';
+</script>
+'''.format(self.id)
+
+    def list_column(self):
+
+        self.content.text += '''
+<!-- list column -->
+<link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css">
+<script type='text/javascript' src='public/listcolumn/listcolumn.js'></script>
+<script type='text/javascript'>
+new IbisListColumn("{0}",{1});
+</script>
+'''.format(self.id, self.columns)
+
+    def dezaktywacja_opena(self):
+
+        self.content.text = '''
+<!-- dezaktywacja opena -->
+<script type='text/javascript'>
+    var opendisDest = "{0}";
+    var opendisText = "Nie wiem / trudno powiedzieć";
+    var opendisValue = "98";
+</script>
+<script type='text/javascript' src='opendis/opendis.js'></script>
+'''.format(self.id)
+
+    def to_xml(self):
+        return self.control

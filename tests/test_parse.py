@@ -926,6 +926,68 @@ B"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_control_open_deactivate(self):
+        line = "Q O90_4 Q1 COS --dezaktywacja"
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_open id="Q1"
+                                                               length="90"
+                                                               lines="4"
+                                                               mask=".*"
+                                                               require="true"
+                                                               results="true"
+                                                               style=""
+                                                               name="Q1 | COS ">
+                                                               <content></content>
+                                                 </control_open>
+<control_layout id="Q1.js" layout="default" style="">
+<content>
+&lt;!-- dezaktywacja opena --&gt;
+&lt;script type='text/javascript'&gt;
+    var opendisDest = "Q1";
+    var opendisText = "Nie wiem / trudno powiedzieć";
+    var opendisValue = "98";
+&lt;/script&gt;
+&lt;script type='text/javascript' src='opendis/opendis.js'&gt;&lt;/script&gt;
+</content>
+
+</control_layout>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
 
 class TestParseToXmlControlLayout(KreaturaTestCase):
     def test_control_layout_xml(self):
@@ -1865,6 +1927,306 @@ endif]]>
 
         self.assertXmlEqual(got, want)
 
+    def test_obrazki_zamiast_kaf(self):
+        input_ = '''Q S Q2 COS --images
+1 A
+2 B
+3 C'''
+        survey = parse(input_)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q2_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q2"
+                                                 name="">
+                                                 <control_layout id="Q2.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q2"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q2 | COS "
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                                 <list_item id="2" name="" style="">
+                                                                    <content>B</content>
+                                                                 </list_item>
+                                                                 <list_item id="3" name="" style="">
+                                                                    <content>C</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                                 <control_layout id="Q2.js"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>
+&lt;!-- Obrazki zamiast kafeterii --&gt;
+&lt;script type='text/javascript'&gt;
+var multiImageControlId = 'Q2';
+&lt;/script&gt;</content>
+                                                 </control_layout>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+
+        self.assertXmlEqual(got, want)
+
+    def test_list_column_3(self):
+        input_ = '''Q S Q2 COS --listcolumn-3
+1 A
+2 B
+3 C'''
+        survey = parse(input_)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q2_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q2"
+                                                 name="">
+                                                 <control_layout id="Q2.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q2"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q2 | COS "
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                                 <list_item id="2" name="" style="">
+                                                                    <content>B</content>
+                                                                 </list_item>
+                                                                 <list_item id="3" name="" style="">
+                                                                    <content>C</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                                 <control_layout id="Q2.js"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>
+&lt;!-- list column --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+new IbisListColumn("Q2",3);
+&lt;/script&gt;
+</content>
+                                                 </control_layout>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+
+        self.assertXmlEqual(got, want)
+
+    def test_list_column_default(self):
+        input_ = '''Q S Q2 COS --listcolumn
+1 A
+2 B
+3 C'''
+        survey = parse(input_)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q2_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q2"
+                                                 name="">
+                                                 <control_layout id="Q2.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q2"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q2 | COS "
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                                 <list_item id="2" name="" style="">
+                                                                    <content>B</content>
+                                                                 </list_item>
+                                                                 <list_item id="3" name="" style="">
+                                                                    <content>C</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                                 <control_layout id="Q2.js"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>
+&lt;!-- list column --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+new IbisListColumn("Q2",2);
+&lt;/script&gt;
+</content>
+                                                 </control_layout>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+
+        self.assertXmlEqual(got, want)
+
+    def test_list_column_10_col(self):
+        input_ = '''Q S Q2 COS --listcolumn-10
+1 A
+2 B
+3 C'''
+        survey = parse(input_)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q2_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q2"
+                                                 name="">
+                                                 <control_layout id="Q2.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q2"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q2 | COS "
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                                 <list_item id="2" name="" style="">
+                                                                    <content>B</content>
+                                                                 </list_item>
+                                                                 <list_item id="3" name="" style="">
+                                                                    <content>C</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                                 <control_layout id="Q2.js"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>
+&lt;!-- list column --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+new IbisListColumn("Q2",10);
+&lt;/script&gt;
+</content>
+                                                 </control_layout>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+
+        self.assertXmlEqual(got, want)
 
 
 class TestParseToXmlControlMulti(KreaturaTestCase):
@@ -2147,8 +2509,10 @@ _
 <content>CAF A</content>
 </list_item>
 </control_single>
-<control_layout id="Q1tableJs" layout="default" style="">
-<content>&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
+<control_layout id="Q1.js" layout="default" style="">
+<content>
+&lt;!-- tabela js --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
 &lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript'&gt;
 
@@ -2169,7 +2533,9 @@ t.print();
 }});
 &lt;/script&gt;
 
-&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;</content>
+&lt;!-- custom css --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;
+</content>
 
 </control_layout>
 </question>
@@ -2184,46 +2550,7 @@ t.print();
 
         self.assertXmlEqual(got, want)
 
-    def test_cos(self):
-        xml = '''<content>&lt;link rel="stylesheet" href="public/tables.css" type="text/css"&gt;
-&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript'&gt;
-jQuery(document).ready(function(){{
-// ustawienia:
-// wspolny prefix kontrolek
-// zwróć uwagę by nie zaczynało się tak id page/question
-t = new Table("Q1_");
-// jeśli ma być transpozycja, odkomentuj poniższe
-//t.transposition();
-// jeśli nie ma być randoma, zakomentuj to
-t.shuffle();
-t.print();
-}});
-&lt;/script&gt;
-&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
-</content>'''
-
-        xml2 = '''<content>&lt;link rel="stylesheet" href="public/tables.css" type="text/css"&gt;
-&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript'&gt;
-jQuery(document).ready(function(){{
-// ustawienia:
-// wspolny prefix kontrolek
-// zwróć uwagę by nie zaczynało się tak id page/question
-t = new Table("Q1_");
-// jeśli ma być transpozycja, odkomentuj poniższe
-//t.transposition();
-// jeśli nie ma być randoma, zakomentuj to
-t.shuffle();
-t.print();
-}});
-&lt;/script&gt;
-&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
-</content>'''
-
-        self.assertXmlEqual(xml, xml2)
-
-    def test_no_statements(self):
+    def test_table_no_statements(self):
         line = '''Q T Q1 COS
 1 CAF A
 2 STW A'''
@@ -2259,8 +2586,10 @@ _
 <content>B</content>
 </list_item>
 </control_multi>
-<control_layout id="Q1tableJs" layout="default" style="">
-<content>&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
+<control_layout id="Q1.js" layout="default" style="">
+<content>
+&lt;!-- tabela js --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
 &lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript'&gt;
 
@@ -2281,7 +2610,9 @@ t.print();
 }});
 &lt;/script&gt;
 
-&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;</content>
+&lt;!-- custom css --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;
+</content>
 
 </control_layout>
 </question>
@@ -2295,7 +2626,7 @@ t.print();
 
         self.assertXmlEqual(got, want)
 
-    def test_caf_with_hide(self):
+    def test_table_caf_with_hide(self):
         input_ = """Q T Q1 COS --multi
 1 A --hide:$Q1:{0} == "1"
 2 B
@@ -2325,8 +2656,10 @@ _
 <hide><![CDATA[$Q1:2 == "1"]]></hide>
 </list_item>
 </control_multi>
-<control_layout id="Q1tableJs" layout="default" style="">
-<content>&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
+<control_layout id="Q1.js" layout="default" style="">
+<content>
+&lt;!-- tabela js --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
 &lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript'&gt;
 
@@ -2347,7 +2680,9 @@ t.print();
 }});
 &lt;/script&gt;
 
-&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;</content>
+&lt;!-- custom css --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;
+</content>
 
 </control_layout>
 </question>
@@ -2361,6 +2696,71 @@ t.print();
 
         self.assertXmlEqual(got, want)
 
+    def test_statement_with_hide(self):
+        input_ = '''Q T Q1 COS --multi
+1 A
+_
+2 B --hide:$Q1:{0} == "1"'''
+
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+<block id="Default" name="" quoted="false" random="false" rotation="false">
+<page hideBackButton="false" id="Q1_p" name="">
+<question id="Q1" name="">
+<control_layout id="Q1.labelka" layout="default" style="">
+<content>COS</content>
+</control_layout>
+<control_layout id="Q1_2_txt" layout="default" style="">
+<hide><![CDATA[$Q1:2 == "1"]]></hide>
+<content>B</content>
+</control_layout>
+<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true" results="true" rotation="false" style="">
+<hide><![CDATA[$Q1:2 == "1"]]></hide>
+<list_item id="1" name="" style="">
+<content>A</content>
+</list_item>
+</control_multi>
+<control_layout id="Q1.js" layout="default" style="">
+<content>
+&lt;!-- tabela js --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+
+jQuery(document).ready(function(){{
+// ustawienia:
+
+// wspolny prefix kontrolek
+// zwróć uwagę by nie zaczynało się tak id page/question
+t = new Table(&quot;Q1_&quot;);
+
+// jeśli ma być transpozycja, odkomentuj poniższe
+//t.transposition();
+
+// jeśli nie ma być randoma, zakomentuj to
+t.shuffle();
+
+t.print();
+}});
+&lt;/script&gt;
+
+&lt;!-- custom css --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;</content>
+
+</control_layout>
+</question>
+</page>
+</block>
+<vars></vars>
+<procedures>
+<procedure id="PROC" shortdesc=""></procedure>
+</procedures>
+</survey>""".format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
 
 class TestErrors(KreaturaTestCase):
     def test_two_same_caf_numbers(self):
@@ -2370,5 +2770,18 @@ class TestErrors(KreaturaTestCase):
         survey = parse(input_)
 
         self.assertRaises(ValueError, survey.to_xml)
+
+
+class TestWarnings(KreaturaTestCase):
+    def test_many_columns_warning(self):
+        text_input = """Q S Q1 COS --listcolumn-5
+    1 a"""
+
+        survey = parse(text_input)
+        survey.to_xml()
+
+        expected = "W pytaniu Q1 wskazana liczba kolumn ma być większa niż 3. Nie za szeroko?"
+        self.assertEqual(expected, survey.warnings[0])
+
 if __name__ == "__main__":
     main()
