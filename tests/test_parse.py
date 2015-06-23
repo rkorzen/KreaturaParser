@@ -694,6 +694,7 @@ class TestParseToXmlPage(KreaturaTestCase):
 
 
 class TestParseToXmlOpen(KreaturaTestCase):
+
     def test_control_open_xml(self):
         line = "Q O Q1 COS"
         survey = parse(line)
@@ -988,6 +989,7 @@ B"""
 
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
+
 
 class TestParseToXmlControlLayout(KreaturaTestCase):
     def test_control_layout_xml(self):
@@ -1426,14 +1428,16 @@ Q L Q2 COS
         survey = parse(line)
         survey.to_xml()
         got = etree.tostring(survey.xml)
-        want = '''  <survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+        want = '''  <survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray"
+                            localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
     <block id="Default" name="" quoted="false" random="false" rotation="false">
       <page hideBackButton="false" id="Q1_p" name="">
         <question id="Q1" name="">
           <control_layout id="Q1.labelka" layout="default" style="">
             <content>COS</content>
           </control_layout>
-          <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 | COS" random="false" require="true" results="true" rotation="false" style="">
+          <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 | COS" random="false" require="true"
+                          results="true" rotation="false" style="">
             <list_item id="1" name="" style="">
               <content>A</content>
             </list_item>
@@ -2494,7 +2498,8 @@ _
         self.survey.to_xml()
         got = etree.tostring(self.survey.xml, pretty_print=True)
         want = '''
-<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl"
+        name="CHANGEIT" sensitive="false" showbar="false" time="60000">
 <block id="Default" name="" quoted="false" random="false" rotation="false">
 <page hideBackButton="false" id="Q1_p" name="">
 <question id="Q1" name="">
@@ -2504,7 +2509,8 @@ _
 <control_layout id="Q1_1_txt" layout="default" style="">
 <content>STW A</content>
 </control_layout>
-<control_single id="Q1_1" itemlimit="0" layout="vertical" name="Q1_1 | STW A" random="false" require="true" results="true" rotation="false" style="">
+<control_single id="Q1_1" itemlimit="0" layout="vertical" name="Q1_1 | STW A" random="false" require="true"
+                results="true" rotation="false" style="">
 <list_item id="1" name="" style="">
 <content>CAF A</content>
 </list_item>
@@ -2568,7 +2574,8 @@ _
         survey.to_xml()
         got = etree.tostring(survey.xml)
 
-        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray"
+                          localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
 <block id="Default" name="" quoted="false" random="false" rotation="false">
 <page hideBackButton="false" id="Q1_p" name="">
 <question id="Q1" name="">
@@ -2578,7 +2585,8 @@ _
 <control_layout id="Q1_2_txt" layout="default" style="">
 <content>B</content>
 </control_layout>
-<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true" results="true" rotation="false" style="">
+<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true" results="true"
+               rotation="false" style="">
 <list_item id="1" name="" style="">
 <content>A</content>
 </list_item>
@@ -2636,7 +2644,8 @@ _
         survey.to_xml()
         got = etree.tostring(survey.xml)
 
-        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray"
+                          localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
 <block id="Default" name="" quoted="false" random="false" rotation="false">
 <page hideBackButton="false" id="Q1_p" name="">
 <question id="Q1" name="">
@@ -2646,7 +2655,8 @@ _
 <control_layout id="Q1_2_txt" layout="default" style="">
 <content>B</content>
 </control_layout>
-<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true" results="true" rotation="false" style="">
+<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true"
+               results="true" rotation="false" style="">
 <list_item id="1" name="" style="">
 <content>A</content>
 <hide><![CDATA[$Q1:1 == "1"]]></hide>
@@ -2706,7 +2716,8 @@ _
         survey.to_xml()
         got = etree.tostring(survey.xml)
 
-        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray"
+                          localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
 <block id="Default" name="" quoted="false" random="false" rotation="false">
 <page hideBackButton="false" id="Q1_p" name="">
 <question id="Q1" name="">
@@ -2717,7 +2728,8 @@ _
 <hide><![CDATA[$Q1:2 == "1"]]></hide>
 <content>B</content>
 </control_layout>
-<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true" results="true" rotation="false" style="">
+<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true"
+               results="true" rotation="false" style="">
 <hide><![CDATA[$Q1:2 == "1"]]></hide>
 <list_item id="1" name="" style="">
 <content>A</content>
@@ -2775,7 +2787,7 @@ class TestErrors(KreaturaTestCase):
 class TestWarnings(KreaturaTestCase):
     def test_many_columns_warning(self):
         text_input = """Q S Q1 COS --listcolumn-5
-    1 a"""
+1 a"""
 
         survey = parse(text_input)
         survey.to_xml()

@@ -10,6 +10,7 @@ def unix_time(dt):
     delta = dt - epoch
     return delta.total_seconds()
 
+
 def unix_creation_time(dt):
     """Czas utworzenia - ms epoch time - coś analogicznego do tworzonego w kreaturze"""
     return int(unix_time(dt) * 1000)
@@ -242,7 +243,7 @@ class Question(SurveyElements):
             self.content = self.content.replace('--images', '')
 
         if '--listcolumn' in self.content:
-            pattern = re.compile( '--listcolumn(-\d+){0,1}')
+            pattern = re.compile('--listcolumn(-\d+)?')
             list_column = pattern.search(self.content).group()
 
             special_markers.append(list_column.replace('--', ''))
@@ -290,15 +291,17 @@ class Question(SurveyElements):
             # dodaję kontrolkę/kontrolki open
             if self.cafeteria:
                 for nr, caf in enumerate(self.cafeteria):
-                    if not caf.id:
-                        id_suf = '_' + str(nr+1)
-                    else:
-                        id_suf = '_' + str(caf.id)
+                    id_suf = '_' + str(caf.id)
+                    # if not caf.id:
+                    #     id_suf = '_' + str(nr+1)
+                    # else:
+                    #     id_suf = '_' + str(caf.id)
 
                     open_ = ControlOpen(self.id + id_suf)
                     open_.name = self.id + id_suf + ' | ' + caf.content
-                    if self.size:
-                        open_.size = self.size
+
+                    # if self.size:
+                    #     open_.size = self.size
                     open_.to_xml()
                     self.xml.append(open_.xml)
             else:
@@ -315,13 +318,12 @@ class Question(SurveyElements):
 
                     self.xml.append(script_call.to_xml())
 
-
         # endregion
 
         # region control_single/multi
-        if self.typ == "S" or self.typ =="M":
-            if self.cafeteria == []:
-                raise ValueError("Brak kafeterii w pytaniu ", self.id )
+        if self.typ == "S" or self.typ == "M":
+            if not self.cafeteria: # []
+                raise ValueError("Brak kafeterii w pytaniu ", self.id)
 
             if self.typ == "S":
                 control = ControlSingle(self.id)
@@ -357,7 +359,7 @@ class Question(SurveyElements):
                     # jeśli mamy podejrzanie dużo kolumn to warto o tym poinformować
                     if int(columns) > 3:
                         self.warnings.append("W pytaniu " + self.id + " wskazana liczba kolumn ma być większa niż 3."
-                                                                      " Nie za szeroko?" )
+                                                                      " Nie za szeroko?")
 
                     script_call = ScriptsCalls(self.id, **{'columns': columns})
                     script_call.list_column()
@@ -392,7 +394,7 @@ class Question(SurveyElements):
 
         # region js tables
         if self.typ == "T":
-            if self.statements == []:
+            if not self.statements: # []
                 raise ValueError("Brak stwierdzen w pytaniu ", self.id, "Być może zapomniałeś o _, "
                                                                         "albo chciales zastosowac inny typ pytania")
 
@@ -429,8 +431,14 @@ class Question(SurveyElements):
             script_call.js_table()
             # script_call = script_call.to_xml()
             self.xml.append(script_call.to_xml())
-
         # endregion
+
+        # region dinamic grid
+        if self.typ in ('G', 'SDG'):
+            pass
+        # endregion
+
+        x = 0
 
 
 class Control:
@@ -567,7 +575,7 @@ class ControlSingle(Control):
         """
         if self.cafeteria:
 
-            caf_hide_pattern = "" # na poczatek pusty hide pattern
+            caf_hide_pattern = ""  # na poczatek pusty hide pattern
             for caf in self.cafeteria:
                 list_item = Cafeteria()
                 list_item.id = caf.id
@@ -708,6 +716,7 @@ class ScriptsCalls:
         self.content = etree.SubElement(self.control, 'content')
         self.content.text = ""
 
+        self.columns = ''
         for key in kwargs:
             if kwargs[key]:
                 setattr(self, key, kwargs[key])
@@ -749,9 +758,20 @@ var multiImageControlId = '{0}';
 </script>
 '''.format(self.id)
 
-    def list_column(self):
+    def list_column(self, example=False):
 
-        self.content.text += '''
+        if example:
+            self.content.text += '''
+<!-- list column -->
+<link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css">
+<script type='text/javascript' src='public/listcolumn/listcolumn.js'></script>
+<script type='text/javascript'>
+  // new IbisListColumn("{0}",{1});
+</script>
+'''.format(self.id, self.columns)
+
+        else:
+            self.content.text += '''
 <!-- list column -->
 <link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css">
 <script type='text/javascript' src='public/listcolumn/listcolumn.js'></script>
@@ -770,6 +790,27 @@ new IbisListColumn("{0}",{1});
     var opendisValue = "98";
 </script>
 <script type='text/javascript' src='opendis/opendis.js'></script>
+'''.format(self.id)
+
+    def superimages(self, example=False):
+
+        if example:
+            self.content.text += '''
+<!-- super images -->
+<link rel='stylesheet' type='text/css' href='public/superImages.css'/>
+<script type='text/javascript' src='public/superImages.js'></script>
+<script type='text/javascript'>
+  // s{0} = new SuperImages("{0}", {{zoom: false}});
+</script>
+'''.format(self.id)
+        else:
+            self.content.text += '''
+<!-- super images -->
+<link rel='stylesheet' type='text/css' href='public/superImages.css'/>
+<script type='text/javascript' src='public/superImages.js'></script>
+<script type='text/javascript'>
+  s{0} = new SuperImages("{0}", {{zoom: false}});
+</script>
 '''.format(self.id)
 
     def to_xml(self):

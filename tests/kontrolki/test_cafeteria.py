@@ -23,3 +23,8 @@ class TestCafeteria(KreaturaTestCase):
 
         self.assertXmlEqual(got, want)
 
+    def test_repr(self):
+        c = Cafeteria()
+        c.id = '1'
+        c.content = 'a'
+        self.assertEqual('1,a', str(c))

@@ -367,19 +367,21 @@ def parse(text_input):
     return survey
 
 
-if __name__ == "__main__":
-    input_ = """Q T Q7 COS
-1 a
-2 b
-_
-1 stw a
-2 stw b
-"""
+# if __name__ == "__main__":
+#    pass
+#     input_ = """Q T Q7 COS
+# 1 a
+# 2 b
+# _
+# 1 stw a
+# 2 stw b
+# """
+#
+#     survey = parse(input_)
+#     survey.to_xml()
+#     x = etree.tostring(survey.xml)
+#     with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+#         f.write(x)
+#     #print(BeautifulSoup(x).prettify(formatter="xml"))
 
-    survey = parse(input_)
-    survey.to_xml()
-    x = etree.tostring(survey.xml)
-    with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
-        f.write(x)
-    #print(BeautifulSoup(x).prettify(formatter="xml"))
 

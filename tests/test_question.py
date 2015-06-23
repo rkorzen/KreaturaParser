@@ -1,5 +1,4 @@
 from tests.testing_tools import KreaturaTestCase
-from unittest import TestCase
 from elements import Question
 from lxml import etree
 __author__ = 'KorzeniewskiR'

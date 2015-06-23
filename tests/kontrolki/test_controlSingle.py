@@ -20,3 +20,26 @@ class TestControlSingle(KreaturaTestCase):
         </control_single>'''
 
         self.assertXmlEqual(got, want)
+
+    def test_wartosci_nadpisane(self):
+        single = ControlSingle('Q1', **{"random": 'true'})
+        single.name = 'Q1 COS'
+
+        caf = Cafeteria()
+        caf.id = "1"
+        caf.content = "a"
+
+        single.cafeteria = [caf]
+
+        single.to_xml()
+        want = '<control_single id="Q1" layout="vertical" style="" itemlimit="0" name="Q1 COS" random="true" ' \
+               'require="true" results="true" rotation="false"><list_item id="1" name="" style="">' \
+               '<content>a</content></list_item></control_single>'
+        got = etree.tostring(single.xml)
+
+        self.assertXmlEqual(got, want)
+
+    def test_no_cafeteria(self):
+        single = ControlSingle('Q1', **{"random": 'true'})
+        single.name = 'Q1 COS'
+        self.assertRaises(ValueError, single.to_xml)

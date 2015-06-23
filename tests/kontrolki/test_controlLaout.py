@@ -15,3 +15,11 @@ class TestControlLaout(KreaturaTestCase):
         expected = etree.tostring(expected, pretty_print=True)
 
         self.assertXmlEqual(expected, result)
+
+    def test_content_in_kwargs(self):
+        c = ControlLaout('Q1', **{'content': 'COS'})
+        c.to_xml()
+        want = '<control_layout id="Q1" layout="default" style=""><content>COS</content></control_layout>'
+        got = etree.tostring(c.xml)
+
+        self.assertXmlEqual(got, want)

@@ -2,6 +2,7 @@ import re
 # import subprocess
 from elements import Block, Page, Question, Cafeteria
 
+
 def block_parser(line):
     """
     :param line: String
@@ -30,6 +31,7 @@ def block_parser(line):
 
     return block
 
+
 def page_parser(line):
     """
     :param line: String
@@ -43,6 +45,7 @@ def page_parser(line):
         page.hide = line.split(" --hide:")[1]
 
     return page
+
 
 def question_parser(line):
     """
@@ -94,6 +97,7 @@ def question_parser(line):
 
     return question
 
+
 def cafeteria_parser(line):
     """
     :param line: String
@@ -127,6 +131,7 @@ def cafeteria_parser(line):
         cafeteria.gotonext = True
 
     return cafeteria
+
 
 def program_parser(input_):
     """text - > text

@@ -26,3 +26,33 @@ class TestBlock(KreaturaTestCase):
 
         xml = etree.tostring(b1.xml)
         self.assertEqual(e_xml, xml)
+
+    def test_quoted(self):
+        b = Block('B1')
+        b.quoted = True
+
+        b.to_xml()
+
+        want = '<block id="B1" name="" quoted="true" random="false" rotation="false"></block>'
+
+        self.assertXmlEqual(etree.tostring(b.xml), want)
+
+    def test_random(self):
+        b = Block('B1')
+        b.random = True
+
+        b.to_xml()
+
+        want = '<block id="B1" name="" quoted="false" random="true" rotation="false"></block>'
+
+        self.assertXmlEqual(etree.tostring(b.xml), want)
+
+    def test_rotation(self):
+        b = Block('B1')
+        b.rotation = True
+
+        b.to_xml()
+
+        want = '<block id="B1" name="" quoted="false" random="false" rotation="true"></block>'
+
+        self.assertXmlEqual(etree.tostring(b.xml), want)
