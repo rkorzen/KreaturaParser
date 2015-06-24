@@ -131,6 +131,9 @@ class TestQuestionRecoginize(TestCase):
         line = "Q O Q1 TRESC --d:'Nie wiem'"
         self.assertEqual('QUESTION', recognize(line))
 
+    def test_slider(self):
+        line = "Q SLIDER Q1 TRESC"
+        self.assertEqual('QUESTION', recognize(line))
 
 class TestSwitchRecognize(TestCase):
     def test_switch(self):

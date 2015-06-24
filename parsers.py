@@ -54,7 +54,7 @@ def question_parser(line):
 
     """
     #                  typ                      size             id       parent                     5
-    r = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")\
+    r = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")\
           .match(line)
 
     question = Question(r.group(3))  # id

@@ -68,7 +68,7 @@ def recognize(line):
         return "PAGE"
 
     # example: Q O Q1 Coś tam --rot --hide
-    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|SDG|T|B|G)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
+    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
     if question_pattern.match(line):
         return "QUESTION"
 
@@ -328,7 +328,9 @@ def parse(text_input):
             if collect_statements:
                 current_question.statements.append(statement)
             else:
+                print(current_question.cafeteria)
                 current_question.cafeteria.append(statement)
+
         # endregion
 
         # region switch
@@ -367,21 +369,67 @@ def parse(text_input):
     return survey
 
 
-# if __name__ == "__main__":
-#    pass
-#     input_ = """Q T Q7 COS
-# 1 a
-# 2 b
-# _
-# 1 stw a
-# 2 stw b
-# """
-#
-#     survey = parse(input_)
-#     survey.to_xml()
-#     x = etree.tostring(survey.xml)
-#     with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
-#         f.write(x)
-#     #print(BeautifulSoup(x).prettify(formatter="xml"))
+if __name__ == "__main__":
+
+    input_ = """Q M CW1 W jakich opakowaniach kupuje Pan(i) Cydr Lubelski?
+Butelka 1l
+Butelka 0.33l
+Puszka 0.5l
+Nie kupuję Cydru Lubelskiego
+
+B CW2_BLOCK
+
+BEGIN PROGRAM
+
+lista = '''1	Butelka 1l
+2	Butelka 0.33l
+3	Puszka 0.5l
+4	Nie kupuję Cydru Lubelskiego'''.splitlines()
+
+def func():
+    out = ''
+    for n in lista:
+        n = n.split('\\t')
+        out += '''Q M CW2_{0} Z jakich powodów kupuje Pan(i) Cydr Lubelski w {1}?
+PRE if ($CW1:{0} == "1");else;goto next;endif
+1 Atrakcyjna cena
+2 Wygodny format opakowania
+3 Promocja
+4 Okazja na którą jest kupowany cydr
+5 Dostępność/ widoczność w sklepie
+6 Smak
+7 Odpowiednia pojemność
+97.c Inne (jakie)
+'''.format(n[0], n[1])
+    return out
+
+xxx = func()
+END PROGRAM
+
+B CW3_BLOK
+Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy propozycje, które najbardziej zachęciłyby Pana(nią) do zakupu --min:3--max:3
+1 Cydr Lubelski - butelka 1L za 9.99 PLN
+2 Cydr Lubelski - butelka 0.33L za 3.99 PLN
+3 Cydr Lubelski - butelka trójpak 0.33L za 9.99 PLN
+4 Cydr Lubelski - puszka 0.5L za 4.49 PLN
+5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN
+"""
+
+    in_3 = """Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy propozycje, które najbardziej zachęciłyby Pana(nią) do zakupu --min:3--max:3
+1 Cydr Lubelski - butelka 1L za 9.99 PLN
+2 Cydr Lubelski - butelka 0.33L za 3.99 PLN
+3 Cydr Lubelski - butelka trójpak 0.33L za 9.99 PLN
+4 Cydr Lubelski - puszka 0.5L za 4.49 PLN
+5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN
+"""
+
+
+    survey = parse(input_)
+    survey = parse(in_3)
+    survey.to_xml()
+    x = etree.tostring(survey.xml)
+    with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+        f.write(x)
+    #print(BeautifulSoup(x).prettify(formatter="xml"))
 
 

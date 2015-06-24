@@ -2295,6 +2295,179 @@ A"""
 
         self.assertRaises(ValueError, survey.to_xml)
 
+    def test_control_multi_min_precode(self):
+        input_ = '''Q M Q1 COS--minchoose:2
+PRE $A="0"
+A'''
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <precode>$A=&quot;0&quot;</precode>
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_multi id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 minchoose="2"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_multi>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_multi_min(self):
+        input_ = '''Q M Q1 COS--minchoose:2
+A'''
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_multi id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 minchoose="2"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_multi>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_multi_min_max(self):
+        input_ = '''Q M Q1 COS--minchoose:2--maxchoose:2
+A'''
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_multi id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 minchoose="2"
+                                                                 maxchoose="2"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_multi>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
 
 class TestParseToXmlControlNumber(KreaturaTestCase):
     def test_control_open_xml(self):
@@ -2771,6 +2944,31 @@ t.print();
 <procedure id="PROC" shortdesc=""></procedure>
 </procedures>
 </survey>""".format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+
+class TestSlider(KreaturaTestCase):
+    def test_slider(self):
+        line = "Q SLIDER Q1 TRESC"
+        survey = parse(line)
+
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = "<cos></cos>"
+        self.assertXmlEqual(got, want)
+
+    def test_slider_with_ends(self):
+        line = '''Q SLIDER Q1 TRESC
+lewy koniec
+prawy koniec'''
+
+        survey = parse(line)
+
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = "<cos></cos>"
         self.assertXmlEqual(got, want)
 
 

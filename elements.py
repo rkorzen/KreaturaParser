@@ -253,6 +253,21 @@ class Question(SurveyElements):
             special_markers.append("dezaktywacja")
             self.content = self.content.replace('--dezaktywacja', '')
 
+        if '--minchoose:' in self.content:
+            pattern = re.compile('--minchoose:\d+')
+            minchoose= pattern.search(self.content).group()
+
+            special_markers.append(minchoose.replace('--', ''))
+            self.content = self.content.replace(minchoose, '')
+
+        if '--maxchoose:' in self.content:
+            pattern = re.compile('--maxchoose:\d+')
+            maxchoose= pattern.search(self.content).group()
+
+            special_markers.append(maxchoose.replace('--', ''))
+            self.content = self.content.replace(maxchoose, '')
+
+
         # endregion
 
         layout = ControlLaout(self.id + '.labelka')
@@ -262,6 +277,7 @@ class Question(SurveyElements):
 
         # region sprawdzamy id stwierdzen i kafeterii
         temp_ids = []
+        print(self.cafeteria)
         for caf in self.cafeteria:
             if caf.id in temp_ids:
                 raise ValueError('Przynajmniej dwie odpowiedzi mają to samo id w pytaniu', self.id)
@@ -333,9 +349,33 @@ class Question(SurveyElements):
             control.cafeteria = self.cafeteria
             control.name = self.id + ' | ' + self.content
             control.postcode = self.postcode
+
+            # minchoice itd
+            # to co do atrybutow tagow musi byc ustawione przed to_xml
+            for el in special_markers:
+                if el.startswith('minchoose:'):
+                    try:
+                        # print('BBB')
+                        minchoose = el.split(':')
+                        control.minchoose = minchoose[1]
+                        # print(control.minchoice)
+                    except:
+                        raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
+                                         'być może  po --min: jest spacja. Format to --min:x')
+
+                if el.startswith('maxchoose:'):
+                    try:
+                        # print('BBB')
+                        maxchoose = el.split(':')
+                        control.maxchoose = maxchoose[1]
+                        # print(control.minchoice)
+                    except:
+                        raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
+                                         'być może  po --min: jest spacja. Format to --min:x')
+
+
             control.to_xml()
             self.postcode = control.postcode
-
             self.xml.append(control.xml)
 
             # obrazki zamiast kafeterii
@@ -365,6 +405,16 @@ class Question(SurveyElements):
                     script_call.list_column()
 
                     self.xml.append(script_call.to_xml())
+
+                if el.startswith('min:'):
+                    try:
+                        # print('BBB')
+                        min = el.split(':')
+                        control.minchoose = min[1]
+                        # print(control.minchoice)
+                    except:
+                        raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
+                                         'być może  po --min: jest spacja. Format to --min:x')
 
         # endregion
 
@@ -543,10 +593,12 @@ class ControlSingle(Control):
     def __init__(self, id_, **kwargs):
         Control.__init__(self, id_, **kwargs)
         self.tag = 'control_single'
-
         if not self.layout:
             self.layout = 'vertical'
         self.itemlimit = "0"
+
+        self.minchoose = None
+        self.maxchoose = None
 
         # wartości nadpisane
         for key in kwargs:
@@ -567,6 +619,12 @@ class ControlSingle(Control):
         self.xml.set('results', self.results)
         self.xml.set('rotation', self.rotation)
         self.xml.set('style', self.style)
+
+        if self.minchoose:
+            self.xml.set('minchoose', self.minchoose)
+
+        if self.maxchoose:
+            self.xml.set('maxchoose', self.maxchoose)
 
         """Sprawdzenie, czy ma kafeterię zostawiam tutaj. Nie chcę tego robić w init
         ponieważ dopuszczam różne możliwości ustawiania atrybutu:
