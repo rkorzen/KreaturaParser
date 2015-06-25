@@ -488,6 +488,55 @@ class Question(SurveyElements):
             pass
         # endregion
 
+        # region slider
+        if self.typ == 'SLIDER':
+            # TODO: dodatkowe atrybuty? value min max step - można to też odpuścić
+
+            left, right = None, None
+
+            num = ControlNumber(self.id)
+
+            # jeśłi jest kafeteria - to powinny być poadane oba końce skali
+            if self.cafeteria:
+                try:
+                    left = self.cafeteria[0].content
+                    right = self.cafeteria[1].content
+                except IndexError as e:
+                    raise ValueError('W pytaniu ' + self.id + ' powinny być podane oba końce skali - czyli dwa elementy kafeterii', e)
+
+            if not left:
+                num.name = self.id + ' ' + self.content
+                num.to_xml()
+
+                self.xml.append(num.xml)
+            else:
+                num.name = "{0} | {1} - {2} | {3} ".format(self.id, left, right, self.content)
+                table = ControlTable(self.id+'_table')
+                row = Row()
+                l_cell = Cell()
+                l_cell.add_control(ControlLaout(self.id + 'left', **{'content': left}))
+
+                n_cell = Cell()
+                n_cell.add_control(num)
+
+                r_cell = Cell()
+                r_cell.add_control(ControlLaout(self.id + 'right', **{'content': right}))
+
+                row.add_cell(l_cell)
+                row.add_cell(n_cell)
+                row.add_cell(r_cell)
+
+                table.add_row(row)
+                table.to_xml()
+
+                self.xml.append(table.xml)
+
+            script_call = ScriptsCalls(self.id)
+            script_call.slider()
+
+            self.xml.append(script_call.to_xml())
+
+        # endregion
         x = 0
 
 
@@ -871,5 +920,116 @@ new IbisListColumn("{0}",{1});
 </script>
 '''.format(self.id)
 
+    def slider(self):
+        self.content.text += '''
+<!-- Script name/version: slider/1.0 -->
+<link rel="stylesheet" href="public/slider3/css/ui-lightness/jquery-ui-1.8.9.custom.css" type="text/css">
+<script type='text/javascript' src='public/slider3/js/jquery-ui-1.8.9.custom.min.js'></script>
+<link rel="stylesheet" href="public/slider3/slider_sog.css" type="text/css">
+<script type='text/javascript' src='public/slider3/slider_sog.js'></script>
+<script type='text/javascript'>
+     sliderOpts = {{
+          value: 1,
+          min: 1,
+          max: 10,
+          step: 1,
+          animate:"slow",
+          orientation: 'horizontal'
+     }};
+
+new IbisSlider("{0}", sliderOpts);
+</script>
+<!-- ControlScript ENDS HERE: slider -->
+'''.format(self.id)
+
     def to_xml(self):
         return self.control
+
+class Row:
+    def __init__(self):
+        self.forcestable = 'true'
+        self.style = ""
+        self.cells = []
+        self.xml = None
+
+    def add_cell(self, cell):
+
+        if isinstance(cell, Cell):
+            self.cells.append(cell)
+        else:
+            raise TypeError("Próbujesz dodać do wiersza coś co nie jest komórką")
+
+    def to_xml(self):
+        self.xml = etree.Element('row')
+        self.xml.set('forcestable', self.forcestable)
+        self.xml.set('style', self.style)
+
+        if not self.cells:
+            raise ValueError('Wiersz nie ma żadnej komórki')
+
+        for cell in self.cells:
+            cell.to_xml()
+            self.xml.append(cell.xml)
+
+
+class Cell:
+    def __init__(self):
+        self.colspan = '1'
+        self.forcestable = 'false'
+        self.rowspan='1'
+        self.style = ''
+        self.xml = None
+        self.control = None
+
+    def add_control(self, control):
+        self.control = control
+
+    def to_xml(self):
+        self.xml = etree.Element('cell')
+        self.xml.set('colspan', self.colspan)
+        self.xml.set('forcestable', self.forcestable)
+        self.xml.set('rowspan', self.rowspan)
+        self.xml.set('style', self.style)
+
+        if self.control:
+            control = self.control.to_xml()
+            self.xml.append(self.control.xml)
+        else:
+            raise ValueError('W komórce tabeli powinna być kontrolka')
+
+
+class ControlTable:
+    def __init__(self, id_):
+        self.id = id_
+        self.rows = []
+        self.random = 'false'
+        self.rotation = 'false'
+        self.rrdest = 'row'
+        self.style = ''
+        self.xml = None
+
+    def add_row(self, row):
+        if isinstance(row, Row):
+            self.rows.append(row)
+        else:
+            raise TypeError('Chcesz dodać do tabeli element inny niż typ row... może dodajesz cell?')
+
+    def to_xml(self):
+        self.xml = etree.Element('control_table')
+        self.xml.set('id', self.id)
+        self.xml.set('random', self.random)
+        self.xml.set('rotation', self.rotation)
+        self.xml.set('rrdest', self.rrdest)
+        self.xml.set('style', self.style)
+
+        if not self.rows:
+            raise ValueError('Tabela', self.id, 'nie ma wierszy, a powinna mieć przynajmniej jeden')
+
+        try:
+            for row in self.rows:
+                row.to_xml()
+                self.xml.append(row.xml)
+
+        except ValueError as e:
+            # print(str(e))
+            raise ValueError("W tabeli " + self.id, e)

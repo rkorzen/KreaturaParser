@@ -1,7 +1,7 @@
 import re
 # import subprocess
 from elements import Block, Page, Question, Cafeteria
-
+# TODO: przenieść patterny w jedno miejsce (są używane przynajmniej w dwóch i stamtąd ich używać!)
 
 def block_parser(line):
     """
@@ -105,6 +105,7 @@ def cafeteria_parser(line):
 
     """
     cafeteria = Cafeteria()
+    # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
 
     caf = cafeteria_pattern.match(line)

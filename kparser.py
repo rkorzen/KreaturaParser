@@ -85,6 +85,8 @@ def recognize(line):
         return "COMMENT"
 
     caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
+    # caf_patrn = re.compile("[\w !@#$%^&*()_+-=.,'\":;\\|\[\]\{\}`]+")
+    # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
     if caf_patrn.match(line):
         return "CAFETERIA"
@@ -412,22 +414,14 @@ Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy prop
 2 Cydr Lubelski - butelka 0.33L za 3.99 PLN
 3 Cydr Lubelski - butelka trójpak 0.33L za 9.99 PLN
 4 Cydr Lubelski - puszka 0.5L za 4.49 PLN
-5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN
-"""
-
-    in_3 = """Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy propozycje, które najbardziej zachęciłyby Pana(nią) do zakupu --min:3--max:3
-1 Cydr Lubelski - butelka 1L za 9.99 PLN
-2 Cydr Lubelski - butelka 0.33L za 3.99 PLN
-3 Cydr Lubelski - butelka trójpak 0.33L za 9.99 PLN
-4 Cydr Lubelski - puszka 0.5L za 4.49 PLN
-5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN
+5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN --gn
 """
 
 
     survey = parse(input_)
-    survey = parse(in_3)
+
     survey.to_xml()
-    x = etree.tostring(survey.xml)
+    x = etree.tostring(survey.xml, pretty_print=True)
     with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
         f.write(x)
     #print(BeautifulSoup(x).prettify(formatter="xml"))

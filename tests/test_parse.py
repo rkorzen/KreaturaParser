@@ -2469,6 +2469,7 @@ A'''
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+
 class TestParseToXmlControlNumber(KreaturaTestCase):
     def test_control_open_xml(self):
         line = "Q N Q1 COS"
@@ -2951,11 +2952,48 @@ class TestSlider(KreaturaTestCase):
     def test_slider(self):
         line = "Q SLIDER Q1 TRESC"
         survey = parse(line)
-
         survey.to_xml()
 
         got = etree.tostring(survey.xml)
-        want = "<cos></cos>"
+
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+    <block id="Default" name="" quoted="false" random="false" rotation="false">
+      <page hideBackButton="false" id="Q1_p" name="">
+        <question id="Q1" name="">
+          <control_layout id="Q1.labelka" layout="default" style="">
+            <content>TRESC</content>
+          </control_layout>
+          <control_number float="false" id="Q1" mask=".*" name="Q1 TRESC" require="true" results="true" style="">
+            <content></content>
+          </control_number>
+          <control_layout id="Q1.js" layout="default" style="">
+            <content>&lt;!-- Script name/version: slider/1.0 --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/slider3/css/ui-lightness/jquery-ui-1.8.9.custom.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/slider3/js/jquery-ui-1.8.9.custom.min.js'&gt;&lt;/script&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/slider3/slider_sog.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/slider3/slider_sog.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+     sliderOpts = {{
+          value: 1,
+          min: 1,
+          max: 10,
+          step: 1,
+          animate:&quot;slow&quot;,
+          orientation: 'horizontal'
+     }};
+
+new IbisSlider(&quot;Q1&quot;, sliderOpts);
+&lt;/script&gt;
+&lt;!-- ControlScript ENDS HERE: slider --&gt;</content>
+          </control_layout>
+        </question>
+      </page>
+    </block>
+    <vars></vars>
+    <procedures>
+      <procedure id="PROC" shortdesc=""></procedure>
+    </procedures>
+  </survey>""".format(survey.createtime)
         self.assertXmlEqual(got, want)
 
     def test_slider_with_ends(self):
@@ -2964,12 +3002,70 @@ lewy koniec
 prawy koniec'''
 
         survey = parse(line)
-
         survey.to_xml()
 
         got = etree.tostring(survey.xml)
-        want = "<cos></cos>"
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+    <block id="Default" name="" quoted="false" random="false" rotation="false">
+      <page hideBackButton="false" id="Q1_p" name="">
+        <question id="Q1" name="">
+          <control_layout id="Q1.labelka" layout="default" style="">
+            <content>TRESC</content>
+          </control_layout>
+          <control_table id="Q1_table" random='false' rotation='false' rrdest='row' style=''>
+          <row forcestable='true' style=''>
+          <cell colspan='1' forcestable='false' rowspan='1' style=''>
+            <control_layout id='Q1left' layout="default" style="">
+                <content>lewy koniec</content>
+            </control_layout>
+          </cell>
+          <cell colspan='1' forcestable='false' rowspan='1' style=''>
+              <control_number float="false" id="Q1" mask=".*" name="Q1 | lewy koniec - prawy koniec | TRESC " require="true" results="true" style="">
+                <content></content>
+              </control_number>
+          </cell>
+          <cell colspan='1' forcestable='false' rowspan='1' style=''>
+            <control_layout id='Q1right' layout="default" style="">
+                <content>prawy koniec</content>
+            </control_layout>
+          </cell>
+          </row>
+          </control_table>
+          <control_layout id="Q1.js" layout="default" style="">
+            <content>&lt;!-- Script name/version: slider/1.0 --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/slider3/css/ui-lightness/jquery-ui-1.8.9.custom.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/slider3/js/jquery-ui-1.8.9.custom.min.js'&gt;&lt;/script&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/slider3/slider_sog.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/slider3/slider_sog.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+     sliderOpts = {{
+          value: 1,
+          min: 1,
+          max: 10,
+          step: 1,
+          animate:&quot;slow&quot;,
+          orientation: 'horizontal'
+     }};
+
+new IbisSlider(&quot;Q1&quot;, sliderOpts);
+&lt;/script&gt;
+&lt;!-- ControlScript ENDS HERE: slider --&gt;</content>
+          </control_layout>
+        </question>
+      </page>
+    </block>
+    <vars></vars>
+    <procedures>
+      <procedure id="PROC" shortdesc=""></procedure>
+    </procedures>
+  </survey>""".format(survey.createtime)
+
         self.assertXmlEqual(got, want)
+
+    def test_slider_only_one_end(self):
+        line = "Q SLIDER Q1 TRESC\nlewy koniec"
+        survey = parse(line)
+        self.assertRaises(ValueError, survey.to_xml)
 
 
 class TestErrors(KreaturaTestCase):
