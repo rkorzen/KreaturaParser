@@ -417,6 +417,12 @@ Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy prop
 5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN --gn
 """
 
+    input_ = '''Q S A2_1 <img src='public/koncept_1.jpg'><br>Jak ocenia Pan(i) tę promocję?
+1 Bardzo atrakcyjna
+2 Raczej atrakcyjna
+3 Ani atrakcyjna ani nieatrakcyjna
+4 Raczej nieatrakcyjna
+5 Zupełnie nie jest atrakcyjna'''
 
     survey = parse(input_)
 

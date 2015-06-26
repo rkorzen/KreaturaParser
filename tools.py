@@ -1,3 +1,4 @@
+# coding: utf-8
 from lxml import etree
 
 
@@ -84,3 +85,58 @@ def build_precode(precode, tag):
     prec.text = etree.CDATA(text)
 
     return prec
+
+
+def clean_labels(text):
+    """
+    ma czyścić labelki ze znaczników html
+
+    cos <img src='public/cos.jpg' alt='cos'> -> cos
+    """
+    import re
+    tags_re = re.compile('(<(\S+?)>|<(\S+)\s.*?>)')
+
+    # na wypadek, gdyby niektóre tagi trzeba bylo zostawic
+    # tags = ('br', 'sub', 'sup', 'cotamjeszczechcesz')
+    tags = ()
+
+    def tags_filter(matchobj):
+        matched = matchobj.groups()[1]
+        matched = matched if matched else matchobj.groups()[2]
+
+        return matchobj.group(0) if matched in tags else ''
+
+    tekst_bez_znacznikow = tags_re.sub(tags_filter, text)
+    return(tekst_bez_znacznikow)
+
+def wersjonowanie_plci(text):
+
+    dict_ = {'Pan(i)':'#SEX_M#',
+             'Pan/i':'#SEX_M#',
+             'Pan/Pani':'#SEX_M#',
+             'Pana(i)':'#SEX_D#',
+             'Pana(-i)':'#SEX_D#',
+             'Pana/i':'#SEX_D#',
+             'Pana/Pani':'#SEX_D#',
+             'Panu(i)':'#SEX_C#',
+             'Panu/i':'#SEX_C#',
+             'Pani(u)': '#SEX_C#',
+             'Pana(ią)':'#SEX_B#',
+             'Panem(ią)':'#SEX_N#',
+             'Panem(nią)':'#SEX_N#',
+             'y(a)':'#END_Y#',
+             '(a)':'#END_A#',
+             'em/am':'#END_EM#',
+             'em(am)':'#END_EM#',
+             'e(am)':"#END_EM#",
+             'by/aby':'#END_A#by',
+             'Panu/Pani':'#SEX_C#',
+             # u'„': '&bdquo;',
+             # u'”': '&rdquo;',
+             'zadowolony/ zadowolona': 'zadowolon#END_Y#',
+             'zadowolony/zadowolona': 'zadowolon#END_Y#',
+             'zadowolona/zadowolony': 'zadowolon#END_Y#'}
+
+    for key in dict_:
+        text = text.replace(key, dict_[key])
+    return text
