@@ -1,6 +1,6 @@
 import re
 from lxml import etree
-from tools import build_precode, find_parent
+from tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
 
 import datetime
 
@@ -271,13 +271,13 @@ class Question(SurveyElements):
         # endregion
 
         layout = ControlLaout(self.id + '.labelka')
-        layout.content = self.content
+        layout.content = wersjonowanie_plci(self.content)
         layout.to_xml()
         self.xml.append(layout.xml)
 
         # region sprawdzamy id stwierdzen i kafeterii
         temp_ids = []
-        print(self.cafeteria)
+        # print(self.cafeteria)
         for caf in self.cafeteria:
             if caf.id in temp_ids:
                 raise ValueError('Przynajmniej dwie odpowiedzi mają to samo id w pytaniu', self.id)
@@ -295,7 +295,7 @@ class Question(SurveyElements):
                     else:
                         id_suf = '_' + str(caf.id)
                     layout_ = ControlLaout(self.id + id_suf + '_txt')
-                    layout_.content = caf.content
+                    layout_.content = wersjonowanie_plci(caf.content)
                     layout_.to_xml()
                     self.xml.append(layout_.xml)
 
@@ -314,7 +314,7 @@ class Question(SurveyElements):
                     #     id_suf = '_' + str(caf.id)
 
                     open_ = ControlOpen(self.id + id_suf)
-                    open_.name = self.id + id_suf + ' | ' + caf.content
+                    open_.name = self.id + id_suf + ' | ' + clean_labels(caf.content)
 
                     # if self.size:
                     #     open_.size = self.size
@@ -322,7 +322,7 @@ class Question(SurveyElements):
                     self.xml.append(open_.xml)
             else:
                 open_ = ControlOpen(self.id)
-                open_.name = self.id + ' | ' + self.content
+                open_.name = self.id + ' | ' + clean_labels(self.content)
                 if self.size:
                     open_.size = self.size
                 open_.to_xml()
@@ -347,7 +347,7 @@ class Question(SurveyElements):
                 control = ControlMulti(self.id)
 
             control.cafeteria = self.cafeteria
-            control.name = self.id + ' | ' + self.content
+            control.name = self.id + ' | ' + clean_labels(self.content)
             control.postcode = self.postcode
 
             # minchoice itd
@@ -372,7 +372,6 @@ class Question(SurveyElements):
                     except:
                         raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
                                          'być może  po --min: jest spacja. Format to --min:x')
-
 
             control.to_xml()
             self.postcode = control.postcode
@@ -428,14 +427,14 @@ class Question(SurveyElements):
                         id_suf = '_' + str(caf.id)
 
                     open_ = ControlNumber(self.id + id_suf)
-                    open_.name = self.id + id_suf + ' | ' + caf.content
+                    open_.name = self.id + id_suf + ' | ' + clean_labels(caf.content)
                     if self.size:
                         open_.size = self.size
                     open_.to_xml()
                     self.xml.append(open_.xml)
             else:
                 open_ = ControlNumber(self.id)
-                open_.name = self.id + ' | ' + self.content
+                open_.name = self.id + ' | ' + clean_labels(self.content)
                 if self.size:
                     open_.size = self.size
                 open_.to_xml()
@@ -466,7 +465,7 @@ class Question(SurveyElements):
                     control = ControlSingle(el_id)
 
                 control.cafeteria = self.cafeteria
-                control.name = el_id + ' | ' + stwierdzenie.content
+                control.name = el_id + ' | ' + clean_labels(stwierdzenie.content)
 
                 if stwierdzenie.hide:
                     control.hide = stwierdzenie.hide.format(stwierdzenie.id)
@@ -505,12 +504,12 @@ class Question(SurveyElements):
                     raise ValueError('W pytaniu ' + self.id + ' powinny być podane oba końce skali - czyli dwa elementy kafeterii', e)
 
             if not left:
-                num.name = self.id + ' ' + self.content
+                num.name = self.id + ' ' + clean_labels(self.content)
                 num.to_xml()
 
                 self.xml.append(num.xml)
             else:
-                num.name = "{0} | {1} - {2} | {3} ".format(self.id, left, right, self.content)
+                num.name = "{0} | {1} - {2} | {3} ".format(self.id, clean_labels(left), clean_labels(right), clean_labels(self.content))
                 table = ControlTable(self.id+'_table')
                 row = Row()
                 l_cell = Cell()
@@ -802,7 +801,7 @@ class Cafeteria:
         self.xml.set('name', "")
         self.xml.set('style', "")
         content = etree.Element('content')
-        content.text = self.content
+        content.text = wersjonowanie_plci(self.content)
         self.xml.append(content)
         if self.hide:
             hide = etree.Element('hide')
@@ -944,6 +943,7 @@ new IbisSlider("{0}", sliderOpts);
 
     def to_xml(self):
         return self.control
+
 
 class Row:
     def __init__(self):

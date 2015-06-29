@@ -1,5 +1,5 @@
 from unittest import main
-from kparser import parse
+from kparser import parse, print_tree
 from elements import Block, Page, Question, Cafeteria, Survey
 from lxml import etree
 from tests.testing_tools import KreaturaTestCase
@@ -130,6 +130,24 @@ B B1 B0
 
         result = parse(text_input)
         self.assertEqual(expected, result)
+
+    def test_page_parent(self):
+        text_input = "P PO --parent:MAIN"
+        page = Page('P0')
+        page.parent_id = 'MAIN'
+
+        block = Block('MAIN')
+        block.childs.append(page)
+
+        survey = Survey()
+        survey.append(block)
+
+        result = parse(text_input)
+        print('got', result.childs[0].childs[0].parent_id)
+        print('want', survey.childs[0].childs[0].parent_id)
+
+        print(print_tree(survey))
+
     # endregion
 
     # region question test
@@ -640,8 +658,44 @@ endif"""
         survey.append(b)
         result = parse(input_)
         self.assertEqual(survey, result)
-    # endregion
 
+    def test_nesting(self):
+        input_ = """B MAIN
+B B1 MAIN
+Q L Q1 cos
+
+B B2 MAIN
+Q L Q2 cos
+
+P Q3_p MAIN
+Q L Q3 cos
+"""
+        survey = parse(input_)
+
+        want = Survey()
+        want.createtime = survey.createtime
+
+        b_main = Block('MAIN')
+        b_b1 = Block('B1')
+        p = Page('Q1_p')
+        q = Question('Q1')
+        q.typ = 'L'
+        q.content  = 'cos'
+
+        p.childs.append(q)
+        b_b1.childs.append(p)
+        b_main.childs.append(b_b1)
+        want.append(b_main)
+
+        print(print_tree(survey))
+        print(print_tree(want))
+
+        got = print_tree(survey)
+        want = print_tree(want)
+        self.assertEqual(got, want)
+
+
+    # endregion
 
 class TestParseToXmlBlock(KreaturaTestCase):
     def test_block_with_precode_to_xml(self):

@@ -8,10 +8,12 @@ The main function is parse
 
 """
 import re
-from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser
+from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
 from elements import Question, Survey, Page, Block
 from lxml import etree
+
 from bs4 import BeautifulSoup
+
 
 
 def recognize(line):
@@ -58,40 +60,47 @@ def recognize(line):
         return "SWITCH"
 
     # example: B B1 B0 --ran --hide: $A1:{0} == "1"
-    block_pattern = re.compile("^(B)(( )[\w_.]+){1,2}(( --ran)|( --rot))?( --hide:.*)?$")
+    # block_pattern = re.compile("^(B)(( )[\w_.]+){1,2}(( --ran)|( --rot))?( --hide:.*)?$")
+    block_pattern = Patterns.block_pattern
     if block_pattern.match(line):
         return "BLOCK"
 
     # example: P P0 --hide: $A1:{0} == "1"
-    page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*((--hide:)(.*)))*$")  # z grupowaniem
+    # page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*((--hide:)(.*)))*$")  # z grupowaniem
+    page_pattern = Patterns.page_pattern
     if page_pattern.match(line):
         return "PAGE"
 
     # example: Q O Q1 Coś tam --rot --hide
-    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
+    # question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
+    question_pattern = Patterns.question_pattern
     if question_pattern.match(line):
         return "QUESTION"
 
-    precode_pattern = re.compile("^PRE .*$")
+    # precode_pattern = re.compile("^PRE .*$")
+    precode_pattern = Patterns.precode_pattern
     if precode_pattern.match(line):
         return "PRECODE"
 
-    precode_pattern = re.compile("^POST .*$")
-    if precode_pattern.match(line):
+    # postcode_pattern = re.compile("^POST .*$")
+    postcode_pattern = Patterns.postcode_pattern
+    if postcode_pattern.match(line):
         return "POSTCODE"
 
-    comment_line_patrn = re.compile("^//.*$")
-    if comment_line_patrn.match(line):
+    # comment_line_patrn = re.compile("^//.*$")
+    comment_line_pattern = Patterns.comment_line_pattern
+    if comment_line_pattern.match(line):
         return "COMMENT"
 
-    caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
+    # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # caf_patrn = re.compile("[\w !@#$%^&*()_+-=.,'\":;\\|\[\]\{\}`]+")
     # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
-    if caf_patrn.match(line):
+    caf_pattern = Patterns.caf_pattern
+    if caf_pattern.match(line):
         return "CAFETERIA"
 
-    blanck_pattern = re.compile("^$")
+    blanck_pattern = Patterns.blanck_pattern
     if blanck_pattern.match(line):
         return "BLANK"
 
@@ -205,6 +214,8 @@ def parse(text_input):
 
             if b.parent_id:
                 survey.add_to_parent(b)
+                current_block = b
+
             else:
                 current_block = b
                 survey.append(current_block)
@@ -228,6 +239,8 @@ def parse(text_input):
             # endregion
 
             current_page = page_parser(line)
+            print('AAA')
+            print(current_page.parent_id)
             # print('AA', next_page_precode)
             # if next_page_precode[0] is not None:
             #     print('AAA')
@@ -373,63 +386,22 @@ def parse(text_input):
 
 if __name__ == "__main__":
 
-    input_ = """Q M CW1 W jakich opakowaniach kupuje Pan(i) Cydr Lubelski?
-Butelka 1l
-Butelka 0.33l
-Puszka 0.5l
-Nie kupuję Cydru Lubelskiego
 
-B CW2_BLOCK
-
-BEGIN PROGRAM
-
-lista = '''1	Butelka 1l
-2	Butelka 0.33l
-3	Puszka 0.5l
-4	Nie kupuję Cydru Lubelskiego'''.splitlines()
-
-def func():
-    out = ''
-    for n in lista:
-        n = n.split('\\t')
-        out += '''Q M CW2_{0} Z jakich powodów kupuje Pan(i) Cydr Lubelski w {1}?
-PRE if ($CW1:{0} == "1");else;goto next;endif
-1 Atrakcyjna cena
-2 Wygodny format opakowania
-3 Promocja
-4 Okazja na którą jest kupowany cydr
-5 Dostępność/ widoczność w sklepie
-6 Smak
-7 Odpowiednia pojemność
-97.c Inne (jakie)
-'''.format(n[0], n[1])
-    return out
-
-xxx = func()
-END PROGRAM
-
-B CW3_BLOK
-Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy propozycje, które najbardziej zachęciłyby Pana(nią) do zakupu --min:3--max:3
+    input_ = '''Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy propozycje, które najbardziej zachęciłyby Pana(nią) do zakupu --min:3--max:3
 1 Cydr Lubelski - butelka 1L za 9.99 PLN
 2 Cydr Lubelski - butelka 0.33L za 3.99 PLN
 3 Cydr Lubelski - butelka trójpak 0.33L za 9.99 PLN
 4 Cydr Lubelski - puszka 0.5L za 4.49 PLN
-5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN --gn
-"""
+5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN --gn'''
 
-    input_ = '''Q S A2_1 <img src='public/koncept_1.jpg'><br>Jak ocenia Pan(i) tę promocję?
-1 Bardzo atrakcyjna
-2 Raczej atrakcyjna
-3 Ani atrakcyjna ani nieatrakcyjna
-4 Raczej nieatrakcyjna
-5 Zupełnie nie jest atrakcyjna'''
+    with open(r'c:\badania\ADHOC.2015\T125734.06\tajpej.txt', 'r') as in_:
 
-    survey = parse(input_)
+        survey = parse(in_.read())
 
-    survey.to_xml()
-    x = etree.tostring(survey.xml, pretty_print=True)
-    with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
-        f.write(x)
+        survey.to_xml()
+        x = etree.tostring(survey.xml, pretty_print=True)
+        with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+            f.write(x)
     #print(BeautifulSoup(x).prettify(formatter="xml"))
 
 

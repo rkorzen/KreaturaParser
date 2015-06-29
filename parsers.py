@@ -1,7 +1,40 @@
 import re
 # import subprocess
 from elements import Block, Page, Question, Cafeteria
+
 # TODO: przenieść patterny w jedno miejsce (są używane przynajmniej w dwóch i stamtąd ich używać!)
+
+
+class Patterns:
+
+    # region recognize
+    # example: B B1 B0 --ran --hide: $A1:{0} == "1"
+    block_pattern = re.compile("^(B)(( )[\w_.]+){1,2}(( --ran)|( --rot))?( --hide:.*)?$")
+
+    # example: P P0 --hide: $A1:{0} == "1"
+    # example: P P0 --parent:Q --hide: $A1:97 == "1"
+    # page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*((--hide:)(.*)))*$")  # z grupowaniem
+    page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*(--parent:)([\w_.]+))?([ ])*(((--hide:)(.*)))*$")  # z grupowaniem
+    # example: Q O Q1 Coś tam --rot --hide
+    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
+    #                        #                           typ                      size             id       parent                     5
+    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")
+    precode_pattern = re.compile("^PRE .*$")
+    postcode_pattern = re.compile("^POST .*$")
+    comment_line_pattern = re.compile("^//.*$")
+
+    # caf_patrn = re.compile("[\w !@#$%^&*()_+-=.,'\":;\\|\[\]\{\}`]+")
+    # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
+    # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
+    # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
+    # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +&\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
+
+    blanck_pattern = re.compile("^$")
+    # endregion
+
+    parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
+
 
 def block_parser(line):
     """
@@ -13,7 +46,8 @@ def block_parser(line):
     id_ = line.split(' ', 2)[1]
     block = Block(id_)
 
-    parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
+    # parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
+    parent_pattern = Patterns.parent_pattern
     r = parent_pattern.match(line)
     if r:
         block.parent_id = r.group(4)
@@ -38,6 +72,9 @@ def page_parser(line):
     :rtype: Page
 
     """
+    r = Patterns.page_pattern.match(line)
+    parent_id = r.groups()[5]
+
     id_ = line.split(' ', 2)[1]
     page = Page(id_)
 
@@ -54,8 +91,8 @@ def question_parser(line):
 
     """
     #                  typ                      size             id       parent                     5
-    r = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")\
-          .match(line)
+    # r = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$").match(line)
+    r = Patterns.question_pattern_advanced.match(line)
 
     question = Question(r.group(3))  # id
     question.typ = r.group(1)
@@ -106,8 +143,8 @@ def cafeteria_parser(line):
     """
     cafeteria = Cafeteria()
     # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
-
+    # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
+    cafeteria_pattern = Patterns.caf_pattern
     caf = cafeteria_pattern.match(line)
 
     if caf.group(2):           # id
