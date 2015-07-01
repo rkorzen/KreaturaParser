@@ -27,9 +27,8 @@ class Patterns:
     # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +&\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
-
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
+    # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +\-&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     blanck_pattern = re.compile("^$")
     # endregion
 
@@ -146,12 +145,24 @@ def cafeteria_parser(line):
     # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     cafeteria_pattern = Patterns.caf_pattern
     caf = cafeteria_pattern.match(line)
-
+    # print(caf.groups())
     if caf.group(2):           # id
         cafeteria.id = caf.group(2)
 
     if caf.group(4):           # content
         cafeteria.content = caf.group(4)
+        if ' --so' in cafeteria.content:
+            cafeteria.screenout = True
+            cafeteria.content = cafeteria.content.replace(' --so', '')
+        if '--so' in cafeteria.content:
+            cafeteria.screenout = True
+            cafeteria.content = cafeteria.content.replace('--so', '')
+        if ' --gn' in cafeteria.content:
+            cafeteria.gotonext = True
+            cafeteria.content = cafeteria.content.replace(' --gn', '')
+        if '--gn' in cafeteria.content:
+            cafeteria.gotonext = True
+            cafeteria.content = cafeteria.content.replace('--gn', '')
 
     if caf.group(3) == ".d":   # deactivate
         cafeteria.deactivate = True

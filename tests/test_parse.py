@@ -667,7 +667,7 @@ Q L Q1 cos
 B B2 MAIN
 Q L Q2 cos
 
-P Q3_p MAIN
+P P3_p MAIN
 Q L Q3 cos
 """
         survey = parse(input_)
@@ -697,6 +697,7 @@ Q L Q3 cos
 
     # endregion
 
+# Block
 class TestParseToXmlBlock(KreaturaTestCase):
     def test_block_with_precode_to_xml(self):
         input_ = 'B B0\nPRE if($A1:1 == "1");goto next;else;endif'
@@ -720,7 +721,7 @@ class TestParseToXmlBlock(KreaturaTestCase):
         survey = parse(input_)
         self.assertRaises(ValueError, survey.to_xml)
 
-
+# Page
 class TestParseToXmlPage(KreaturaTestCase):
     def test_page_with_precode_to_xml(self):
         input_ = 'P P0\nPRE if($A1:1 == "1");goto next;else;endif'
@@ -746,7 +747,7 @@ class TestParseToXmlPage(KreaturaTestCase):
         survey = parse(input_)
         self.assertRaises(ValueError, survey.to_xml)
 
-
+# Open
 class TestParseToXmlOpen(KreaturaTestCase):
 
     def test_control_open_xml(self):
@@ -1044,7 +1045,7 @@ B"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
-
+# Text
 class TestParseToXmlControlLayout(KreaturaTestCase):
     def test_control_layout_xml(self):
         line = "Q L Q1 COS"
@@ -1142,7 +1143,7 @@ B"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
-
+# Single
 class TestParseToXmlControlSingle(KreaturaTestCase):
     def test_control_single_xml(self):
         line = """Q S Q1 COS
@@ -2286,7 +2287,7 @@ new IbisListColumn("Q2",10);
 
         self.assertXmlEqual(got, want)
 
-
+# Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):
     def test_control_multi_xml(self):
         line = """Q M Q1 COS
@@ -2523,7 +2524,7 @@ A'''
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
-
+# Number
 class TestParseToXmlControlNumber(KreaturaTestCase):
     def test_control_open_xml(self):
         line = "Q N Q1 COS"
@@ -2700,7 +2701,7 @@ B"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
-
+# js table
 class TestJsTables(KreaturaTestCase):
     def setUp(self):
         self.line = '''Q T Q1 COS
@@ -3001,7 +3002,7 @@ t.print();
 </survey>""".format(survey.createtime)
         self.assertXmlEqual(got, want)
 
-
+# slider
 class TestSlider(KreaturaTestCase):
     def test_slider(self):
         line = "Q SLIDER Q1 TRESC"

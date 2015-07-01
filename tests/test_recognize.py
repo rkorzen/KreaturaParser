@@ -208,6 +208,15 @@ class TestCafeteriaRecognize(TestCase):
         line = 'a!@#$%^&*()_+-=.,'":;\|/[]{}`"
         self.assertEqual('CAFETERIA', recognize(line))
 
+    def test_real_test_1(self):
+        line = '2 W wieku 5-9 lat'
+        line2 = '3 W wieku 10-14 lat'
+        line3 = '1.	Tak, kupuję je dość często'
+        line4 = '2.001 - 3.000 zł'
+        self.assertEqual('CAFETERIA', recognize(line))
+        self.assertEqual('CAFETERIA', recognize(line2))
+        self.assertEqual('CAFETERIA', recognize(line3))
+        self.assertEqual('CAFETERIA', recognize(line4))
 
 class TestBlankRecognize(TestCase):
     def test_blank_line(self):

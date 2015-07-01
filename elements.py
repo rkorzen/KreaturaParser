@@ -803,6 +803,7 @@ class Cafeteria:
         content = etree.Element('content')
         content.text = wersjonowanie_plci(self.content)
         self.xml.append(content)
+        # print(self.hide)
         if self.hide:
             hide = etree.Element('hide')
             hide.text = etree.CDATA(self.hide.format(self.id))

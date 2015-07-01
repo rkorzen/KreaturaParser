@@ -104,6 +104,8 @@ def recognize(line):
     if blanck_pattern.match(line):
         return "BLANK"
 
+    print("Nie wiem co to jest", line)
+
 
 def clean_line(line):
     """:rtype : string
@@ -239,8 +241,8 @@ def parse(text_input):
             # endregion
 
             current_page = page_parser(line)
-            print('AAA')
-            print(current_page.parent_id)
+            # print('AAA')
+            # print(current_page.parent_id)
             # print('AA', next_page_precode)
             # if next_page_precode[0] is not None:
             #     print('AAA')
@@ -343,7 +345,7 @@ def parse(text_input):
             if collect_statements:
                 current_question.statements.append(statement)
             else:
-                print(current_question.cafeteria)
+                # print(current_question.cafeteria)
                 current_question.cafeteria.append(statement)
 
         # endregion
