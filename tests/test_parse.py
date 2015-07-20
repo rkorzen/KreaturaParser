@@ -3,7 +3,7 @@ from kparser import parse, print_tree
 from elements import Block, Page, Question, Cafeteria, Survey
 from lxml import etree
 from tests.testing_tools import KreaturaTestCase
-
+from tools import show_attr
 
 class TestParse(KreaturaTestCase):
 
@@ -132,22 +132,31 @@ B B1 B0
         self.assertEqual(expected, result)
 
     def test_page_parent(self):
-        text_input = "P PO --parent:MAIN"
+        text_input = "B MAIN\nB B1\nP PO --parent:MAIN"
+        survey = Survey()
+        block = Block('MAIN')
+        b1 = Block('B1')
         page = Page('P0')
         page.parent_id = 'MAIN'
 
-        block = Block('MAIN')
         block.childs.append(page)
-
-        survey = Survey()
         survey.append(block)
+        survey.append(b1)
 
-        result = parse(text_input)
-        print('got', result.childs[0].childs[0].parent_id)
-        print('want', survey.childs[0].childs[0].parent_id)
+        got = parse(text_input)
+        survey.createtime = got.createtime
 
+        # print('got', result.childs[0].childs[0].parent_id)
+        # print('want', survey.childs[0].childs[0].parent_id)
+        print(show_attr(survey.childs[0]))
+        print(show_attr(got.childs[0]))
+
+
+        print(show_attr(survey.childs[0].childs[0]))
+        print(show_attr(got.childs[0].childs[0]))
         print(print_tree(survey))
-
+        print(print_tree(got))
+        self.assertEqual(got, survey)
     # endregion
 
     # region question test
@@ -667,7 +676,7 @@ Q L Q1 cos
 B B2 MAIN
 Q L Q2 cos
 
-P P3_p MAIN
+P P3_p --parent:MAIN
 Q L Q3 cos
 """
         survey = parse(input_)
@@ -676,15 +685,35 @@ Q L Q3 cos
         want.createtime = survey.createtime
 
         b_main = Block('MAIN')
+
         b_b1 = Block('B1')
         p = Page('Q1_p')
         q = Question('Q1')
         q.typ = 'L'
         q.content  = 'cos'
-
         p.childs.append(q)
         b_b1.childs.append(p)
+
+        b_b2 = Block('B2')
+        b_b2.parent_id = "MAIN"
+        p = Page('Q2_p')
+        q = Question('Q2')
+        q.typ = 'L'
+        q.content  = 'cos'
+        p.childs.append(q)
+        b_b2.childs.append(p)
+
+        p = Page('P3_p')
+        p.parent_id = "MAIN"
+        q = Question('Q3')
+        q.typ = 'L'
+        q.content  = 'cos'
+        p.childs.append(q)
+
         b_main.childs.append(b_b1)
+        b_main.childs.append(b_b2)
+        b_main.childs.append(p)
+
         want.append(b_main)
 
         print(print_tree(survey))

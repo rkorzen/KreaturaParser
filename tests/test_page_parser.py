@@ -18,5 +18,14 @@ class TestPageParser(TestCase):
         expected.hide = ' $A1:97 == "1"'
         self.assertEqual(result, expected)
 
+    def test_page_with_parent(self):
+        line = "P P0 --parent:MAIN"
+        got = page_parser(line)
+
+        want = Page('P0')
+        want.parent_id = "MAIN"
+
+        self.assertEqual(got, want)
+
 if __name__ == '__main__':
     main()

@@ -79,7 +79,8 @@ def page_parser(line):
 
     if " --hide:" in line:
         page.hide = line.split(" --hide:")[1]
-
+    if parent_id:
+        page.parent_id = parent_id
     return page
 
 

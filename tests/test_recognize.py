@@ -70,6 +70,10 @@ class TestPageRecognize(TestCase):
     #     result = recognize(line)
     #     self.assertEqual(None, result)
 
+    def test_page_with_parent(self):
+        line = 'P P0 --parent:MAIN'
+        result = recognize(line)
+        self.assertEqual('PAGE', result)
 
 class TestQuestionRecoginize(TestCase):
 
@@ -217,6 +221,7 @@ class TestCafeteriaRecognize(TestCase):
         self.assertEqual('CAFETERIA', recognize(line2))
         self.assertEqual('CAFETERIA', recognize(line3))
         self.assertEqual('CAFETERIA', recognize(line4))
+
 
 class TestBlankRecognize(TestCase):
     def test_blank_line(self):

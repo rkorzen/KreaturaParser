@@ -11,7 +11,7 @@ import re
 from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
 from elements import Question, Survey, Page, Block
 from lxml import etree
-
+from tools import find_parent
 from bs4 import BeautifulSoup
 
 
@@ -228,7 +228,7 @@ def parse(text_input):
 
         # region page
         if structure == "PAGE":
-
+            print('BBB')
             # region reset
             """
                 Jeśli wieresz to nowa struktura BLOCK/PAGE/QUESTION,
@@ -255,7 +255,13 @@ def parse(text_input):
                 current_block = block_parser("B Default")
                 survey.append(current_block)
 
-            current_block.childs.append(current_page)
+            if current_page.parent_id:
+                block = find_parent(survey.childs, current_page.parent_id)
+                # print('BLOCK', block.id)
+                block.childs.append(current_page)
+            else:
+                current_block.childs.append(current_page)
+
             current_element = current_page
 
         # endregion
@@ -286,10 +292,12 @@ def parse(text_input):
                 survey.append(current_block)
 
             if not current_page:
+                print('AAA', current_page)
                 tmp_line = "P " + current_question.id + "_p"
                 current_page = page_parser(tmp_line)
                 current_block.childs.append(current_page)
 
+            print(current_page.id)
             current_page.childs.append(current_question)
             current_element = current_question
 
