@@ -210,6 +210,7 @@ class TestCafeteriaRecognize(TestCase):
 
     def test_sign_in_cafeteria(self):
         line = 'a!@#$%^&*()_+-=.,'":;\|/[]{}`"
+        line = '1 cos (PLN;EUR)'
         self.assertEqual('CAFETERIA', recognize(line))
 
     def test_real_test_1(self):

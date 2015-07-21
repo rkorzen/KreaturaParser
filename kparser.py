@@ -292,12 +292,12 @@ def parse(text_input):
                 survey.append(current_block)
 
             if not current_page:
-                print('AAA', current_page)
+                # print('AAA', current_page)
                 tmp_line = "P " + current_question.id + "_p"
                 current_page = page_parser(tmp_line)
                 current_block.childs.append(current_page)
 
-            print(current_page.id)
+            # print(current_page.id)
             current_page.childs.append(current_question)
             current_element = current_question
 
@@ -395,8 +395,6 @@ def parse(text_input):
 
 
 if __name__ == "__main__":
-
-
     input_ = '''Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy propozycje, które najbardziej zachęciłyby Pana(nią) do zakupu --min:3--max:3
 1 Cydr Lubelski - butelka 1L za 9.99 PLN
 2 Cydr Lubelski - butelka 0.33L za 3.99 PLN

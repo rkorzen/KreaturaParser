@@ -132,7 +132,7 @@ B B1 B0
         self.assertEqual(expected, result)
 
     def test_page_parent(self):
-        text_input = "B MAIN\nB B1\nP PO --parent:MAIN"
+        text_input = "B MAIN\nB B1\nP P0 --parent:MAIN"
         survey = Survey()
         block = Block('MAIN')
         b1 = Block('B1')
@@ -146,16 +146,6 @@ B B1 B0
         got = parse(text_input)
         survey.createtime = got.createtime
 
-        # print('got', result.childs[0].childs[0].parent_id)
-        # print('want', survey.childs[0].childs[0].parent_id)
-        print(show_attr(survey.childs[0]))
-        print(show_attr(got.childs[0]))
-
-
-        print(show_attr(survey.childs[0].childs[0]))
-        print(show_attr(got.childs[0].childs[0]))
-        print(print_tree(survey))
-        print(print_tree(got))
         self.assertEqual(got, survey)
     # endregion
 

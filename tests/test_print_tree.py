@@ -14,7 +14,13 @@ B B4"""
 
         survey = parse(input_)
         result = print_tree(survey)
-        expected = '''B0\n\tB1\n\tB2\n\t\tB3\n\tP1\n\t\tQ1\nB4'''
+        expected = '''B0
+\tB1
+\tB2
+\t\tP1
+\t\t\tQ1
+\t\tB3
+B4'''
         self.assertEqual(expected, result)
 
     def test_print_tree_2(self):
@@ -34,7 +40,13 @@ B B4"""
 
         survey = parse(input_)
         result = print_tree(survey)
-        expected = '''B0\n\tB1\n\tB2\n\t\tB3\n\tP1\n\t\tQ1\nB4'''
+        expected = '''B0
+\tB1
+\tB2
+\t\tP1
+\t\t\tQ1
+\t\tB3
+B4'''
         self.assertEqual(expected, result)
 
 
