@@ -201,7 +201,13 @@ class Page(SurveyElements):
             # aktualizuję postcode strony tym  co zebrane w głębi
             self.postcode = child.postcode
             self.warnings = child.warnings
-            self.xml.append(child.xml)
+
+            # w gridzie to_xml dla question zwraca element page wraz z dziećmi.. trzeba to podmienić,
+            # by nie było strony w stronie
+            if child.xml.tag == 'page':
+                self.xml = child.xml
+            else:
+                self.xml.append(child.xml)
 
         # print("jestem tu: ". self.postcode)
         if self.postcode:
@@ -222,10 +228,15 @@ class Question(SurveyElements):
         Tu najwięcej się dzieje
         """
 
-        # TODO: tutaj duużo do zrobienia - wszystkie typy
-        self.xml = etree.Element('question')
-        self.xml.set('id', self.id)
-        self.xml.set('name', '')
+        # region sprawdzamy id stwierdzen i kafeterii
+        temp_ids = []
+        # print(self.cafeteria)
+        for caf in self.cafeteria:
+            if caf.id in temp_ids:
+                raise ValueError('Przynajmniej dwie odpowiedzi mają to samo id w pytaniu', self.id)
+            else:
+                temp_ids.append(caf.id)
+        # endregion
 
         # region special markers
         # w pytaniach mogą być ukryte specjalne znaczniki
@@ -266,24 +277,37 @@ class Question(SurveyElements):
 
             special_markers.append(maxchoose.replace('--', ''))
             self.content = self.content.replace(maxchoose, '')
-
-
         # endregion
 
-        layout = ControlLaout(self.id + '.labelka')
-        layout.content = wersjonowanie_plci(self.content)
-        layout.to_xml()
-        self.xml.append(layout.xml)
+        # TODO: tutaj duużo do zrobienia - wszystkie typy
 
-        # region sprawdzamy id stwierdzen i kafeterii
-        temp_ids = []
-        # print(self.cafeteria)
-        for caf in self.cafeteria:
-            if caf.id in temp_ids:
-                raise ValueError('Przynajmniej dwie odpowiedzi mają to samo id w pytaniu', self.id)
-            else:
-                temp_ids.append(caf.id)
-        # endregion
+        if self.typ in ('G', 'SDG'):
+            # w tym przypadku niestety question w to_xml musi zwrócić page
+
+            self.xml = etree.Element('page')
+            self.xml.set('id', self.id + '_p')
+            self.xml.set('hideBackButton', 'false')
+
+            # question z instrukcją
+            instr = etree.Element('question')
+            instr.set('id', self.id + 'instr')
+
+            layout = ControlLaout(self.id + '_lab_instr')
+            layout.content = '<div class="grid_instrukcja">' + wersjonowanie_plci(self.content) + "</div>"
+            layout.to_xml()
+
+            instr.append(layout.xml)
+            self.xml.append(instr)
+
+        else:
+            self.xml = etree.Element('question')
+            self.xml.set('id', self.id)
+            self.xml.set('name', '')
+
+            layout = ControlLaout(self.id + '.labelka')
+            layout.content = wersjonowanie_plci(self.content)
+            layout.to_xml()
+            self.xml.append(layout.xml)
 
         # region control_layout
         if self.typ is "L":
@@ -345,6 +369,11 @@ class Question(SurveyElements):
                 control = ControlSingle(self.id)
             else:
                 control = ControlMulti(self.id)
+
+            if self.random:
+                control.random = 'true'
+            if self.rotation:
+                control.rotation = 'true'
 
             control.cafeteria = self.cafeteria
             control.name = self.id + ' | ' + clean_labels(self.content)
@@ -484,7 +513,55 @@ class Question(SurveyElements):
 
         # region dinamic grid
         if self.typ in ('G', 'SDG'):
-            pass
+            hide_ptrn = ""
+            for stwierdzenie in self.statements:
+                el_id = self.id + '_' + stwierdzenie.id
+                question = etree.Element('question')
+                question.set('id', el_id)
+
+                if stwierdzenie.hide:
+                    hide_ptrn = stwierdzenie.hide
+
+                if hide_ptrn:
+                    try:
+                        hide_q = hide_ptrn.format(stwierdzenie.id)
+                    except ValueError as e:
+                        raise ValueError(e, self.id)
+                    hide = etree.Element('hide')
+                    hide.text = etree.CDATA(hide_q)
+                    question.append(hide)
+
+                lay = ControlLaout(el_id + '_txt')
+
+                if '--multi' in stwierdzenie.content:
+                    control = ControlMulti(el_id)
+                    stwierdzenie.content = stwierdzenie.content.replace('--multi', '')
+                else:
+                    control = ControlSingle(el_id)
+
+                lay.content = stwierdzenie.content
+                control.cafeteria = self.cafeteria
+
+                lay.to_xml()
+                # min i maxchoose dla kontrolek single/multi
+                # TODO: redaktoring dla single multi
+                Question.min_max_choice(special_markers, control)
+
+                control.name = el_id + ' | ' + clean_labels(stwierdzenie.content)
+                control.to_xml()
+
+                question.append(lay.xml)
+                question.append(control.xml)
+                self.xml.append(question)
+
+            question_sc = etree.Element('question')
+            question_sc.set('id', self.id + 'script_calls')
+
+            script_call = ScriptsCalls(self.id)
+            script_call.dinamic_grid()
+
+            question_sc.append(script_call.to_xml())
+            self.xml.append(question_sc)
         # endregion
 
         # region slider
@@ -537,6 +614,29 @@ class Question(SurveyElements):
 
         # endregion
         x = 0
+
+    @staticmethod
+    def min_max_choice(special_markers, control):
+        for el in special_markers:
+            if el.startswith('minchoose:'):
+                try:
+                    # print('BBB')
+                    minchoose = el.split(':')
+                    control.minchoose = minchoose[1]
+                    # print(control.minchoice)
+                except:
+                    raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
+                                     'być może  po --min: jest spacja. Format to --min:x')
+
+            if el.startswith('maxchoose:'):
+                try:
+                    # print('BBB')
+                    maxchoose = el.split(':')
+                    control.maxchoose = maxchoose[1]
+                    # print(control.minchoice)
+                except:
+                    raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
+                                     'być może  po --min: jest spacja. Format to --min:x')
 
 
 class Control:
@@ -776,6 +876,7 @@ class Cafeteria:
         self.other = False
         self.screenout = False
         self.gotonext = False
+        self.goto = None
         self.xml = None
 
         for key in kwargs:
@@ -789,7 +890,8 @@ class Cafeteria:
                self.deactivate == other.deactivate and
                self.other == other.other and
                self.screenout == other.screenout and
-               self.gotonext == other.gotonext
+               self.gotonext == other.gotonext and
+               self.goto == other.goto
                )
 
     def __repr__(self):
@@ -940,6 +1042,38 @@ new IbisListColumn("{0}",{1});
 new IbisSlider("{0}", sliderOpts);
 </script>
 <!-- ControlScript ENDS HERE: slider -->
+'''.format(self.id)
+
+    def dinamic_grid(self):
+        self.content.text += '''<!-- Script: listcolumn -->
+<link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css">
+<script type='text/javascript' src='public/listcolumn/listcolumn.js'></script>
+<script type='text/javascript'>
+  // przykład dla list kolumn
+  // użyj, gdy listy mają być podzielone na kolumny - np gdy bardzo długa lista
+  // new IbisListColumn("{0}_1",2);
+</script>
+<!-- end: listcolumn -->
+
+<!-- Script: SuperImages -->
+<link rel='stylesheet' type='text/css' href='public/superImages.css'/>
+<script type='text/javascript' src='public/superImages.js'></script>
+<script type='text/javascript'>
+  // przykład dla SuperImages
+  // użyj jeśli mają być w gridzie obrazki zamiast kafeterii tekstowej
+  // s1 = new SuperImages("{0}_1", {{zoom: false}});
+</script>
+<!-- end: SuperImages -->
+
+<!-- Script: MerryGoRound -->
+<link rel='stylesheet' type='text/css' href='public/merryGoRound.css'/>
+<script type='text/javascript' src='public/merryGoRound.js'></script>
+<script type='text/javascript'>
+    mgr = new MerryGoRound(jQuery("div.question").slice(1,-1),{{randomQuestion: false}});
+</script>
+<!-- end: MerryGoRound -->
+
+<link rel="stylesheet" href="public/custom.css" type="text/css">
 '''.format(self.id)
 
     def to_xml(self):

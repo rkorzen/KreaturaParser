@@ -27,7 +27,7 @@ class Patterns:
     # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +\-&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     blanck_pattern = re.compile("^$")
     # endregion
@@ -125,6 +125,7 @@ def question_parser(line):
         question.content = question.content.split(' --hide:')[0]
 
     if " --rot" in line:
+        print('AAAA')
         question.rotation = True
         question.content = question.content.replace(' --rot', '')
 
@@ -147,6 +148,7 @@ def cafeteria_parser(line):
     cafeteria_pattern = Patterns.caf_pattern
     caf = cafeteria_pattern.match(line)
     # print(caf.groups())
+    print(line)
     if caf.group(2):           # id
         cafeteria.id = caf.group(2)
 
@@ -164,6 +166,10 @@ def cafeteria_parser(line):
         if '--gn' in cafeteria.content:
             cafeteria.gotonext = True
             cafeteria.content = cafeteria.content.replace('--gn', '')
+        if '--goto:' in cafeteria.content:
+            goto = caf.group(8)
+            cafeteria.goto = goto
+            cafeteria.content = cafeteria.content.replace('--goto:' + goto, '')
 
     if caf.group(3) == ".d":   # deactivate
         cafeteria.deactivate = True
@@ -179,6 +185,9 @@ def cafeteria_parser(line):
 
     if caf.group(7) == ' --gn':  # goto next
         cafeteria.gotonext = True
+
+    if caf.group(8):  # goto next
+        cafeteria.goto = caf.group(8)
 
     return cafeteria
 

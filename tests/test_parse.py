@@ -2306,6 +2306,205 @@ new IbisListColumn("Q2",10);
 
         self.assertXmlEqual(got, want)
 
+    def test_goto(self):
+        line = """Q S Q1 COS
+A--goto:A2_p
+
+Q S Q2 COS
+A"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+                                 <page id="Q2_p"
+                                       hideBackButton="false"
+                                       name="">
+<precode>
+<![CDATA[if ($Q1:1 == "1")
+    goto A2_p
+else
+endif]]>
+</precode>
+                                       <question id="Q2"
+                                                 name="">
+                                                 <control_layout id="Q2.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q2"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q2 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+
+                          </block>
+                        <vars/>
+                        <procedures>
+                        <procedure id="PROC" shortdesc=""/>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_randomize(self):
+        line = """Q S Q1 COS --ran
+A"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="true"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="false"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_rotation(self):
+        line = """Q S Q1 COS --rot
+A"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        print(got)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="true"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
 # Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):
     def test_control_multi_xml(self):
@@ -3141,6 +3340,281 @@ new IbisSlider(&quot;Q1&quot;, sliderOpts);
         survey = parse(line)
         self.assertRaises(ValueError, survey.to_xml)
 
+# dinamic grid
+class TestDinamicGrid(KreaturaTestCase):
+    def test_dinamic_grid(self):
+        line = '''Q G Q1 COS
+1 a
+_
+1 stw a'''
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false">
+      <question id="Q1instr">
+        <control_layout id="Q1_lab_instr" layout="default" style="">
+          <content>&lt;div class="grid_instrukcja"&gt;COS&lt;/div&gt;</content>
+        </control_layout>
+      </question>
+      <question id="Q1_1">
+        <control_layout id="Q1_1_txt" layout="default" style="">
+          <content>stw a</content>
+        </control_layout>
+        <control_single id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false" require="true" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+        </control_single>
+      </question>
+      <control_layout id="Q1.js" layout="default" style="">
+        <content>&lt;!-- Script: listcolumn --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla list kolumn
+  // u&#380;yj, gdy listy maj&#261; by&#263; podzielone na kolumny - np gdy bardzo d&#322;uga lista
+  // new IbisListColumn("Q1_1",2);
+&lt;/script&gt;
+&lt;!-- end: listcolumn --&gt;
+
+&lt;!-- Script: SuperImages --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/superImages.css'/&gt;
+&lt;script type='text/javascript' src='public/superImages.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla SuperImages
+  // u&#380;yj je&#347;li maj&#261; by&#263; w gridzie obrazki zamiast kafeterii tekstowej
+  // s1 = new SuperImages("Q1_1", {{zoom: false}});
+&lt;/script&gt;
+&lt;!-- end: SuperImages --&gt;
+
+&lt;!-- Script: MerryGoRound --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/merryGoRound.css'/&gt;
+&lt;script type='text/javascript' src='public/merryGoRound.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+    mgr = new MerryGoRound(jQuery("div.question").slice(1,-1),{{randomQuestion: false}});
+&lt;/script&gt;
+&lt;!-- end: MerryGoRound --&gt;
+
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+      </control_layout>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_dinamic_grid_multi(self):
+        line = '''Q G Q1 COS
+1 a
+_
+1 stw a--multi'''
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false">
+      <question id="Q1instr">
+        <control_layout id="Q1_lab_instr" layout="default" style="">
+          <content>&lt;div class="grid_instrukcja"&gt;COS&lt;/div&gt;</content>
+        </control_layout>
+      </question>
+      <question id="Q1_1">
+        <control_layout id="Q1_1_txt" layout="default" style="">
+          <content>stw a</content>
+        </control_layout>
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false" require="true" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+        </control_multi>
+      </question>
+      <control_layout id="Q1.js" layout="default" style="">
+        <content>&lt;!-- Script: listcolumn --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla list kolumn
+  // u&#380;yj, gdy listy maj&#261; by&#263; podzielone na kolumny - np gdy bardzo d&#322;uga lista
+  // new IbisListColumn("Q1_1",2);
+&lt;/script&gt;
+&lt;!-- end: listcolumn --&gt;
+
+&lt;!-- Script: SuperImages --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/superImages.css'/&gt;
+&lt;script type='text/javascript' src='public/superImages.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla SuperImages
+  // u&#380;yj je&#347;li maj&#261; by&#263; w gridzie obrazki zamiast kafeterii tekstowej
+  // s1 = new SuperImages("Q1_1", {{zoom: false}});
+&lt;/script&gt;
+&lt;!-- end: SuperImages --&gt;
+
+&lt;!-- Script: MerryGoRound --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/merryGoRound.css'/&gt;
+&lt;script type='text/javascript' src='public/merryGoRound.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+    mgr = new MerryGoRound(jQuery("div.question").slice(1,-1),{{randomQuestion: false}});
+&lt;/script&gt;
+&lt;!-- end: MerryGoRound --&gt;
+
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+      </control_layout>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_dinamic_grid_multi_hide(self):
+        line = '''Q G Q1 COS
+1 a
+_
+1 stw a--multi --hide:A'''
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false">
+      <question id="Q1instr">
+        <control_layout id="Q1_lab_instr" layout="default" style="">
+          <content>&lt;div class="grid_instrukcja"&gt;COS&lt;/div&gt;</content>
+        </control_layout>
+      </question>
+      <question id="Q1_1">
+      <hide><![CDATA[A]]></hide>
+        <control_layout id="Q1_1_txt" layout="default" style="">
+          <content>stw a</content>
+        </control_layout>
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false" require="true" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+        </control_multi>
+      </question>
+      <control_layout id="Q1.js" layout="default" style="">
+        <content>&lt;!-- Script: listcolumn --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla list kolumn
+  // u&#380;yj, gdy listy maj&#261; by&#263; podzielone na kolumny - np gdy bardzo d&#322;uga lista
+  // new IbisListColumn("Q1_1",2);
+&lt;/script&gt;
+&lt;!-- end: listcolumn --&gt;
+
+&lt;!-- Script: SuperImages --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/superImages.css'/&gt;
+&lt;script type='text/javascript' src='public/superImages.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla SuperImages
+  // u&#380;yj je&#347;li maj&#261; by&#263; w gridzie obrazki zamiast kafeterii tekstowej
+  // s1 = new SuperImages("Q1_1", {{zoom: false}});
+&lt;/script&gt;
+&lt;!-- end: SuperImages --&gt;
+
+&lt;!-- Script: MerryGoRound --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/merryGoRound.css'/&gt;
+&lt;script type='text/javascript' src='public/merryGoRound.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+    mgr = new MerryGoRound(jQuery("div.question").slice(1,-1),{{randomQuestion: false}});
+&lt;/script&gt;
+&lt;!-- end: MerryGoRound --&gt;
+
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+      </control_layout>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_dinamic_grid_multi_hide_maxchoice(self):
+        line = '''Q G Q1 COS--maxchoose:5
+1 a
+_
+1 stw a--multi --hide:A'''
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false">
+      <question id="Q1instr">
+        <control_layout id="Q1_lab_instr" layout="default" style="">
+          <content>&lt;div class="grid_instrukcja"&gt;COS&lt;/div&gt;</content>
+        </control_layout>
+      </question>
+      <question id="Q1_1">
+      <hide><![CDATA[A]]></hide>
+        <control_layout id="Q1_1_txt" layout="default" style="">
+          <content>stw a</content>
+        </control_layout>
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false" require="true" results="true" rotation="false" maxchoose="5">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+        </control_multi>
+      </question>
+      <control_layout id="Q1.js" layout="default" style="">
+        <content>&lt;!-- Script: listcolumn --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla list kolumn
+  // u&#380;yj, gdy listy maj&#261; by&#263; podzielone na kolumny - np gdy bardzo d&#322;uga lista
+  // new IbisListColumn("Q1_1",2);
+&lt;/script&gt;
+&lt;!-- end: listcolumn --&gt;
+
+&lt;!-- Script: SuperImages --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/superImages.css'/&gt;
+&lt;script type='text/javascript' src='public/superImages.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla SuperImages
+  // u&#380;yj je&#347;li maj&#261; by&#263; w gridzie obrazki zamiast kafeterii tekstowej
+  // s1 = new SuperImages("Q1_1", {{zoom: false}});
+&lt;/script&gt;
+&lt;!-- end: SuperImages --&gt;
+
+&lt;!-- Script: MerryGoRound --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/merryGoRound.css'/&gt;
+&lt;script type='text/javascript' src='public/merryGoRound.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+    mgr = new MerryGoRound(jQuery("div.question").slice(1,-1),{{randomQuestion: false}});
+&lt;/script&gt;
+&lt;!-- end: MerryGoRound --&gt;
+
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+      </control_layout>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
 
 class TestErrors(KreaturaTestCase):
     def test_two_same_caf_numbers(self):

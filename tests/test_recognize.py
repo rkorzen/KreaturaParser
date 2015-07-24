@@ -75,6 +75,7 @@ class TestPageRecognize(TestCase):
         result = recognize(line)
         self.assertEqual('PAGE', result)
 
+
 class TestQuestionRecoginize(TestCase):
 
     def test_simple_single(self):
@@ -218,11 +219,12 @@ class TestCafeteriaRecognize(TestCase):
         line2 = '3 W wieku 10-14 lat'
         line3 = '1.	Tak, kupuję je dość często'
         line4 = '2.001 - 3.000 zł'
+        line5 = '2 Nie --goto:S7_p'
         self.assertEqual('CAFETERIA', recognize(line))
         self.assertEqual('CAFETERIA', recognize(line2))
         self.assertEqual('CAFETERIA', recognize(line3))
         self.assertEqual('CAFETERIA', recognize(line4))
-
+        self.assertEqual('CAFETERIA', recognize(line5))
 
 class TestBlankRecognize(TestCase):
     def test_blank_line(self):

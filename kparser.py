@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Author: Rafał Korzeniewski
 Mail: korzeniewski@gmail.com
@@ -356,6 +357,14 @@ def parse(text_input):
                 # print(current_question.cafeteria)
                 current_question.cafeteria.append(statement)
 
+            if statement.goto:
+                if next_page_precode[0] is None:
+                    next_page_precode = [current_page.id, '''if (${0}:{1} == "1");  goto {2};else;endif'''.format(
+                        current_question.id, statement.id, statement.goto)]
+                else:
+                    next_page_precode[1] += ''';;if (${0}:{1} == "1");  goto {2};else;endif'''.format(
+                        current_question.id, statement.id, statement.goto)
+
         # endregion
 
         # region switch
@@ -395,14 +404,166 @@ def parse(text_input):
 
 
 if __name__ == "__main__":
-    input_ = '''Q M CW3 Wyświetli się kilka ofert Cydru Lubelskiego. Proszę wybrać trzy propozycje, które najbardziej zachęciłyby Pana(nią) do zakupu --min:3--max:3
-1 Cydr Lubelski - butelka 1L za 9.99 PLN
-2 Cydr Lubelski - butelka 0.33L za 3.99 PLN
-3 Cydr Lubelski - butelka trójpak 0.33L za 9.99 PLN
-4 Cydr Lubelski - puszka 0.5L za 4.49 PLN
-5 Cydr Lubelski - puszka czteropak 4x0.5L za 14.99 PLN --gn'''
+    input_ = '''B SCREENER
+Q S S0 Czy pracuje Pan(i) w którejś z poniższych branż?
+1 Służba zdrowia, ochrona zdrowia --so
+2 Farmacja, apteki --so
+3 Marketing, reklama --so
+4 Badania rynku --so
+5 W żadnej z powyższych
 
-    with open(r'c:\badania\ADHOC.2015\T125734.06\tajpej.txt', 'r') as in_:
+Q S S1 Czy zażywał(a) Pan(i) w ciągu ostatnich 3 miesięcy witaminy, minerały lub preparaty witaminowo-minerałowe / multiwitaminy?
+1 Tak
+2 Nie --so
+
+Q M S2 Proszę wskazać, które z poniższych kategorii preparatów zażywał(a) Pan(i) w ciągu ostatnich 3 miesięcy:
+1 Preparaty witaminowo-minerałowe lub multiwitaminy (np. Centrum, Vita-miner itp.)
+2 Pojedyncze witaminy
+3 Pojedyncze minerały
+4 Witaminy lub minerały z dodatkiem
+5 Inne suplementy
+98.d Żadne z powyższych --so
+
+Q M S2a Proszę wskazać, jakie witaminy zażywał(a) Pan(i) w ciągu ostatnich 3 miesięcy --ran
+PRE if($S2:2 == "1");else;goto next;endif
+Witamina A
+Witamina B
+Witamina C
+Witamina D
+Witamina E
+Witamina K
+97 Inne pojedyncze witaminy
+
+Q M S2b Proszę wskazać, jakie minerały zażywał(a) Pan(i) w ciągu ostatnich 3 miesięcy --ran
+PRE if($S2:3 == "1");else;goto next;endif
+Wapń
+Cynk
+Potas
+Magnez
+Żelazo
+Sód
+97 Inne pojedyncze minerały
+
+Q M S2c Proszę wskazać, jakie witaminy lub minerały z dodatkiem zażywał(a) Pan(i) w ciągu ostatnich 3 miesięcy --ran
+PRE if($S2:4 == "1");else;goto next;endif
+Magnez + wit.B6
+Rutyna + wit.C
+Omega3 + wit.E
+Witamina A + E
+Wapno + wit.C
+97.c Inne - jakie?
+
+Q M S2d Proszę wskazać, jakie inne suplementy zażywał(a) Pan(i) w ciągu ostatnich 3 miesięcy --ran
+PRE if($S2:5 == "1");else;goto next;endif
+Koenzym Q10
+Kwasy omega-3
+Kwasy DHA
+Tran
+Kolagen
+97.c Inne - jakie?
+
+Q O S3 Ile osób (łącznie z Panem/Panią) liczy Pana(i) gospodarstwo domowe?
+
+Q S S4 Czy posiada Pan(i) dzieci w wieku poniżej 18 lat?
+1 Tak
+2 Nie --goto:S7_p
+
+Q O S5 Ile dzieci poniżej 18 lat Pan(i) posiada?
+
+Q O S6 W jakim  wieku są Pana(i) dzieci?
+1 1 dziecko
+2 2 dziecko
+3 3 dziecko
+4 4 dziecko
+5 5 dziecko
+
+Q S S7 Czy jest Pani obecnie w ciąży?
+PRE if (#PLEC == "k");else;goto next;endif
+1 Tak
+2 Nie
+3 Nie wiem / trudno powiedzieć / odmowa
+
+B A
+Q L A1_intro Mianem witamin i minerałów określa się bardzo różne preparaty, zarówno pojedyncze witaminy i minerały jak i środki złożone z wielu elementów. Teraz chcielibyśmy poznać Pana(i) zwyczaje i opinie dotyczące stosowania tego typu preparatów.
+
+Q SDG A1 Proszę wskazać jak często zażywa Pan(i)...?
+1 Codziennie
+2 3-4 razy w tygodniu
+3 1-2 razy w tygodniu
+4 2-3 razy w miesiącu
+5 Raz na miesiąc
+6 Rzadziej niż raz na miesiąc
+7 Nieregularnie, tylko w okresach zwiększonego zapotrzebowania / choroby
+8 Nie wiem / trudno powiedzieć
+_
+1 Preparaty witaminowo-minerałowe lub multiwitaminy (np. Centrum, Vita-miner itp.)
+2 Pojedyncze witaminy
+3 Pojedyncze minerały
+4 Witaminy lub minerały z dodatkiem
+5 Inne suplementy'''
+
+    input_ = '''Q SDG A1 Proszę wskazać jak często zażywa Pan(i)...?
+1 Codziennie
+2 3-4 razy w tygodniu
+3 1-2 razy w tygodniu
+4 2-3 razy w miesiącu
+5 Raz na miesiąc
+6 Rzadziej niż raz na miesiąc
+7 Nieregularnie, tylko w okresach zwiększonego zapotrzebowania / choroby
+8 Nie wiem / trudno powiedzieć
+_
+1 Preparaty witaminowo-minerałowe lub multiwitaminy (np. Centrum, Vita-miner itp.)
+2 Pojedyncze witaminy
+3 Pojedyncze minerały
+4 Witaminy lub minerały z dodatkiem
+5 Inne suplementy'''
+
+    input_ = """Q G A15 Teraz wyświetlą się Panu(i) różne opinie o wybranych preparatach witaminowo-minerałowych. Który lub które z poniższych preparatów…:
+1 Centrum --hide:$A14_{0}:2 == "0" && $A14_{0}:3 == "0" && $A14_{0}:4 == "0"
+2 Vitaral
+3 Plusssz
+4 Vita-miner
+5 Multi Code
+6 VigorUp!
+7 Olimp Labs
+8 Bodymax
+9 Doppelherz
+10 Pharmaton Geriavit
+11 Vitotal
+12 Falvit
+13 Vitrum Calcium
+14 Vibovit
+15 VisolVit
+16 Marsjanki
+17 Gumiżelki Witaminiaki
+18 Ceruvit Junior
+98 Żadne z powyższych
+_
+1 Jest godny zaufania
+2 Jest skuteczny
+3 Ma atrakcyjną cenę
+4 To najlepszy preparat witaminowo-minerałowy
+5 Jest modny, na czasie
+6 Jest nowoczesny
+7 Jest bezpieczny
+8 Jest najbardziej popularny
+9 To preparat dla kogoś takiego jak ja
+10 To preparat, który polecił(a)bym swoim znajomym
+11 Jest wysokiej jakości
+12 Jest wygodny w stosowaniu
+13 Jest go dużo w opakowaniu w rozsądnej cenie
+14 Jest dobrze przyswajalny
+15 Można go stosować w różnych formach
+16 Pochodzi z naturalnych składników
+17 Ładnie pachnie
+18 Jest smaczny
+19 Jest „chemiczny”
+20 Szybko działa
+21 Można go wszędzie kupić
+22 Ma szeroki / bogaty skład
+"""
+
+    with open(r'c:\badania\ADHOC.2015\124747.07\IBIS\skrypt\pepperoni.txt', 'rU') as in_:
 
         survey = parse(in_.read())
 
@@ -410,6 +571,13 @@ if __name__ == "__main__":
         x = etree.tostring(survey.xml, pretty_print=True)
         with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
             f.write(x)
+
+    # survey = parse(input_)
+    # survey.to_xml()
+    # x = etree.tostring(survey.xml, pretty_print=True)
+    # with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+    #     f.write(x)
+
     #print(BeautifulSoup(x).prettify(formatter="xml"))
 
 
