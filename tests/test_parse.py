@@ -2505,6 +2505,72 @@ A"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_single_and_open(self):
+        line = """Q S Q1 COS --rot
+1.c A"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        print(got)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_single id="Q1"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="true"
+                                                                 style="">
+                                                                 <list_item id="1" name="" style="" connected="Q1_1T">
+                                                                    <content>A</content>
+                                                                 </list_item>
+                                                 </control_single>
+                                                 <control_open id="Q1_1T"
+                                                                 itemlimit="0"
+                                                                 layout="vertical"
+                                                                 name="Q1 | COS"
+                                                                 random="false"
+                                                                 require="true"
+                                                                 results="true"
+                                                                 rotation="true"
+                                                                 style="">
+                                                                <content></content>
+                                                 </control_single>
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
 # Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):
     def test_control_multi_xml(self):
