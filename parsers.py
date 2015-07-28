@@ -27,7 +27,7 @@ class Patterns:
     # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;\<\>=\"]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +\-&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     blanck_pattern = re.compile("^$")
     # endregion
