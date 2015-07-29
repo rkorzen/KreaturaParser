@@ -27,7 +27,7 @@ class Patterns:
     # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;\<\>=\"]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +\-&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     blanck_pattern = re.compile("^$")
     # endregion
@@ -125,7 +125,7 @@ def question_parser(line):
         question.content = question.content.split(' --hide:')[0]
 
     if " --rot" in line:
-        print('AAAA')
+        # print('AAAA')
         question.rotation = True
         question.content = question.content.replace(' --rot', '')
 
@@ -148,7 +148,7 @@ def cafeteria_parser(line):
     cafeteria_pattern = Patterns.caf_pattern
     caf = cafeteria_pattern.match(line)
     # print(caf.groups())
-    print(line)
+    # print(line)
     if caf.group(2):           # id
         cafeteria.id = caf.group(2)
 

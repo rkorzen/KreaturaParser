@@ -229,7 +229,7 @@ def parse(text_input):
 
         # region page
         if structure == "PAGE":
-            print('BBB')
+            # print('BBB')
             # region reset
             """
                 Jeśli wieresz to nowa struktura BLOCK/PAGE/QUESTION,
@@ -563,20 +563,234 @@ _
 22 Ma szeroki / bogaty skład
 """
 
-    with open(r'c:\badania\ADHOC.2015\124747.07\IBIS\skrypt\pepperoni.txt', 'rU') as in_:
+    # with open(r'c:\badania\ADHOC.2015\124747.07\IBIS\skrypt\pepperoni.txt', 'rU') as in_:
+    #
+    #     survey = parse(in_.read())
+    #
+    #     survey.to_xml()
+    #     x = etree.tostring(survey.xml, pretty_print=True)
+    #     with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+    #         f.write(x)
 
-        survey = parse(in_.read())
+    input_ = '''B SCREENER
 
-        survey.to_xml()
-        x = etree.tostring(survey.xml, pretty_print=True)
-        with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
-            f.write(x)
+Q M SCR1 Czy jest Pani związana zawodowo z którąś z następujących branż?
+01 Reklama --so
+02 Badania rynku --so
+03 Marketing --so
+04 Dziennikarstwo --so
+05 Public Relations --so
+06 Branża farmaceutyczna --so
+07 Produkcja lub sprzedaż samochodów
+08 Produkcja mebli
+98.d Żadne z wymienionych
 
-    # survey = parse(input_)
-    # survey.to_xml()
-    # x = etree.tostring(survey.xml, pretty_print=True)
-    # with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
-    #     f.write(x)
+Q M SCR2 Proszę wskazać, które z wymienionych dolegliwości miewa Pani przynajmniej od czasu do czasu?
+1 alergia, uczulenie
+2 dolegliwości wątroby
+3 wrzody żołądka
+4 zaparcia/zatwardzenia
+5 zgaga
+6 nadkwaśność żołądka
+7 zespół wrażliwego/drażliwego jelita
+8 pieczenie przełyku
+9 niestrawność
+10 pieczenie/drażliwość żołądka
+11 biegunki
+12 wzdęcia
+98.d żadne z wymienionych
+
+Q G SCR3 Proszę powiedzieć, jak często odczuwa Pani (dolegliwość)?
+PRE if($SCR2:98 == "1");goto next;else;endif
+1 raz w tygodniu lub częściej
+2 2-3 razy w miesiącu
+3 raz w miesiącu
+4 raz na 2 miesiące
+5 raz na 3 miesiące
+6 2-3 razy w roku
+7 1 raz w roku
+8 rzadziej
+9 nie miewam w ogóle
+10 trudno powiedzieć
+_
+1 alergia, uczulenie --hide:$SCR2:{0} == "0"
+2 dolegliwości wątroby
+3 wrzody żołądka
+4 zaparcia/zatwardzenia
+5 zgaga
+6 nadkwaśność żołądka
+7 zespół wrażliwego/drażliwego jelita
+8 pieczenie przełyku
+9 niestrawność
+10 pieczenie/drażliwość żołądka
+11 biegunki
+12 wzdęcia
+
+B GLOWNY
+Q O90_1 A1 Proszę pomyśleć o preparatach na zgagę, które Pani zna. Jaki preparat przychodzi Pani do głowy jako pierwszy?--nr
+
+Q O50_1 A1a Jakie jeszcze preparaty na zgagę Pani zna choćby ze słyszenia? Proszę wymienić wszystkie środki na zgagę, o których Pani słyszała.--nr
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+
+Q M A2 Proszę spojrzeć na listę preparatów, które można stosować na zgagę. Które z tych preparatów zna Pan(i) przynajmniej ze słyszenia? --rot
+1 Rennie
+2 Manti
+3 Gaviscon
+4 Alugastrin
+5 Ranigast
+6 Controloc control
+7 Bioprazol
+8 Ortanol Max
+9 Polprazol
+10 Piastprazol
+11 Anesteloc Max
+12 Ranimax
+13 Riflux
+14 Malox
+96.c Inne (jakie?)
+97.d żadne z powyższych --goto:C3_p
+
+Q M A3 Proszę jeszcze raz spojrzeć na listę, na której wymieniono różne środki na zgagę. Proszę wskazać te środki, które zdarzyło się Pani stosować osobiście kiedykolwiek.
+1 Rennie --hide:$A2:{0} == "0"
+2 Manti
+3 Gaviscon
+4 Alugastrin
+5 Ranigast
+6 Controloc control
+7 Bioprazol
+8 Ortanol Max
+9 Polprazol
+10 Piastprazol
+11 Anesteloc Max
+12 Ranimax
+13 Riflux
+14 Malox
+96 $A2_96T$
+97.d żadne z powyższych  --hide:"0"--goto:B1_p
+
+Q M A4 A które z tych środków stosowała Pani osobiście w ciągu ostatnich 12 miesięcy?
+1 Rennie --hide:$A3:{0} == "0"
+2 Manti
+3 Gaviscon
+4 Alugastrin
+5 Ranigast
+6 Controloc control
+7 Bioprazol
+8 Ortanol Max
+9 Polprazol
+10 Piastprazol
+11 Anesteloc Max
+12 Ranimax
+13 Riflux
+14 Malox
+96 $A2_96T$
+97.d żadne z powyższych --hide:"0"--goto:A5_p
+
+Q M A4a A które z tych środków stosowała Pani osobiście w ciągu ostatniego miesiąca?
+1 Rennie --hide:$A4:{0} == "0"
+2 Manti
+3 Gaviscon
+4 Alugastrin
+5 Ranigast
+6 Controloc control
+7 Bioprazol
+8 Ortanol Max
+9 Polprazol
+10 Piastprazol
+11 Anesteloc Max
+12 Ranimax
+13 Riflux
+14 Malox
+96 $A2_96T$
+97.d żadne z powyższych --hide:"0"--goto:B1_p
+
+Q S A5 A który z tych środków stosuje Pani najczęściej?
+PRE #C_A3 = @count A3@;if (#C_A3 > "1");else;goto next;endif
+1 Rennie --hide:$A3:{0} == "0"
+2 Manti
+3 Gaviscon
+4 Alugastrin
+5 Ranigast
+6 Controloc control
+7 Bioprazol
+8 Ortanol Max
+9 Polprazol
+10 Piastprazol
+11 Anesteloc Max
+12 Ranimax
+13 Riflux
+14 Malox
+96 $A2_96T$
+97.d żadne z powyższych --hide:"0"
+
+Q G A6 Na ile prawdopodobne jest, że wybierze Pan(i) tę markę następnym razem, kiedy będzie Pan(i) kupować preparat na zgagę?
+1 to pierwsza marka, którą wezmę pod uwagę
+2 to marka, którą na pewno wezmę pod uwagę
+3 to marka, którą być może wezmę pod uwagę
+4 to marka, której nie wezmę pod uwagę
+5 nie wiem/ trudno powiedzieć
+_
+1 Rennie --hide:$A2:{0} == "0"
+2 Manti
+3 Gaviscon
+4 Alugastrin
+5 Ranigast
+6 Controloc control
+7 Bioprazol
+8 Ortanol Max
+9 Polprazol
+10 Piastprazol
+11 Anesteloc Max
+12 Ranimax
+13 Riflux
+14 Malox
+96 $A2_96T$
+
+B OCENA
+PRE if ($SCR2:98 == "1"); goto METRYCZKA;else;endif
+
+B LOS OCENA
+Q L LOS_WZDECIA A
+
+P D1_p --parent:OCENA
+Q G D1 Poniżej zobaczy Pani różne stwierdzenia, które mogą opisywać ten preparat. W odniesieniu do każdego stwierdzenia proszę określić, na ile Pani zdaniem pasuje ono do tego preparatu.
+1 Zdecydowanie pasuje
+2 Raczej pasuje
+3 Raczej nie pasuje
+4 Zdecydowanie nie pasuje
+5 Nie wiem/trudno powiedzieć
+_
+1 Wydaje się lepszy niż preparaty o podobnym przeznaczeniu dostępne na rynku
+2 Jest odpowiedni dla mnie
+3 Odpowiada na moje potrzeby
+4 Jest atrakcyjny
+5 Wzbudza moje zainteresowanie
+6 Wydaje się być wysokiej jakości
+7 Wydaje się być skuteczny w walce z dolegliwością
+8 Mam ochotę go wypróbować
+9 Podoba mi się nazwa tego preparatu
+10 Marka tego preparatu wzbudza moje zaufanie
+11 Marka tego preparatu gwarantuje wysoką jakość'''
+
+    survey = parse(input_)
+    survey.to_xml()
+    x = etree.tostring(survey.xml, pretty_print=True)
+    with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+        f.write(x)
 
     #print(BeautifulSoup(x).prettify(formatter="xml"))
 

@@ -277,6 +277,12 @@ class Question(SurveyElements):
 
             special_markers.append(maxchoose.replace('--', ''))
             self.content = self.content.replace(maxchoose, '')
+
+        # --nr czyli not require. Przydatne np przy liście openów nie wymaganych
+        if '--nr' in self.content:
+            self.content = self.content.replace('--nr', '')
+            special_markers.append('not_require')
+
         # endregion
 
         # TODO: tutaj duużo do zrobienia - wszystkie typy
@@ -327,7 +333,6 @@ class Question(SurveyElements):
 
         # region control_open
         if self.typ is "O":
-
             # dodaję kontrolkę/kontrolki open
             if self.cafeteria:
                 for nr, caf in enumerate(self.cafeteria):
@@ -339,7 +344,8 @@ class Question(SurveyElements):
 
                     open_ = ControlOpen(self.id + id_suf)
                     open_.name = self.id + id_suf + ' | ' + clean_labels(caf.content)
-
+                    if 'not_require' in special_markers:
+                        open_.require = 'false'
                     # if self.size:
                     #     open_.size = self.size
                     open_.to_xml()
@@ -347,6 +353,9 @@ class Question(SurveyElements):
             else:
                 open_ = ControlOpen(self.id)
                 open_.name = self.id + ' | ' + clean_labels(self.content)
+                if 'not_require' in special_markers:
+                    open_.require = 'false'
+
                 if self.size:
                     open_.size = self.size
                 open_.to_xml()
@@ -405,6 +414,15 @@ class Question(SurveyElements):
             control.to_xml()
             self.postcode = control.postcode
             self.xml.append(control.xml)
+
+            for caf in self.cafeteria:
+                if caf.other:
+                    open_id = self.id + '_' + caf.id + 'T'
+                    open_ = ControlOpen(open_id)
+                    open_.name = open_id + ' | ' + caf.content
+                    open_.to_xml()
+                    self.xml.append(open_.xml)
+
 
             # obrazki zamiast kafeterii
             if 'images' in special_markers:
@@ -552,7 +570,14 @@ class Question(SurveyElements):
 
                 question.append(lay.xml)
                 question.append(control.xml)
-                self.xml.append(question)
+
+                for caf in self.cafeteria:
+                    if caf.other:
+                        open_id = el_id + '_' + caf.id + 'T'
+                        open_ = ControlOpen(open_id)
+                        open_.name = open_id + ' | ' + caf.content
+                        open_.to_xml()
+                        question.append(open_.xml)
 
             question_sc = etree.Element('question')
             question_sc.set('id', self.id + 'script_calls')
@@ -718,11 +743,14 @@ class ControlOpen(Control):
     def to_xml(self):
         # example: <control_open id="Q1" length="25" line="1" mask=".*" require="true" results="true" rotation="false"
         # style="" name="Q1 COS"/>
+        # print(self.require)
+
         self.xml = etree.Element(self.tag)
         self.xml.set('id', self.id)
         self.xml.set('length', self.size[0])
         self.xml.set('lines', self.size[1])
         self.xml.set('mask', self.mask)
+
         self.xml.set('name', self.name)
         self.xml.set('require', self.require)
         self.xml.set('results', self.results)
@@ -731,6 +759,8 @@ class ControlOpen(Control):
         content = etree.Element('content')
         if self.content:
             content.text = self.content
+
+
 
         self.xml.append(content)
 
@@ -783,6 +813,8 @@ class ControlSingle(Control):
 
             caf_hide_pattern = ""  # na poczatek pusty hide pattern
             for caf in self.cafeteria:
+                print('AAA', caf.other)
+                # print('AAA', caf.deactivate)
                 list_item = Cafeteria()
                 list_item.id = caf.id
                 list_item.content = caf.content
@@ -798,6 +830,12 @@ class ControlSingle(Control):
 
                 if caf_hide_pattern:
                     list_item.hide = caf_hide_pattern
+
+                if caf.deactivate:
+                    list_item.deactivate = True
+
+                if caf.other:
+                    list_item.connected = self.id + '_' + caf.id + 'T'
 
                 list_item.to_xml()
 
@@ -878,6 +916,7 @@ class Cafeteria:
         self.gotonext = False
         self.goto = None
         self.xml = None
+        self.connected = False
 
         for key in kwargs:
             if kwargs[key]:
@@ -906,11 +945,17 @@ class Cafeteria:
         content.text = wersjonowanie_plci(self.content)
         self.xml.append(content)
         # print(self.hide)
+        if self.deactivate:
+            self.xml.set('disablerest', 'true')
+
         if self.hide:
             hide = etree.Element('hide')
             hide.text = etree.CDATA(self.hide.format(self.id))
             self.xml.append(hide)
 
+        if self.connected:
+            print(self.connected)
+            self.xml.set('connected', self.connected)
 
 class ScriptsCalls:
     def __init__(self, id_, **kwargs):
