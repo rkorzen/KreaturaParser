@@ -3602,6 +3602,7 @@ _
           </list_item>
         </control_single>
       </question>
+      <question id="Q1script_calls">
       <control_layout id="Q1.js" layout="default" style="">
         <content>&lt;!-- Script: listcolumn --&gt;
 &lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
@@ -3634,6 +3635,7 @@ _
 &lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
 </content>
       </control_layout>
+      </question>
     </page>
   </block>
   <vars/>
@@ -3670,6 +3672,7 @@ _
           </list_item>
         </control_multi>
       </question>
+      <question id="Q1script_calls">
       <control_layout id="Q1.js" layout="default" style="">
         <content>&lt;!-- Script: listcolumn --&gt;
 &lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
@@ -3702,6 +3705,7 @@ _
 &lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
 </content>
       </control_layout>
+      </question>
     </page>
   </block>
   <vars/>
@@ -3739,6 +3743,7 @@ _
           </list_item>
         </control_multi>
       </question>
+      <question id="Q1script_calls">
       <control_layout id="Q1.js" layout="default" style="">
         <content>&lt;!-- Script: listcolumn --&gt;
 &lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
@@ -3771,6 +3776,7 @@ _
 &lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
 </content>
       </control_layout>
+      </question>
     </page>
   </block>
   <vars/>
@@ -3808,6 +3814,7 @@ _
           </list_item>
         </control_multi>
       </question>
+      <question id="Q1script_calls">
       <control_layout id="Q1.js" layout="default" style="">
         <content>&lt;!-- Script: listcolumn --&gt;
 &lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
@@ -3840,6 +3847,7 @@ _
 &lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
 </content>
       </control_layout>
+      </question>
     </page>
   </block>
   <vars/>
@@ -3880,6 +3888,7 @@ _
         </control_open>
 
       </question>
+      <question id="Q1script_calls">
       <control_layout id="Q1.js" layout="default" style="">
         <content>&lt;!-- Script: listcolumn --&gt;
 &lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
@@ -3912,6 +3921,7 @@ _
 &lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
 </content>
       </control_layout>
+      </question>
     </page>
   </block>
   <vars/>
@@ -3922,6 +3932,78 @@ _
 '''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+# highlighter
+class TestHiglighter(KreaturaTestCase):
+    def test_highlighter(self):
+        input_ = "Q H Q1 COS\npublic/X4_2.jpg"
+        survey = parse(input_)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                  createtime="{0}"
+                  creator="CHANGEIT"
+                  exitpage=""
+                  layoutid="ShadesOfGray"
+                  localeCode="pl"
+                  name="CHANGEIT"
+                  sensitive="false"
+                  showbar="false"
+                  time="60000">
+                  <block id="Default"
+                         quoted="false"
+                         random="false"
+                         rotation="false"
+                         name="">
+                         <page id="Q1_p"
+                               hideBackButton="false"
+                               name="">
+                               <question id="Q1"
+                                         name="">
+                                         <control_layout id="Q1.labelka"
+                                                         layout="default"
+                                                         style="">
+                                                         <content>COS</content>
+                                         </control_layout>
+                                         <control_layout id="Q1.js"
+                                                         layout="default"
+                                                         style="">
+                                                         <content>&lt;script type='text/javascript' src='public/highlighter/highlighter.js'&gt;&lt;/script&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/highlighter/highlighter.css'/&gt;
+&lt;script type='text/javascript'&gt;
+hl = new IbisHighlighter('Q1.img','Q1.input', {{ hlClass: 'hl-active-green', debug: false }})
+&lt;/script&gt;</content>
+                                         </control_layout>
+                                         <control_layout id="Q1.img" layout="default" style="">
+                                           <content>&lt;img src="public/X4_2.jpg"&gt;</content>
+                                         </control_layout>
+
+                                         <control_open id="Q1.input"
+                                                       length="25"
+                                                       lines="1"
+                                                       mask=".*"
+                                                       require="true"
+                                                       results="true"
+                                                       style=""
+                                                       name="Q1.input">
+                                                       <content></content>
+                                         </control_open>
+                               </question>
+                         </page>
+                  </block>
+                <vars></vars>
+                <procedures>
+                  <procedure id="PROC" shortdesc=""></procedure>
+                </procedures>
+
+            </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_highlighter_no_img(self):
+        input_ = "Q H Q1 COS"
+        survey = parse(input_)
+        #survey.to_xml()
+        self.assertRaises(ValueError, survey.to_xml)
 
 class TestErrors(KreaturaTestCase):
     def test_two_same_caf_numbers(self):

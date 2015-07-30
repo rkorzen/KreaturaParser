@@ -298,7 +298,7 @@ class Question(SurveyElements):
             instr = etree.Element('question')
             instr.set('id', self.id + 'instr')
 
-            layout = ControlLaout(self.id + '_lab_instr')
+            layout = ControlLayout(self.id + '_lab_instr')
             layout.content = '<div class="grid_instrukcja">' + wersjonowanie_plci(self.content) + "</div>"
             layout.to_xml()
 
@@ -310,7 +310,7 @@ class Question(SurveyElements):
             self.xml.set('id', self.id)
             self.xml.set('name', '')
 
-            layout = ControlLaout(self.id + '.labelka')
+            layout = ControlLayout(self.id + '.labelka')
             layout.content = wersjonowanie_plci(self.content)
             layout.to_xml()
             self.xml.append(layout.xml)
@@ -324,7 +324,7 @@ class Question(SurveyElements):
                         id_suf = '_' + str(nr+1)
                     else:
                         id_suf = '_' + str(caf.id)
-                    layout_ = ControlLaout(self.id + id_suf + '_txt')
+                    layout_ = ControlLayout(self.id + id_suf + '_txt')
                     layout_.content = wersjonowanie_plci(caf.content)
                     layout_.to_xml()
                     self.xml.append(layout_.xml)
@@ -498,7 +498,7 @@ class Question(SurveyElements):
 
                 el_id = self.id + '_' + stwierdzenie.id
 
-                layout = ControlLaout(el_id + '_txt')
+                layout = ControlLayout(el_id + '_txt')
                 layout.content = stwierdzenie.content
                 if stwierdzenie.hide:
                     layout.hide = stwierdzenie.hide.format(stwierdzenie.id)
@@ -533,6 +533,7 @@ class Question(SurveyElements):
         if self.typ in ('G', 'SDG'):
             hide_ptrn = ""
             for stwierdzenie in self.statements:
+
                 el_id = self.id + '_' + stwierdzenie.id
                 question = etree.Element('question')
                 question.set('id', el_id)
@@ -549,7 +550,7 @@ class Question(SurveyElements):
                     hide.text = etree.CDATA(hide_q)
                     question.append(hide)
 
-                lay = ControlLaout(el_id + '_txt')
+                lay = ControlLayout(el_id + '_txt')
 
                 if '--multi' in stwierdzenie.content:
                     control = ControlMulti(el_id)
@@ -558,8 +559,9 @@ class Question(SurveyElements):
                     control = ControlSingle(el_id)
 
                 lay.content = stwierdzenie.content
+                # print(lay.content)
                 control.cafeteria = self.cafeteria
-
+                # print(control.cafeteria)
                 lay.to_xml()
                 # min i maxchoose dla kontrolek single/multi
                 # TODO: redaktoring dla single multi
@@ -579,6 +581,8 @@ class Question(SurveyElements):
                         open_.to_xml()
                         question.append(open_.xml)
 
+
+                self.xml.append(question)
             question_sc = etree.Element('question')
             question_sc.set('id', self.id + 'script_calls')
 
@@ -615,13 +619,13 @@ class Question(SurveyElements):
                 table = ControlTable(self.id+'_table')
                 row = Row()
                 l_cell = Cell()
-                l_cell.add_control(ControlLaout(self.id + 'left', **{'content': left}))
+                l_cell.add_control(ControlLayout(self.id + 'left', **{'content': left}))
 
                 n_cell = Cell()
                 n_cell.add_control(num)
 
                 r_cell = Cell()
-                r_cell.add_control(ControlLaout(self.id + 'right', **{'content': right}))
+                r_cell.add_control(ControlLayout(self.id + 'right', **{'content': right}))
 
                 row.add_cell(l_cell)
                 row.add_cell(n_cell)
@@ -636,6 +640,27 @@ class Question(SurveyElements):
             script_call.slider()
 
             self.xml.append(script_call.to_xml())
+
+        # endregion
+
+        # region highlighter
+        if self.typ == "H":
+            script_call = ScriptsCalls(self.id)
+            script_call.highlighter()
+            self.xml.append(script_call.to_xml())
+
+            img = ControlLayout(self.id + '.img')
+            try:
+                img.content = '<img src="{0}">'.format(self.cafeteria[0].content)
+            except IndexError:
+                raise ValueError('Highlighter wymaga podania obrazka, lokalizacje obrazka bez znaczników'
+                                 'html umiesc  jako pierwszy element kafeterii', self.id)
+            img.to_xml()
+            self.xml.append(img.xml)
+
+            open_ = ControlOpen(self.id + '.input')
+            open_.to_xml()
+            self.xml.append(open_.xml)
 
         # endregion
         x = 0
@@ -704,7 +729,7 @@ class Control:
             self.xml.append(hide)
 
 
-class ControlLaout(Control):
+class ControlLayout(Control):
     def __init__(self, id_, **kwargs):
         Control.__init__(self, id_, **kwargs)
         self.tag = 'control_layout'
@@ -813,7 +838,7 @@ class ControlSingle(Control):
 
             caf_hide_pattern = ""  # na poczatek pusty hide pattern
             for caf in self.cafeteria:
-                print('AAA', caf.other)
+                # print('AAA', caf.other)
                 # print('AAA', caf.deactivate)
                 list_item = Cafeteria()
                 list_item.id = caf.id
@@ -956,6 +981,7 @@ class Cafeteria:
         if self.connected:
             print(self.connected)
             self.xml.set('connected', self.connected)
+
 
 class ScriptsCalls:
     def __init__(self, id_, **kwargs):
@@ -1120,6 +1146,13 @@ new IbisSlider("{0}", sliderOpts);
 
 <link rel="stylesheet" href="public/custom.css" type="text/css">
 '''.format(self.id)
+
+    def highlighter(self):
+        self.content.text += '''<script type='text/javascript' src='public/highlighter/highlighter.js'></script>
+<link rel='stylesheet' type='text/css' href='public/highlighter/highlighter.css'/>
+<script type='text/javascript'>
+hl = new IbisHighlighter('{0}.img','{0}.input', {{ hlClass: 'hl-active-green', debug: false }})
+</script>'''.format(self.id)
 
     def to_xml(self):
         return self.control

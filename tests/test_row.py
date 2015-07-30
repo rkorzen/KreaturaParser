@@ -1,7 +1,7 @@
 from tests.testing_tools import KreaturaTestCase
 from elements import Row
 from elements import Cell
-from elements import ControlLaout
+from elements import ControlLayout
 from lxml import etree
 
 __author__ = 'KorzeniewskiR'
@@ -28,7 +28,7 @@ class TestRow(KreaturaTestCase):
 
     def test_to_xml(self):
         cell = Cell()
-        cl = ControlLaout('Q1')
+        cl = ControlLayout('Q1')
         cell.add_control(cl)
 
         self.row.add_cell(cell)

@@ -2,7 +2,7 @@ from unittest import TestCase, main
 from kparser import recognize
 
 
-class TestBlockRecognize(TestCase):
+class TestBlock(TestCase):
 
     def test_simple_block(self):
         line = "B B0"
@@ -51,7 +51,7 @@ class TestBlockRecognize(TestCase):
         self.assertEqual("CAFETERIA", result)
 
 
-class TestPageRecognize(TestCase):
+class TestPage(TestCase):
 
     def test_simple_page(self):
         line = "P P0"
@@ -142,8 +142,12 @@ class TestQuestionRecoginize(TestCase):
         line = "Q SLIDER Q1 TRESC"
         self.assertEqual('QUESTION', recognize(line))
 
+    def test_highlighter(self):
+        line = "Q H Q1 COS"
+        self.assertEqual('QUESTION', recognize(line))
 
-class TestSwitchRecognize(TestCase):
+
+class TestSwitch(TestCase):
     def test_switch(self):
         line = "_"
         self.assertEqual("SWITCH", recognize(line))
@@ -157,19 +161,19 @@ class TestSwitchRecognize(TestCase):
         self.assertEqual("SWITCH", recognize(line))
 
 
-class TestPrecodeRecognize(TestCase):
+class TestPrecode(TestCase):
     def test_simple_precode(self):
         line = 'PRE $Q1="1";$Q2="2"'
         self.assertEqual("PRECODE", recognize(line))
 
 
-class TestPostcodeRecognize(TestCase):
+class TestPostcode(TestCase):
     def test_simple_precode(self):
         line = 'POST $Q1="1";$Q2="2"'
         self.assertEqual("POSTCODE", recognize(line))
 
 
-class TestCafeteriaRecognize(TestCase):
+class TestCafeteria(TestCase):
     """kafeterie stwierdzen i odpowiedzi"""
 
     def test_just_number(self):
@@ -200,6 +204,10 @@ class TestCafeteriaRecognize(TestCase):
         line = '1 cos --hide:$A1:1 == "1"'
         self.assertEqual("CAFETERIA", recognize(line))
 
+    def test_goto_and_hide(self):
+        line = '98.d żadne z powyższych --hide:"0"--goto:B1_p'
+        self.assertEqual('CAFETERIA', recognize(line))
+
     # to jednak cafeteria?
     # def test_wrong_call_two_hides(self):
     #     line = r'97.c nie wiem\trudno powiedzieć --hide:$A1:1 == "1" --hide:$A1:1 == "1"'
@@ -226,13 +234,14 @@ class TestCafeteriaRecognize(TestCase):
         self.assertEqual('CAFETERIA', recognize(line4))
         self.assertEqual('CAFETERIA', recognize(line5))
 
-class TestBlankRecognize(TestCase):
+
+class TestBlank(TestCase):
     def test_blank_line(self):
         line = ""
         self.assertEqual("BLANK", recognize(line))
 
 
-class TestCommentRecognize(TestCase):
+class TestComment(TestCase):
 
     def test_comment_line(self):
         input_ = "// this is a comment"

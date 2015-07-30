@@ -1,5 +1,5 @@
 from tests.test_parse import KreaturaTestCase
-from elements import ControlLaout
+from elements import ControlLayout
 from elements import Cell
 from lxml import etree
 __author__ = 'KorzeniewskiR'
@@ -28,7 +28,7 @@ class TestCell(KreaturaTestCase):
 
     def test_to_xml(self):
         cell = Cell()
-        left = ControlLaout('Q1')
+        left = ControlLayout('Q1')
         left.content = 'COS'
         cell.add_control(left)
         want = """<cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1' layout="default" style=""><content>COS</content></control_layout></cell>"""

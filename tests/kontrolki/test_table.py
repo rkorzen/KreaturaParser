@@ -1,4 +1,4 @@
-from elements import ControlTable, Row, Cell, ControlLaout
+from elements import ControlTable, Row, Cell, ControlLayout
 from tests.testing_tools import KreaturaTestCase
 from lxml import etree
 __author__ = 'KorzeniewskiR'
@@ -33,7 +33,7 @@ class TestTable(KreaturaTestCase):
          style=''><cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1' layout="default"
          style=""><content></content></control_layout></cell></row></control_table>"""
 
-        cl = ControlLaout('Q1')
+        cl = ControlLayout('Q1')
         cell = Cell()
         row = Row()
 

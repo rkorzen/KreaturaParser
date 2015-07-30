@@ -16,9 +16,9 @@ class Patterns:
     # page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*((--hide:)(.*)))*$")  # z grupowaniem
     page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*(--parent:)([\w_.]+))?([ ])*(((--hide:)(.*)))*$")  # z grupowaniem
     # example: Q O Q1 Coś tam --rot --hide
-    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
+    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER|H)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
     #                        #                           typ                      size             id       parent                     5
-    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")
+    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER|H)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")
     precode_pattern = re.compile("^PRE .*$")
     postcode_pattern = re.compile("^POST .*$")
     comment_line_pattern = re.compile("^//.*$")
@@ -26,8 +26,10 @@ class Patterns:
     # caf_patrn = re.compile("[\w !@#$%^&*()_+-=.,'\":;\\|\[\]\{\}`]+")
     # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
-    # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
+    # caf_patte<img src="public/1.jpg" alt="Vitaral">rn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
+
+    # w miarę dobry: caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +\-&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     blanck_pattern = re.compile("^$")
     # endregion
