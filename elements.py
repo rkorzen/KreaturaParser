@@ -98,7 +98,7 @@ class Survey:
             parent.childs.append(block)
         else:
             # TODO: some other exception type?
-            raise Exception("Wrong parent id")
+            raise Exception("Wrong parent id", block.parent_id)
 
     def to_xml(self):
         """survey xml"""
