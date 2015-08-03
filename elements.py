@@ -979,7 +979,7 @@ class Cafeteria:
             self.xml.append(hide)
 
         if self.connected:
-            print(self.connected)
+            # print(self.connected)
             self.xml.set('connected', self.connected)
 
 
@@ -1153,6 +1153,9 @@ new IbisSlider("{0}", sliderOpts);
 <script type='text/javascript'>
 hl = new IbisHighlighter('{0}.img','{0}.input', {{ hlClass: 'hl-active-green', debug: false }})
 </script>'''.format(self.id)
+
+    def baskets(self):
+        self.content.text += ''''''
 
     def to_xml(self):
         return self.control

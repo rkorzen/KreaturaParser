@@ -706,8 +706,8 @@ Q L Q3 cos
 
         want.append(b_main)
 
-        print(print_tree(survey))
-        print(print_tree(want))
+        # print(print_tree(survey))
+        # print(print_tree(want))
 
         got = print_tree(survey)
         want = print_tree(want)
@@ -2571,7 +2571,7 @@ A"""
         survey = parse(line)
         survey.to_xml()
         got = etree.tostring(survey.xml)
-        print(got)
+        # print(got)
         want = '''<survey SMSComp="false"
                           createtime="{0}"
                           creator="CHANGEIT"
@@ -4004,6 +4004,109 @@ hl = new IbisHighlighter('Q1.img','Q1.input', {{ hlClass: 'hl-active-green', deb
         survey = parse(input_)
         #survey.to_xml()
         self.assertRaises(ValueError, survey.to_xml)
+
+
+class TestBaskets(KreaturaTestCase):
+    def test_baskets(self):
+        input_ = """Q LHS Q1 COS
+1 1
+2 3
+_
+1 A
+2 B"""
+        survey = parse(input_)
+        survey.to_xml()
+        want = '''<survey SMSComp="false"
+                  createtime="{0}"
+                  creator="CHANGEIT"
+                  exitpage=""
+                  layoutid="ShadesOfGray"
+                  localeCode="pl"
+                  name="CHANGEIT"
+                  sensitive="false"
+                  showbar="false"
+                  time="60000">
+                  <block id="Default"
+                         quoted="false"
+                         random="false"
+                         rotation="false"
+                         name="">
+  <page id="Q1_p" hideBackButton="true">
+    <question id="Q1" name="">
+      <control_layout id="Q1.label" layout="default" style="">
+        <content>&lt;div class="tresc"&gt;COS&lt;/div&gt;</content>
+      </control_layout>
+      <control_single id="Q1" layout="vertical" name="" random="false" require="false" results="true" rotation="false" style="">
+        <list_item id="1" connected="">
+          <content>&lt;img src="public/image_folder/1.jpg" alt = "1"&gt;</content>
+        </list_item>
+        <list_item id="2" connected="">
+          <content>&lt;img src="public/image_folder/2.jpg" alt = "3"&gt;</content>
+        </list_item>
+      </control_single>
+      <control_multi id="Q1x1" layout="vertical" name="Q1x1 | 1 A" random="false" require="false" results="true" rotation="false" style="">
+        <list_item id="1" connected="">
+          <content>1</content>
+        </list_item>
+        <list_item id="2" connected="">
+          <content>3</content>
+        </list_item>
+      </control_multi>
+      <control_multi id="Q1x2" layout="vertical" name="Q1x2 | 2 B&#9;" random="false" require="false" results="true" rotation="false" style="">
+        <list_item id="1" connected="">
+          <content>1</content>
+        </list_item>
+        <list_item id="2" connected="">
+          <content>3</content>
+        </list_item>
+      </control_multi>
+      <control_layout id="Q1.js" layout="default" style="">
+<content>&lt;script type="text/javascript" src="public/baskets/jquery-ui/js/jquery-ui-1.8.18.custom.min.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="public/baskets/jquery-ui/css/ui-lightness/jquery-ui-1.8.18.custom.css" type="text/css"&gt;
+
+&lt;script type="text/javascript" src="public/baskets/baskets.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="public/baskets/baskets.css" type="text/css"&gt;
+&lt;!--[if IE]&gt;
+&lt;link rel="stylesheet" href="public/baskets/baskets_IE.css" type="text/css"&gt;
+&lt;![endif]--&gt;
+&lt;script type="text/javascript"&gt;
+var bm = new BasketManager({{className: "multi", dest: "Q1"}});
+
+
+bm.createBasket("Q1", {{
+    source: true,
+    max: 0
+}});
+bm.createBasket("Q1x1", {{
+    label: "1 A",
+    min: 0,
+    max: 2,
+    maxreplace: true
+}});
+bm.createBasket("Q1x2", {{
+    label: "2 B	",
+    min: 0,
+    max: 2,
+    maxreplace: true
+}});
+
+&lt;/script&gt;
+
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+</control_layout>
+    </question>
+  </page>
+</block>
+ <vars></vars>
+ <procedures>
+   <procedure id="PROC" shortdesc=""></procedure>
+ </procedures>
+ </survey>'''.format(survey.createtime)
+
+        got = etree.tostring(survey.xml)
+        self.assertXmlEqual(got, want)
+
 
 class TestErrors(KreaturaTestCase):
     def test_two_same_caf_numbers(self):
