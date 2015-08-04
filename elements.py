@@ -305,6 +305,16 @@ class Question(SurveyElements):
             instr.append(layout.xml)
             self.xml.append(instr)
 
+        elif self.typ in ('B', 'LHS'):
+            self.xml = etree.Element('question')
+            self.xml.set('id', self.id)
+            self.xml.set('name', '')
+
+            layout = ControlLayout(self.id + '.labelka')
+            layout.content = '<div class="basket_instrukcja">' + wersjonowanie_plci(self.content) + '</div>'
+            layout.to_xml()
+            self.xml.append(layout.xml)
+
         else:
             self.xml = etree.Element('question')
             self.xml.set('id', self.id)
@@ -663,6 +673,60 @@ class Question(SurveyElements):
             self.xml.append(open_.xml)
 
         # endregion
+
+        # region baskets
+        if self.typ in ('B', 'LHS'):
+            if not self.cafeteria:
+                raise ValueError('W pytaniu {} brak kafeterii.'.format(self.id))
+
+            if not self.statements:
+                raise ValueError('W pytaniu {} brak stwierdzeń. Być może zapomniałeś o _'.format(self.id))
+
+            # prepare images in cafeteria
+
+            # print(self.cafeteria)
+            for c, caf in enumerate(self.cafeteria):
+                self.cafeteria[c].content = '<img src="public/{0}/{1}.jpg" alt = "{2}">'.format(self.id, caf.id, caf.content)
+
+
+            source = ControlSingle(self.id)
+            source.require = 'false'
+            source.cafeteria = self.cafeteria
+            if self.rotation:
+                source.rotation = 'true'
+            if self.random:
+                source.random = "true"
+
+            source.name = self.content
+            source.to_xml()
+
+            self.xml.append(source.xml)
+
+            basket_calls = ""
+            baskets_count = len(self.statements)
+            for count, statement in enumerate(self.statements):
+                basket = ControlMulti(self.id + 'x' + str(count+1))
+                basket.cafeteria = self.cafeteria
+                basket.name = self.id + 'x' + str(count+1) + " | " + statement.content
+                basket.require = 'false'
+                basket.to_xml()
+                self.xml.append(basket.xml)
+
+                basket_calls += '''bm.createBasket("{id}", {{
+    label: "{label}",
+    min: 0,
+    max: {max},
+    maxreplace: true
+}});
+'''.format(**{'id':basket.id, 'label': statement.content.strip(), 'max': baskets_count})
+
+            script_call = ScriptsCalls(self.id)
+            script_call.baskets(basket_calls)
+
+            self.xml.append(script_call.to_xml())
+
+        # endregion
+
         x = 0
 
     @staticmethod
@@ -1154,8 +1218,21 @@ new IbisSlider("{0}", sliderOpts);
 hl = new IbisHighlighter('{0}.img','{0}.input', {{ hlClass: 'hl-active-green', debug: false }})
 </script>'''.format(self.id)
 
-    def baskets(self):
-        self.content.text += ''''''
+    def baskets(self, calls):
+        self.content.text += '''<!-- Baskets -->
+<script type="text/javascript" src="public/baskets/jquery-ui/js/jquery-ui-1.8.18.custom.min.js"></script>
+<link rel="stylesheet" href="public/baskets/jquery-ui/css/ui-lightness/jquery-ui-1.8.18.custom.css" type="text/css">
+<script type="text/javascript" src="public/baskets/baskets.js"></script>
+<link rel="stylesheet" href="public/baskets/baskets.css" type="text/css">
+<script type="text/javascript">
+var bm = new BasketManager({{className: "multi", dest: "{0}"}});
+bm.createBasket("{0}", {{
+    source: true,
+    max: 0
+}});
+{1}
+</script>
+<link rel="stylesheet" href="public/custom.css" type="text/css">'''.format(self.id, calls)
 
     def to_xml(self):
         return self.control

@@ -4010,7 +4010,7 @@ class TestBaskets(KreaturaTestCase):
     def test_baskets(self):
         input_ = """Q LHS Q1 COS
 1 1
-2 3
+2 2
 _
 1 A
 2 B"""
@@ -4031,67 +4031,61 @@ _
                          random="false"
                          rotation="false"
                          name="">
-  <page id="Q1_p" hideBackButton="true">
+  <page id="Q1_p" hideBackButton="false" name="">
     <question id="Q1" name="">
-      <control_layout id="Q1.label" layout="default" style="">
-        <content>&lt;div class="tresc"&gt;COS&lt;/div&gt;</content>
+      <control_layout id="Q1.labelka" layout="default" style="">
+        <content>&lt;div class="basket_instrukcja"&gt;COS&lt;/div&gt;</content>
       </control_layout>
-      <control_single id="Q1" layout="vertical" name="" random="false" require="false" results="true" rotation="false" style="">
-        <list_item id="1" connected="">
-          <content>&lt;img src="public/image_folder/1.jpg" alt = "1"&gt;</content>
+      <control_single id="Q1" itemlimit="0" layout="vertical" name="COS" random="false" require="false" results="true" rotation="false" style="">
+        <list_item id="1" name="" style="">
+          <content>&lt;img src="public/Q1/1.jpg" alt = "1"&gt;</content>
         </list_item>
-        <list_item id="2" connected="">
-          <content>&lt;img src="public/image_folder/2.jpg" alt = "3"&gt;</content>
+        <list_item id="2" name="" style="">
+          <content>&lt;img src="public/Q1/2.jpg" alt = "2"&gt;</content>
         </list_item>
       </control_single>
-      <control_multi id="Q1x1" layout="vertical" name="Q1x1 | 1 A" random="false" require="false" results="true" rotation="false" style="">
-        <list_item id="1" connected="">
-          <content>1</content>
+      <control_multi id="Q1x1" itemlimit="0" layout="vertical" name="Q1x1 | A" random="false" require="false" results="true" rotation="false" style="">
+        <list_item id="1" name="" style="">
+          <content>&lt;img src="public/Q1/1.jpg" alt = "1"&gt;</content>
         </list_item>
-        <list_item id="2" connected="">
-          <content>3</content>
+        <list_item id="2" name="" style="">
+          <content>&lt;img src="public/Q1/2.jpg" alt = "2"&gt;</content>
         </list_item>
       </control_multi>
-      <control_multi id="Q1x2" layout="vertical" name="Q1x2 | 2 B&#9;" random="false" require="false" results="true" rotation="false" style="">
-        <list_item id="1" connected="">
-          <content>1</content>
+      <control_multi id="Q1x2" itemlimit="0" layout="vertical" name="Q1x2 | B" random="false" require="false" results="true" rotation="false" style="">
+        <list_item id="1" name="" style="">
+          <content>&lt;img src="public/Q1/1.jpg" alt = "1"&gt;</content>
         </list_item>
-        <list_item id="2" connected="">
-          <content>3</content>
+        <list_item id="2" name="" style="">
+          <content>&lt;img src="public/Q1/2.jpg" alt = "2"&gt;</content>
         </list_item>
       </control_multi>
       <control_layout id="Q1.js" layout="default" style="">
-<content>&lt;script type="text/javascript" src="public/baskets/jquery-ui/js/jquery-ui-1.8.18.custom.min.js"&gt;&lt;/script&gt;
+<content>&lt;!-- Baskets --&gt;
+&lt;script type="text/javascript" src="public/baskets/jquery-ui/js/jquery-ui-1.8.18.custom.min.js"&gt;&lt;/script&gt;
 &lt;link rel="stylesheet" href="public/baskets/jquery-ui/css/ui-lightness/jquery-ui-1.8.18.custom.css" type="text/css"&gt;
-
 &lt;script type="text/javascript" src="public/baskets/baskets.js"&gt;&lt;/script&gt;
 &lt;link rel="stylesheet" href="public/baskets/baskets.css" type="text/css"&gt;
-&lt;!--[if IE]&gt;
-&lt;link rel="stylesheet" href="public/baskets/baskets_IE.css" type="text/css"&gt;
-&lt;![endif]--&gt;
 &lt;script type="text/javascript"&gt;
 var bm = new BasketManager({{className: "multi", dest: "Q1"}});
-
-
 bm.createBasket("Q1", {{
     source: true,
     max: 0
 }});
 bm.createBasket("Q1x1", {{
-    label: "1 A",
+    label: "A",
     min: 0,
     max: 2,
     maxreplace: true
 }});
 bm.createBasket("Q1x2", {{
-    label: "2 B	",
+    label: "B",
     min: 0,
     max: 2,
     maxreplace: true
 }});
 
 &lt;/script&gt;
-
 &lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
 </content>
 </control_layout>
@@ -4106,6 +4100,38 @@ bm.createBasket("Q1x2", {{
 
         got = etree.tostring(survey.xml)
         self.assertXmlEqual(got, want)
+
+    def test_no_kafeteria(self):
+        line = "Q B Q1 COS"
+        survey = parse(line)
+
+        self.assertRaises(ValueError, survey.to_xml)
+
+    def test_no_statements(self):
+        line = "Q B Q1 COS\n1 a"
+        survey = parse(line)
+
+        self.assertRaises(ValueError, survey.to_xml)
+
+    def test_no_caf_but_statements(self):
+        line = "Q B Q1 COS\n_\n1 a"
+        survey = parse(line)
+
+        self.assertRaises(ValueError, survey.to_xml)
+
+    def test_rotation(self):
+        line = """Q B Q1 COS --rot\n1 a\n_\n1 a"""
+        survey = parse(line)
+        survey.to_xml()
+        single = survey.xml.findall('.//control_single')[0]
+        self.assertEqual(single.attrib['rotation'], 'true')
+
+    def test_random(self):
+        line = """Q B Q1 COS --ran\n1 a\n_\n1 a"""
+        survey = parse(line)
+        survey.to_xml()
+        single = survey.xml.findall('.//control_single')[0]
+        self.assertEqual(single.attrib['random'], 'true')
 
 
 class TestErrors(KreaturaTestCase):
