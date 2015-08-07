@@ -326,8 +326,11 @@ def parse(text_input):
             """
             if not statement.id:
                 if not collect_statements:
-                    ktory = len(current_question.cafeteria)
-                    statement.id = str(ktory + 1)
+                    try:
+                        ktory = len(current_question.cafeteria)
+                        statement.id = str(ktory + 1)
+                    except AttributeError as e:
+                        raise AttributeError("Błąd w linii", line)
                 else:
                     ktory = len(current_question.statements)
                     statement.id = str(ktory + 1)
@@ -409,9 +412,17 @@ def parse(text_input):
 
 if __name__ == "__main__":
 
-    input_ = "Q S Q1 COS"
+    input_ = '''B B0
+B B1 B0
+Q L Q1 COS
+
+P P0'''
     survey = parse(input_)
     survey.to_xml()
+
+    with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+        f.write(etree.tostring(survey.xml, pretty_print=True))
+
 
     # with open(r'c:\badania\ADHOC.2015\125881.07\IBIS\skrypt\TOKIA_OCENA.txt', 'r') as in_:
     #

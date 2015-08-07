@@ -718,7 +718,7 @@ Q L Q3 cos
 
 # Block
 class TestParseToXmlBlock(KreaturaTestCase):
-    def test_block_with_precode_to_xml(self):
+    def test_block_with_precode(self):
         input_ = 'B B0\nPRE if($A1:1 == "1");goto next;else;endif'
 
         result = parse(input_)
@@ -740,6 +740,56 @@ class TestParseToXmlBlock(KreaturaTestCase):
         survey = parse(input_)
         self.assertRaises(ValueError, survey.to_xml)
 
+    def test_block_postcode(self):
+        input_ = 'B B0\nPOST $A1="1"'
+
+        result = parse(input_)
+        result.to_xml()
+        r_xml = etree.tostring(result.xml)
+
+        expected = Survey()
+        expected.createtime = result.createtime
+        expected.append(Block('B0'))
+        expected.childs[0].postcode = '$A1="1"'
+        expected.to_xml()
+
+        e_xml = etree.tostring(expected.xml)
+
+        self.assertEqual(expected, result)
+        self.assertXmlEqual(r_xml, e_xml)
+
+    def test_block_precode_postcode(self):
+        input_ = '''B B0
+PRE $A1="1"
+POST $A1="2"'''
+
+        result = parse(input_)
+        result.to_xml()
+        r_xml = etree.tostring(result.xml)
+
+        expected = Survey()
+        expected.createtime = result.createtime
+        expected.append(Block('B0'))
+        expected.childs[0].precode = '$A1="1"'
+        expected.childs[0].postcode = '$A1="2"'
+        expected.to_xml()
+
+        e_xml = """<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="B0" name="" quoted="false" random="false" rotation="false">
+    <precode><![CDATA[$A1="1"]]></precode>
+    <postcode><![CDATA[$A1="2"]]></postcode>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+""".format(result.createtime)
+
+        self.assertEqual(expected, result)
+        self.assertXmlEqual(r_xml, e_xml)
+
+
 # Page
 class TestParseToXmlPage(KreaturaTestCase):
     def test_page_with_precode_to_xml(self):
@@ -756,7 +806,21 @@ class TestParseToXmlPage(KreaturaTestCase):
         expected.to_xml()
 
         got = etree.tostring(result.xml)
-        want = etree.tostring(expected.xml)
+        want = """<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="P0" hideBackButton="false" name="">
+      <precode><![CDATA[if($A1:1 == "1")
+  goto next
+else
+endif]]></precode>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+""".format(result.createtime)
         # print(got,'\n',want)
         self.assertEqual(expected, result)
         self.assertXmlEqual(got, want)
@@ -933,7 +997,6 @@ class TestParseToXmlOpen(KreaturaTestCase):
 
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
-
 
     def test_controls_open_xml(self):
         line = """Q O Q1 COS

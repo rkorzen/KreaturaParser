@@ -67,6 +67,17 @@ class SurveyElements:
             except ValueError as e:
                 raise ValueError("Błąd w precode elementu {0}, {1}".format(self.id, e))
 
+    def set_postcode(self):
+        """Set precode of element"""
+        if self.postcode:  # jeśli element ma precode
+            try:
+                prec = build_precode(self.postcode, 'postcode')
+                self.xml.append(prec)
+
+            except ValueError as e:
+                raise ValueError("Błąd w postcode elementu {0}, {1}".format(self.id, e))
+
+
 
 class Survey:
     """
@@ -165,6 +176,7 @@ class Block(SurveyElements):
             self.warnings = child.warnings
             self.xml.append(child.xml)
 
+        self.set_postcode()
 
 class Page(SurveyElements):
     """Page element."""
@@ -210,14 +222,14 @@ class Page(SurveyElements):
                 self.xml.append(child.xml)
 
         # print("jestem tu: ". self.postcode)
-        if self.postcode:
-            # drukowanie postcodu do xmla ma sens tylko w przypadku stron i bloków
-            # w tym przypadku chodzi o postcode strony tworzony na podstawie
-            # jego dzieci
-            postcode = etree.Element('postcode')
-            postcode.text = etree.CDATA(self.postcode)
-
-            self.xml.append(postcode)
+        self.set_postcode()
+        # if self.postcode:
+        #     # drukowanie postcodu do xmla ma sens tylko w przypadku stron i bloków
+        #     # w tym przypadku chodzi o postcode strony tworzony na podstawie
+        #     # jego dzieci
+        #     postcode = etree.Element('postcode')
+        #     postcode.text = etree.CDATA(self.postcode)
+        #    self.xml.append(postcode)
 
 
 class Question(SurveyElements):
