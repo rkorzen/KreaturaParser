@@ -13,7 +13,7 @@ from parsers import block_parser, page_parser, question_parser, cafeteria_parser
 from elements import Question, Survey, Page, Block
 from lxml import etree
 from tools import find_parent
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 
 
 
@@ -409,14 +409,18 @@ def parse(text_input):
 
 if __name__ == "__main__":
 
-    with open(r'c:\badania\ADHOC.2015\125881.07\IBIS\skrypt\TOKIA_OCENA.txt', 'r') as in_:
+    input_ = "Q S Q1 COS"
+    survey = parse(input_)
+    survey.to_xml()
 
-        survey = parse(in_.read())
-
-        survey.to_xml()
-        x = etree.tostring(survey.xml, pretty_print=True)
-        with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
-            f.write(x)
+    # with open(r'c:\badania\ADHOC.2015\125881.07\IBIS\skrypt\TOKIA_OCENA.txt', 'r') as in_:
+    #
+    #     survey = parse(in_.read())
+    #
+    #     survey.to_xml()
+    #     x = etree.tostring(survey.xml, pretty_print=True)
+    #     with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
+    #         f.write(x)
 
 
     # survey = parse(input_)

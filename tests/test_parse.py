@@ -4156,4 +4156,5 @@ class TestWarnings(KreaturaTestCase):
         self.assertEqual(expected, survey.warnings[0])
 
 if __name__ == "__main__":
+
     main()
