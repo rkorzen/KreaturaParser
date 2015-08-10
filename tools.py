@@ -109,6 +109,7 @@ def clean_labels(text):
     tekst_bez_znacznikow = tags_re.sub(tags_filter, text)
     return(tekst_bez_znacznikow)
 
+
 def wersjonowanie_plci(text):
 
     dict_ = {'Pan(i)':'#SEX_M#',

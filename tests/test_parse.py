@@ -550,7 +550,7 @@ stwierdzenie 1"""
         q = Question('Q1')
         q.typ = 'O'
         q.content = 'Cos'
-        q.dontknow = 'Nie wiem/trudno powiedzieć'
+        q.dontknow = 'Nie wiem / trudno powiedzieć'
         p.childs.append(q)
         b.childs.append(p)
         expected.append(b)
@@ -713,8 +713,36 @@ Q L Q3 cos
         want = print_tree(want)
         self.assertEqual(got, want)
 
+    def test_qestion_hide_xml(self):
+        input_ = '''Q O Q1 A --hide:#POKAZ_1 == "0"'''
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+
+        want = '''<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false" name="">
+      <question id="Q1" name="">
+        <control_layout id="Q1.labelka" layout="default" style="">
+          <content>A</content>
+        </control_layout>
+        <control_open id="Q1" length="25" lines="1" mask=".*" name="Q1 | A" require="true" results="true" style="">
+          <content/>
+        </control_open>
+        <hide><![CDATA[#POKAZ_1 == "0"]]></hide>
+      </question>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>'''.format(survey.createtime)
+
+        self.assertXmlEqual(got, want)
 
     # endregion
+
 
 # Block
 class TestParseToXmlBlock(KreaturaTestCase):
@@ -829,6 +857,7 @@ endif]]></precode>
         input_ = 'P P0\nPRE if($A1:1 == "1");goto next;endif'
         survey = parse(input_)
         self.assertRaises(ValueError, survey.to_xml)
+
 
 # Open
 class TestParseToXmlOpen(KreaturaTestCase):
@@ -1180,7 +1209,7 @@ B"""
         self.assertXmlEqual(got, want)
 
     def test_control_open_deactivate(self):
-        line = "Q O90_4 Q1 COS --dezaktywacja"
+        line = "Q O90_4 Q1 COS --dk:"
         survey = parse(line)
         survey.to_xml()
         got = etree.tostring(survey.xml)
@@ -1216,7 +1245,7 @@ B"""
                                                                require="true"
                                                                results="true"
                                                                style=""
-                                                               name="Q1 | COS ">
+                                                               name="Q1 | COS">
                                                                <content></content>
                                                  </control_open>
 <control_layout id="Q1.js" layout="default" style="">
@@ -1241,6 +1270,7 @@ B"""
 
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
+
 
 # Text
 class TestParseToXmlControlLayout(KreaturaTestCase):
@@ -1339,6 +1369,7 @@ B"""
 
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
+
 
 # Single
 class TestParseToXmlControlSingle(KreaturaTestCase):
@@ -2741,6 +2772,7 @@ A"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+
 # Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):
     def test_control_multi_xml(self):
@@ -3039,6 +3071,7 @@ A
             </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+
 # Number
 class TestParseToXmlControlNumber(KreaturaTestCase):
     def test_control_open_xml(self):
@@ -3215,6 +3248,7 @@ B"""
 
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
+
 
 # js table
 class TestJsTables(KreaturaTestCase):
@@ -3517,6 +3551,7 @@ t.print();
 </survey>""".format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+
 # slider
 class TestSlider(KreaturaTestCase):
     def test_slider(self):
@@ -3636,6 +3671,7 @@ new IbisSlider(&quot;Q1&quot;, sliderOpts);
         line = "Q SLIDER Q1 TRESC\nlewy koniec"
         survey = parse(line)
         self.assertRaises(ValueError, survey.to_xml)
+
 
 # dinamic grid
 class TestDinamicGrid(KreaturaTestCase):
@@ -3995,6 +4031,7 @@ _
 '''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+
 # highlighter
 class TestHiglighter(KreaturaTestCase):
     def test_highlighter(self):
@@ -4069,6 +4106,7 @@ hl = new IbisHighlighter('Q1.img','Q1.input', {{ hlClass: 'hl-active-green', deb
         self.assertRaises(ValueError, survey.to_xml)
 
 
+# baskets
 class TestBaskets(KreaturaTestCase):
     def test_baskets(self):
         input_ = """Q LHS Q1 COS
@@ -4197,6 +4235,73 @@ bm.createBasket("Q1x2", {{
         self.assertEqual(single.attrib['random'], 'true')
 
 
+# ranking
+class TestRanking(KreaturaTestCase):
+    def test_ranking(self):
+        input_ = '''Q R Q1 COS
+a
+b
+c'''
+        survey = parse(input_)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default" quoted="false" random="false" rotation="false" name="">
+                                 <page id="Q1_p">
+                                    <question id="Q1instr">
+                                      <control_layout id="Q1_lab_instr" layout="default" style="">
+                                        <content>&lt;div class="ranking_instrukcja"&gt;COS&lt;/div&gt;</content>
+                                      </control_layout>
+                                    </question>
+                                    <question id="Q1">
+      <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 | COS" random="false" require="false" results="true" rotation="false" style="">
+        <list_item id="1" name="" style="">
+          <content>a</content>
+        </list_item>
+        <list_item id="2" name="" style="">
+          <content>b</content>
+        </list_item>
+        <list_item id="3" name="" style="">
+          <content>c</content>
+        </list_item>
+      </control_single>
+      <control_number id="Q1.number1" float="false" mask=".*" require="true" results="true" style="" name="Pozycja Odp1"><content></content></control_number>
+      <control_number id="Q1.number2" float="false" mask=".*" require="true" results="true" style="" name="Pozycja Odp2"><content></content></control_number>
+      <control_number id="Q1.number3" float="false" mask=".*" require="true" results="true" style="" name="Pozycja Odp3"><content></content></control_number>
+      <control_layout id="Q1.js" layout="default" style="">
+        <content>&lt;!-- Script Ranking --&gt;
+&lt;link rel=stylesheet type=text/css href="public/ranking.css"&gt;
+&lt;script type='text/javascript' src='public/jquery-ui-1.7.2.custom.min.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript' src='public/ranking.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;addRanking("Q1");&lt;/script&gt;
+&lt;!-- end Script Ranking --&gt;
+
+&lt;link rel=stylesheet type=text/css href="public/custom.css"&gt;
+        </content>
+    </control_layout>
+                                    </question>
+
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+
+# errors
 class TestErrors(KreaturaTestCase):
     def test_two_same_caf_numbers(self):
         input_ = """Q S Q1 COS
@@ -4207,6 +4312,7 @@ class TestErrors(KreaturaTestCase):
         self.assertRaises(ValueError, survey.to_xml)
 
 
+# warnings
 class TestWarnings(KreaturaTestCase):
     def test_many_columns_warning(self):
         text_input = """Q S Q1 COS --listcolumn-5

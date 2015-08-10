@@ -16,9 +16,9 @@ class Patterns:
     # page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*((--hide:)(.*)))*$")  # z grupowaniem
     page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*(--parent:)([\w_.]+))?([ ])*(((--hide:)(.*)))*$")  # z grupowaniem
     # example: Q O Q1 Coś tam --rot --hide
-    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER|H)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
+    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER|SLIDERS|H|R)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
     #                        #                           typ                      size             id       parent                     5
-    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER|H)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")
+    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER|SLIDERS|H|R)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")
     precode_pattern = re.compile("^PRE .*$")
     postcode_pattern = re.compile("^POST .*$")
     comment_line_pattern = re.compile("^//.*$")
@@ -35,6 +35,7 @@ class Patterns:
     # endregion
 
     parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
+    hide_pattern = re.compile("( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))")
 
 
 def block_parser(line):
@@ -95,7 +96,7 @@ def question_parser(line):
     #                  typ                      size             id       parent                     5
     # r = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$").match(line)
     r = Patterns.question_pattern_advanced.match(line)
-
+    # print(r.groups())
     question = Question(r.group(3))  # id
     question.typ = r.group(1)
 
@@ -107,6 +108,11 @@ def question_parser(line):
         question.parent_id = r.group(5)
 
     question.content = r.group(6)    # content
+    # hide_pattern = Patterns.hide_pattern
+    # hp = hide_pattern.find(question.content)
+    #
+    # print(hp.groups())
+
 
     ''' sprawdzam, czy w treści jest " --dk:"
     jeśli jest to przeczyszczam q.content i ustawian q.dontknow
@@ -120,7 +126,7 @@ def question_parser(line):
         if tmp[1].strip():
             question.dontknow = tmp[1].strip()
         else:
-            question.dontknow = r"Nie wiem/trudno powiedzieć"
+            question.dontknow = r"Nie wiem / trudno powiedzieć"
 
     if " --hide:" in line:           # hide
         question.hide = line.split(" --hide:")[1]

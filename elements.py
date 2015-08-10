@@ -78,7 +78,6 @@ class SurveyElements:
                 raise ValueError("Błąd w postcode elementu {0}, {1}".format(self.id, e))
 
 
-
 class Survey:
     """
     Survey contain childs
@@ -177,6 +176,7 @@ class Block(SurveyElements):
             self.xml.append(child.xml)
 
         self.set_postcode()
+
 
 class Page(SurveyElements):
     """Page element."""
@@ -299,19 +299,24 @@ class Question(SurveyElements):
 
         # TODO: tutaj duużo do zrobienia - wszystkie typy
 
-        if self.typ in ('G', 'SDG'):
+        if self.typ in ('G', 'SDG', 'R'):
             # w tym przypadku niestety question w to_xml musi zwrócić page
 
             self.xml = etree.Element('page')
             self.xml.set('id', self.id + '_p')
-            self.xml.set('hideBackButton', 'false')
+
+            if self.typ is not 'R':
+                self.xml.set('hideBackButton', 'false')
 
             # question z instrukcją
             instr = etree.Element('question')
             instr.set('id', self.id + 'instr')
 
             layout = ControlLayout(self.id + '_lab_instr')
-            layout.content = '<div class="grid_instrukcja">' + wersjonowanie_plci(self.content) + "</div>"
+            if self.typ is "R":
+                layout.content = '<div class="ranking_instrukcja">' + wersjonowanie_plci(self.content) + "</div>"
+            else:
+                layout.content = '<div class="grid_instrukcja">' + wersjonowanie_plci(self.content) + "</div>"
             layout.to_xml()
 
             instr.append(layout.xml)
@@ -326,6 +331,7 @@ class Question(SurveyElements):
             layout.content = '<div class="basket_instrukcja">' + wersjonowanie_plci(self.content) + '</div>'
             layout.to_xml()
             self.xml.append(layout.xml)
+
 
         else:
             self.xml = etree.Element('question')
@@ -383,9 +389,12 @@ class Question(SurveyElements):
                 open_.to_xml()
 
                 self.xml.append(open_.xml)
-                if 'dezaktywacja' in special_markers:
+
+                if self.dontknow:
+                    print(self.dontknow)
+                # if 'dezaktywacja' in special_markers:
                     script_call = ScriptsCalls(self.id)
-                    script_call.dezaktywacja_opena()
+                    script_call.dezaktywacja_opena(self.dontknow)
 
                     self.xml.append(script_call.to_xml())
 
@@ -739,6 +748,36 @@ class Question(SurveyElements):
 
         # endregion
 
+        # region ranking
+        if self.typ == "R":
+            question = etree.Element('question')
+            question.set('id', self.id)
+            source = ControlSingle(self.id)
+            source.cafeteria = self.cafeteria
+            source.name = self.id + ' | ' + self.content
+            source.require = 'false'
+            source.to_xml()
+
+            question.append(source.xml)
+
+            for caf in self.cafeteria:
+                if caf.id.startswith('0'):
+                    raise ValueError('W rankingu {0} w kafeterii nie może być zer wiodących'.format(self.id))
+
+                number = ControlNumber(self.id + '.number' + caf.id)
+                number.name = "Pozycja Odp" + caf.id
+                if caf.hide:
+                    print(caf.hide)
+
+                number.to_xml()
+                question.append(number.xml)
+
+            script_call = ScriptsCalls(self.id)
+            script_call.ranking()
+            question.append(script_call.to_xml())
+            self.xml.append(question)
+
+        # enregion
         x = 0
 
     @staticmethod
@@ -1136,17 +1175,17 @@ new IbisListColumn("{0}",{1});
 </script>
 '''.format(self.id, self.columns)
 
-    def dezaktywacja_opena(self):
+    def dezaktywacja_opena(self, dk="Nie wiem / trudno powiedzieć"):
 
         self.content.text = '''
 <!-- dezaktywacja opena -->
 <script type='text/javascript'>
     var opendisDest = "{0}";
-    var opendisText = "Nie wiem / trudno powiedzieć";
+    var opendisText = "{1}";
     var opendisValue = "98";
 </script>
 <script type='text/javascript' src='opendis/opendis.js'></script>
-'''.format(self.id)
+'''.format(self.id, dk)
 
     def superimages(self, example=False):
 
@@ -1245,6 +1284,16 @@ bm.createBasket("{0}", {{
 {1}
 </script>
 <link rel="stylesheet" href="public/custom.css" type="text/css">'''.format(self.id, calls)
+
+    def ranking(self):
+        self.content.text += '''<!-- Script Ranking -->
+<link rel=stylesheet type=text/css href="public/ranking.css">
+<script type='text/javascript' src='public/jquery-ui-1.7.2.custom.min.js'></script>
+<script type='text/javascript' src='public/ranking.js'></script>
+<script type='text/javascript'>addRanking("{}");</script>
+<!-- end Script Ranking -->
+
+<link rel=stylesheet type=text/css href="public/custom.css">'''.format(self.id)
 
     def to_xml(self):
         return self.control
