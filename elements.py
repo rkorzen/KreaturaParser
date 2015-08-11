@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import re
 from lxml import etree
 from tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
@@ -1230,7 +1232,7 @@ new IbisSlider("{0}", sliderOpts);
 <!-- ControlScript ENDS HERE: slider -->
 '''.format(self.id)
 
-    
+
     def dinamic_grid(self):
         self.content.text += '''<!-- Script: listcolumn -->
 <link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css">
