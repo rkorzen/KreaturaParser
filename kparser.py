@@ -412,12 +412,17 @@ def parse(text_input):
 
 if __name__ == "__main__":
 
-    input_ = '''Q O Q1 A --hide:#POKAZ_1 == "0"'''
+    input_ = '''Q T Q1 COS
+1 A
+2 B
+_
+2 B
+'''
     survey = parse(input_)
     survey.to_xml()
 
-    with open(r'C:\users\korzeniewskir\PycharmProjects\prezentacje\xxx.xml', 'wb') as f:
-    # with open('/home/korzen/Workspace/Prezentacje/xxx.xml', 'w') as f:
+    #with open(r'C:\users\korzeniewskir\PycharmProjects\prezentacje\xxx.xml', 'wb') as f:
+    with open('/home/korzen/Workspace/Prezentacje/xxx.xml', 'wb') as f:
         t = etree.tostring(survey.xml, pretty_print=True)
         #t = str(t)
         #t = t[2:-1].replace('<', '&lt;').replace('>', '&gt;').replace(r'\n', '\n')
