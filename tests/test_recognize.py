@@ -228,11 +228,13 @@ class TestCafeteria(TestCase):
         line3 = '1.	Tak, kupuję je dość często'
         line4 = '2.001 - 3.000 zł'
         line5 = '2 Nie --goto:S7_p'
+        line6 = "01 Ballantine's"
         self.assertEqual('CAFETERIA', recognize(line))
         self.assertEqual('CAFETERIA', recognize(line2))
         self.assertEqual('CAFETERIA', recognize(line3))
         self.assertEqual('CAFETERIA', recognize(line4))
         self.assertEqual('CAFETERIA', recognize(line5))
+        self.assertEqual('CAFETERIA', recognize(line6))
 
 
 class TestBlank(TestCase):
