@@ -1,9 +1,9 @@
 from unittest import main
-from kparser import parse, print_tree
-from elements import Block, Page, Question, Cafeteria, Survey
+from KreaturaParser.kparser import parse, print_tree
+from KreaturaParser.elements import Block, Page, Question, Cafeteria, Survey
 from lxml import etree
-from tests.testing_tools import KreaturaTestCase
-from tools import show_attr
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.tools import show_attr
 
 class TestParse(KreaturaTestCase):
 
@@ -714,6 +714,7 @@ Q L Q3 cos
         self.assertEqual(got, want)
 
     def test_qestion_hide_xml(self):
+        # TODO: hide dla question?
         input_ = '''Q O Q1 A --hide:#POKAZ_1 == "0"'''
         survey = parse(input_)
         survey.to_xml()

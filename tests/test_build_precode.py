@@ -1,5 +1,5 @@
 from unittest import TestCase
-from tools import build_precode
+from KreaturaParser.tools import build_precode
 from lxml import etree
 
 __author__ = 'rkorzen'

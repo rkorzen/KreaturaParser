@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from parsers import program_parser
+from KreaturaParser.parsers import program_parser
 
 
 class TestProgramParser(TestCase):

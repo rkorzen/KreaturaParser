@@ -1,6 +1,6 @@
 from unittest import TestCase, main
-from kparser import page_parser
-from elements import Page
+from KreaturaParser.kparser import page_parser
+from KreaturaParser.elements import Page
 
 
 class TestPageParser(TestCase):

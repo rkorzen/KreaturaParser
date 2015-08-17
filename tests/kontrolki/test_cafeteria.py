@@ -1,5 +1,5 @@
-from tests.testing_tools import KreaturaTestCase
-from elements import Cafeteria
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.elements import Cafeteria
 from lxml import etree
 __author__ = 'KorzeniewskiR'
 

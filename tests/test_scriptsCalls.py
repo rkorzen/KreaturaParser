@@ -1,6 +1,6 @@
 # encoding: utf-8
-from tests.testing_tools import KreaturaTestCase
-from elements import ScriptsCalls
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.elements import ScriptsCalls
 from lxml import etree
 
 

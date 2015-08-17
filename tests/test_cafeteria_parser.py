@@ -1,6 +1,6 @@
 from unittest import TestCase, main
-from elements import Cafeteria
-from parsers import cafeteria_parser
+from KreaturaParser.elements import Cafeteria
+from KreaturaParser.parsers import cafeteria_parser
 
 
 class TestStatementParser(TestCase):

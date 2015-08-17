@@ -1,6 +1,6 @@
-from tests.test_parse import KreaturaTestCase
-from elements import ControlLayout
-from elements import Cell
+from KreaturaParser.tests.test_parse import KreaturaTestCase
+from KreaturaParser.elements import ControlLayout
+from KreaturaParser.elements import Cell
 from lxml import etree
 __author__ = 'KorzeniewskiR'
 

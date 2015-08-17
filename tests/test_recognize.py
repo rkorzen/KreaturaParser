@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from kparser import recognize
+from KreaturaParser.kparser import recognize
 
 
 class TestBlock(TestCase):

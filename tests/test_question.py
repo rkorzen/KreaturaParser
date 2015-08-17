@@ -1,5 +1,5 @@
-from tests.testing_tools import KreaturaTestCase
-from elements import Question
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.elements import Question
 from lxml import etree
 __author__ = 'KorzeniewskiR'
 

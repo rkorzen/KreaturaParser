@@ -1,7 +1,7 @@
 from unittest import TestCase, main
-from tools import find_by_id
-from kparser import parse
-from elements import Question
+from KreaturaParser.tools import find_by_id
+from KreaturaParser.kparser import parse
+from KreaturaParser.elements import Question
 __author__ = 'KorzeniewskiR'
 
 

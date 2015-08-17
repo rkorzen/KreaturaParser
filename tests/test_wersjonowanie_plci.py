@@ -1,6 +1,6 @@
 # coding: utf-8
 from unittest import TestCase
-from tools import wersjonowanie_plci
+from KreaturaParser.tools import wersjonowanie_plci
 __author__ = 'KorzeniewskiR'
 
 

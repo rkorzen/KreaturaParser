@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from kparser import parse, print_tree
+from KreaturaParser.kparser import parse, print_tree
 
 
 class TestPrintTree(TestCase):

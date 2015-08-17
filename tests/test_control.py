@@ -1,5 +1,5 @@
 from unittest import TestCase
-from elements import Control
+from KreaturaParser.elements import Control
 __author__ = 'rkorzen'
 
 

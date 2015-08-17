@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from kparser import clean_line
+from KreaturaParser.kparser import clean_line
 
 
 class TestCleanLine(TestCase):
