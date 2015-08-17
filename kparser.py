@@ -9,11 +9,11 @@ The main function is parse
 
 """
 import re
+
 from KreaturaParser.parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
 from KreaturaParser.elements import Question, Survey, Page, Block
 from lxml import etree
 from KreaturaParser.tools import find_parent
-# from bs4 import BeautifulSoup
 
 
 
@@ -411,40 +411,6 @@ def parse(text_input):
 
 
 if __name__ == "__main__":
-
-    input_ = '''Q T Q1 COS
-1 A
-2 B
-_
-2 B
-'''
-    survey = parse(input_)
-    survey.to_xml()
-
-    #with open(r'C:\users\korzeniewskir\PycharmProjects\prezentacje\xxx.xml', 'wb') as f:
-    with open('/home/korzen/Workspace/Prezentacje/xxx.xml', 'wb') as f:
-        t = etree.tostring(survey.xml, pretty_print=True)
-        #t = str(t)
-        #t = t[2:-1].replace('<', '&lt;').replace('>', '&gt;').replace(r'\n', '\n')
-        f.write(t)
-
-
-    # with open(r'c:\badania\ADHOC.2015\125881.07\IBIS\skrypt\TOKIA_OCENA.txt', 'r') as in_:
-    #
-    #     survey = parse(in_.read())
-    #
-    #     survey.to_xml()
-    #     x = etree.tostring(survey.xml, pretty_print=True)
-    #     with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
-    #         f.write(x)
-
-
-    # survey = parse(input_)
-    # survey.to_xml()
-    # x = etree.tostring(survey.xml, pretty_print=True)
-    # with open(r'C:\users\korzeniewskir\Desktop\xxx.xml', 'wb') as f:
-    #     f.write(x)
-
-    #print(BeautifulSoup(x).prettify(formatter="xml"))
+    pass
 
 

@@ -141,3 +141,4 @@ def wersjonowanie_plci(text):
     for key in dict_:
         text = text.replace(key, dict_[key])
     return text
+
