@@ -31,7 +31,7 @@ class Patterns:
     # caf_patte<img src="public/1.jpg" alt="Vitaral">rn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # w miarę dobry: caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
 
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!’'„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!’'„”;:\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +\-&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     blanck_pattern = re.compile("^$")
     # endregion
