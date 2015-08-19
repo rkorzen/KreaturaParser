@@ -1,7 +1,6 @@
 from unittest import TestCase, main
-
 from KreaturaParser.kparser import question_parser
-from elements import Question
+from KreaturaParser.elements import Question
 
 
 class TestQuestionParser(TestCase):

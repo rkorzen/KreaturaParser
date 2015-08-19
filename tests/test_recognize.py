@@ -1,5 +1,4 @@
 from unittest import TestCase, main
-
 from KreaturaParser.kparser import recognize
 
 
@@ -230,12 +229,14 @@ class TestCafeteria(TestCase):
         line4 = '2.001 - 3.000 zł'
         line5 = '2 Nie --goto:S7_p'
         line6 = "01 Ballantine's"
+        line7 = 'A--hide:$P4B:{0} == "1"'
         self.assertEqual('CAFETERIA', recognize(line))
         self.assertEqual('CAFETERIA', recognize(line2))
         self.assertEqual('CAFETERIA', recognize(line3))
         self.assertEqual('CAFETERIA', recognize(line4))
         self.assertEqual('CAFETERIA', recognize(line5))
         self.assertEqual('CAFETERIA', recognize(line6))
+        self.assertEqual('CAFETERIA', recognize(line7))
 
 
 class TestBlank(TestCase):

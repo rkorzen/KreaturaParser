@@ -1,11 +1,9 @@
 from unittest import main
-
+from KreaturaParser.kparser import parse, print_tree
+from KreaturaParser.elements import Block, Page, Question, Cafeteria, Survey
 from lxml import etree
-
-from kparser import parse, print_tree
-from elements import Block, Page, Question, Cafeteria, Survey
-from tests.testing_tools import KreaturaTestCase
-
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.tools import show_attr
 
 class TestParse(KreaturaTestCase):
 
@@ -716,6 +714,7 @@ Q L Q3 cos
         self.assertEqual(got, want)
 
     def test_qestion_hide_xml(self):
+        # TODO: hide dla question?
         input_ = '''Q O Q1 A --hide:#POKAZ_1 == "0"'''
         survey = parse(input_)
         survey.to_xml()
@@ -3508,7 +3507,7 @@ _
 <hide><![CDATA[$Q1:2 == "1"]]></hide>
 <content>B</content>
 </control_layout>
-<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true"
+<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B " random="false" require="true"
                results="true" rotation="false" style="">
 <hide><![CDATA[$Q1:2 == "1"]]></hide>
 <list_item id="1" name="" style="">
@@ -3838,7 +3837,7 @@ _
         <control_layout id="Q1_1_txt" layout="default" style="">
           <content>stw a</content>
         </control_layout>
-        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false" require="true" results="true" rotation="false">
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a " random="false" require="true" results="true" rotation="false">
           <list_item id="1" name="" style="">
             <content>a</content>
           </list_item>
@@ -3909,7 +3908,7 @@ _
         <control_layout id="Q1_1_txt" layout="default" style="">
           <content>stw a</content>
         </control_layout>
-        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false" require="true" results="true" rotation="false" maxchoose="5">
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a " random="false" require="true" results="true" rotation="false" maxchoose="5">
           <list_item id="1" name="" style="">
             <content>a</content>
           </list_item>

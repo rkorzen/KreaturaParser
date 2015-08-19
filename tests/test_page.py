@@ -1,11 +1,6 @@
 from unittest import TestCase
-
-from lxml import etree
-
 from KreaturaParser.elements import Page
-
-__author__ = 'KorzeniewskiR'
-
+from lxml import etree
 
 class TestPage(TestCase):
 

@@ -1,11 +1,7 @@
 # from unittest import TestCase
 from lxml import etree
-
 from KreaturaParser.tests.testing_tools import KreaturaTestCase
 from KreaturaParser.elements import Block
-
-__author__ = 'KorzeniewskiR'
-
 
 class TestBlock(KreaturaTestCase):
 

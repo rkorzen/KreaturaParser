@@ -1,7 +1,6 @@
 from unittest import TestCase, main
-
 from KreaturaParser.parsers import block_parser
-from elements import Block
+from KreaturaParser.elements import Block
 
 
 class TestBlockParser(TestCase):

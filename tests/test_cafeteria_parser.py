@@ -1,6 +1,5 @@
 from unittest import TestCase, main
-
-from elements import Cafeteria
+from KreaturaParser.elements import Cafeteria
 from KreaturaParser.parsers import cafeteria_parser
 
 
@@ -62,11 +61,11 @@ class TestStatementParser(TestCase):
         self.assertEqual(expected, result)
 
     def test_with_hide(self):
-        line = '1 coś coś --hide: $A1:{0} == "1"'
+        line = '1 coś coś --hide:$A1:{0} == "1"'
         expected = Cafeteria()
         expected.id = "1"
-        expected.content = "coś coś"
-        expected.hide = ' $A1:{0} == "1"'
+        expected.content = "coś coś "
+        expected.hide = '$A1:{0} == "1"'
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
 
@@ -92,7 +91,7 @@ class TestStatementParser(TestCase):
         line = '96.d Procter&Gamble --hide: $A1:{0} == "1" --so'
         expected = Cafeteria()
         expected.id = "96"
-        expected.content = "Procter&Gamble"
+        expected.content = "Procter&Gamble "
         expected.hide = ' $A1:{0} == "1"'
         expected.deactivate = True
         expected.screenout = True

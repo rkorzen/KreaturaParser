@@ -1,9 +1,6 @@
+from KreaturaParser.elements import ControlTable, Row, Cell, ControlLayout
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
 from lxml import etree
-
-from elements import ControlTable, Row, Cell, ControlLayout
-from KreaturaParser.tests import KreaturaTestCase
-
-__author__ = 'KorzeniewskiR'
 
 
 class TestTable(KreaturaTestCase):

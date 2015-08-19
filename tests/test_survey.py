@@ -1,9 +1,6 @@
+from KreaturaParser.elements import Survey, Block
 from lxml import etree
-
-from elements import Survey, Block
-from KreaturaParser.tests import KreaturaTestCase
-
-__author__ = 'KorzeniewskiR'
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
 
 
 class TestSurvey(KreaturaTestCase):

@@ -1,9 +1,6 @@
+from KreaturaParser.elements import ControlSingle, Cafeteria
 from lxml import etree
-
-from elements import ControlSingle, Cafeteria
-from KreaturaParser.tests import KreaturaTestCase
-
-__author__ = 'KorzeniewskiR'
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
 
 
 class TestControlSingle(KreaturaTestCase):

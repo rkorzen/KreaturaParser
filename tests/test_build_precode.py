@@ -1,11 +1,6 @@
 from unittest import TestCase
-
-from lxml import etree
-
 from KreaturaParser.tools import build_precode
-
-__author__ = 'rkorzen'
-
+from lxml import etree
 
 class TestBuildPrecode(TestCase):
 

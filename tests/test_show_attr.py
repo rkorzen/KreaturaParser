@@ -1,5 +1,4 @@
 from unittest import TestCase
-
 from KreaturaParser.tools import show_attr
 
 __author__ = 'KorzeniewskiR'

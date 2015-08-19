@@ -1,11 +1,9 @@
 # coding: utf-8
-
+import datetime
 import re
 from lxml import etree
-
 from KreaturaParser.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
 
-import datetime
 
 
 def unix_time(dt):

@@ -1,9 +1,6 @@
+from KreaturaParser.elements import ControlNumber
 from lxml import etree
-
-from elements import ControlNumber
-from KreaturaParser.tests import KreaturaTestCase
-
-__author__ = 'KorzeniewskiR'
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
 
 
 class TestControlNumber(KreaturaTestCase):

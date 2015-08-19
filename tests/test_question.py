@@ -1,10 +1,6 @@
+from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.elements import Question
 from lxml import etree
-
-from KreaturaParser.tests import KreaturaTestCase
-from elements import Question
-
-__author__ = 'KorzeniewskiR'
-
 
 class TestQuestion(KreaturaTestCase):
     def test_to_xml(self):

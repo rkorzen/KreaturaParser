@@ -1,7 +1,5 @@
 # coding: utf-8
-
 import re
-# import subprocess
 from KreaturaParser.elements import Block, Page, Question, Cafeteria
 
 # TODO: przenieść patterny w jedno miejsce (są używane przynajmniej w dwóch i stamtąd ich używać!)
@@ -30,14 +28,16 @@ class Patterns:
     # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
     # caf_patte<img src="public/1.jpg" alt="Vitaral">rn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
     # w miarę dobry: caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
-
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!’'„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
     # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +\-&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
+    #caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!’'„”;:\<\>=\"\$]+)(( )?--hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!’'„”;:\<\>=\"\$]+)$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!’'„”;$:-\<\>=\"{}]+)$")
     blanck_pattern = re.compile("^$")
     # endregion
 
     parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
-    hide_pattern = re.compile("( --hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+))")
+    hide_pattern = re.compile("--hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+)")
+    goto_pattern = re.compile("--goto:( )?([\w_.]+)")
 
 
 def block_parser(line):
@@ -157,7 +157,7 @@ def cafeteria_parser(line):
     # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     cafeteria_pattern = Patterns.caf_pattern
     caf = cafeteria_pattern.match(line)
-    # print(caf.groups())
+    print(caf.groups())
     # print(line)
     if caf.group(2):           # id
         cafeteria.id = caf.group(2)
@@ -176,10 +176,19 @@ def cafeteria_parser(line):
         if '--gn' in cafeteria.content:
             cafeteria.gotonext = True
             cafeteria.content = cafeteria.content.replace('--gn', '')
-        if '--goto:' in cafeteria.content:
-            goto = caf.group(8)
-            cafeteria.goto = goto
-            cafeteria.content = cafeteria.content.replace('--goto:' + goto, '')
+
+        goto = Patterns.goto_pattern.findall(cafeteria.content)
+        if goto:
+        #if '--goto:' in cafeteria.content:
+            # goto = caf.group(8)
+            cafeteria.goto = goto[0][1]
+            cafeteria.content = cafeteria.content.replace('--goto:' + goto[0][1], '')
+
+        hide = Patterns.hide_pattern.findall(cafeteria.content)
+        if hide:
+            print('AAA')
+            cafeteria.hide = hide[0]
+            cafeteria.content = cafeteria.content.replace('--hide:' + hide[0], '')
 
     if caf.group(3) == ".d":   # deactivate
         cafeteria.deactivate = True
@@ -187,17 +196,17 @@ def cafeteria_parser(line):
     if caf.group(3) == ".c":   # comment
         cafeteria.other = True
 
-    if caf.group(6):           # hide
-        cafeteria.hide = caf.group(6)
+    # if caf.group(6):           # hide
+    #     cafeteria.hide = caf.group(6)
 
-    if caf.group(7) == ' --so':  # screen out
-        cafeteria.screenout = True
-
-    if caf.group(7) == ' --gn':  # goto next
-        cafeteria.gotonext = True
-
-    if caf.group(8):  # goto next
-        cafeteria.goto = caf.group(8)
+    # if caf.group(7) == ' --so':  # screen out
+    #     cafeteria.screenout = True
+    #
+    # if caf.group(7) == ' --gn':  # goto next
+    #     cafeteria.gotonext = True
+    #
+    # if caf.group(8):  # goto next
+    #     cafeteria.goto = caf.group(8)
 
     return cafeteria
 

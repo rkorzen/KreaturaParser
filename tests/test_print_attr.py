@@ -1,9 +1,5 @@
 from unittest import TestCase, main
-
 from KreaturaParser.tools import show_attr
-
-__author__ = 'KorzeniewskiR'
-
 
 class SomeObject:
     def __init__(self):
