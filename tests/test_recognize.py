@@ -146,6 +146,9 @@ class TestQuestionRecoginize(TestCase):
         line = "Q H Q1 COS"
         self.assertEqual('QUESTION', recognize(line))
 
+    def test_concept_select(self):
+        line = "Q CS Q1 COS"
+        self.assertEqual('QUESTION', recognize(line))
 
 class TestSwitch(TestCase):
     def test_switch(self):

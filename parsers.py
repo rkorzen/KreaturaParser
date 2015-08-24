@@ -16,9 +16,9 @@ class Patterns:
     # page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*((--hide:)(.*)))*$")  # z grupowaniem
     page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*(--parent:)([\w_.]+))?([ ])*(((--hide:)(.*)))*$")  # z grupowaniem
     # example: Q O Q1 Coś tam --rot --hide
-    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER|SLIDERS|H|R)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
+    question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER|SLIDERS|H|R|CS)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
     #                        #                           typ                      size             id       parent                     5
-    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER|SLIDERS|H|R)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")
+    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER|SLIDERS|H|R|CS)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")
     precode_pattern = re.compile("^PRE .*$")
     postcode_pattern = re.compile("^POST .*$")
     comment_line_pattern = re.compile("^//.*$")

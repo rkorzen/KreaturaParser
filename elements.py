@@ -778,11 +778,52 @@ class Question(SurveyElements):
             question.append(script_call.to_xml())
             self.xml.append(question)
 
-        # enregion
+        # endregion
+
+        # region ConceptSelect
+        if self.typ == "CS":
+            if not self.cafeteria:
+                raise ValueError('W pytaniu {} brak tekstu do ConceptSelecta. Powinien to być 1 element'.format(self.id))
+
+
+            cs_tekst = " | ".join(self.cafeteria[0].content.split())
+            id_c_tresc = self.id + '_tresc'
+            control_tresc = ControlLayout(id_c_tresc)
+            control_tresc.content = cs_tekst
+            control_tresc.to_xml()
+            self.xml.append(control_tresc.xml)
+
+            id_c_data = self.id + '_data'
+            control_data = ControlOpen(id_c_data)
+            control_data.style = "display:none;"
+            control_data.name = self.id + '_data | ConceptSelect'
+            control_data.to_xml()
+            self.xml.append(control_data.xml)
+
+            control_disabler = ControlMulti(self.id + '_dis')
+            caf = Cafeteria(**{'id':'98', 'content':'Nic nie zwróciło mojej uwagi'})
+            control_disabler.cafeteria.append(caf)
+            control_disabler.require = 'false'
+            control_disabler.name = self.id + '_dis'
+            control_disabler.to_xml()
+
+            self.xml.append(control_disabler.xml)
+
+            script_call = ScriptsCalls(self.id)
+
+            id_disablera = self.id + '_dis.98'
+            script_call.ibis_disabler(id_disablera, id_c_tresc )
+            script_call.ibis_disabler(id_disablera, id_c_data, '98')
+            script_call.concept_select(id_c_tresc, id_c_data)
+
+            self.xml.append(script_call.to_xml())
+        # endregion
+
         x = 0
 
     @staticmethod
     def min_max_choice(special_markers, control):
+        self = control
         for el in special_markers:
             if el.startswith('minchoose:'):
                 try:
@@ -1231,7 +1272,6 @@ new IbisSlider("{0}", sliderOpts);
 <!-- ControlScript ENDS HERE: slider -->
 '''.format(self.id)
 
-
     def dinamic_grid(self):
         self.content.text += '''<!-- Script: listcolumn -->
 <link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css">
@@ -1296,6 +1336,41 @@ bm.createBasket("{0}", {{
 <!-- end Script Ranking -->
 
 <link rel=stylesheet type=text/css href="public/custom.css">'''.format(self.id)
+
+    def ibis_disabler(self, id_disablera, id_disablowane, wartosc=""):
+        if wartosc:
+            self.content.text += '''
+&lt;!-- Disabler  --&gt;
+&lt;script type='text/javascript' src='public/ibisDisabler.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+setIbisDisabler('{0}','{1}',{2});
+&lt;/script&gt;
+&lt;!-- End Disabler  --&gt;
+'''.format(id_disablera, id_disablowane, wartosc)
+
+        else:
+            self.content.text += '''
+&lt;!-- Disabler  --&gt;
+&lt;script type='text/javascript' src='public/ibisDisabler.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+setIbisDisabler('{0}','{1}');
+&lt;/script&gt;
+&lt;!-- End Disabler  --&gt;
+'''.format(id_disablera, id_disablowane)
+
+    def concept_select(self, id_tresc, id_data):
+        self.content.text += '''
+<!-- Concept Select  -->
+<link rel="stylesheet" href="public/Selection_sog.css" type="text/css">
+<script type='text/javascript' src='public/Selection_sog.js'></script>
+<script type='text/javascript'>
+var sel = new Selection({{
+textContainerId: "{0}",
+openContainerId: "{1}",
+delimiter: "|"
+}});
+<!-- End ConceptSelect -->
+'''.format(id_tresc, id_data)
 
     def to_xml(self):
         return self.control
