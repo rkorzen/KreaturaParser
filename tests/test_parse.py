@@ -1371,6 +1371,54 @@ B"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_cl_with_css(self):
+        line = """Q L Q1 COS --custom_css"""
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                          createtime="{0}"
+                          creator="CHANGEIT"
+                          exitpage=""
+                          layoutid="ShadesOfGray"
+                          localeCode="pl"
+                          name="CHANGEIT"
+                          sensitive="false"
+                          showbar="false"
+                          time="60000">
+                          <block id="Default"
+                                 quoted="false"
+                                 random="false"
+                                 rotation="false"
+                                 name="">
+                                 <page id="Q1_p"
+                                       hideBackButton="false"
+                                       name="">
+                                       <question id="Q1"
+                                                 name="">
+                                                 <control_layout id="Q1.labelka"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>COS</content>
+                                                 </control_layout>
+                                                 <control_layout id="Q1_css"
+                                                                 layout="default"
+                                                                 style="">
+                                                                 <content>&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;</content>
+                                                 </control_layout>
+
+
+                                       </question>
+                                 </page>
+                          </block>
+                        <vars></vars>
+                        <procedures>
+                          <procedure id="PROC" shortdesc=""></procedure>
+                        </procedures>
+
+                    </survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
 
 # Single
 class TestParseToXmlControlSingle(KreaturaTestCase):

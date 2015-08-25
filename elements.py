@@ -296,6 +296,10 @@ class Question(SurveyElements):
             self.content = self.content.replace('--nr', '')
             special_markers.append('not_require')
 
+        if '--custom_css' in self.content:
+            self.content = self.content.replace('--custom_css', '')
+            special_markers.append('custom_css')
+
         # endregion
 
         # TODO: tutaj duużo do zrobienia - wszystkie typy
@@ -836,7 +840,12 @@ class Question(SurveyElements):
             self.xml.append(script_call.to_xml())
         # endregion
 
-        x = 0
+        if 'custom_css' in special_markers:
+            css_lay = ControlLayout(self.id + '_css')
+            css_lay.content = '<link rel="stylesheet" href="public/custom.css" type="text/css">'
+            css_lay.to_xml()
+            self.xml.append(css_lay.xml)
+
 
     @staticmethod
     def min_max_choice(special_markers, control):
