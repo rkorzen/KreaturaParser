@@ -1395,6 +1395,7 @@ textContainerId: "{0}",
 openContainerId: "{1}",
 delimiter: "|"
 }});
+</script>
 <!-- End ConceptSelect -->
 '''.format(id_tresc, id_data)
 
