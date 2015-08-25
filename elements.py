@@ -1366,22 +1366,22 @@ bm.createBasket("{0}", {{
     def ibis_disabler(self, id_disablera, id_disablowane, wartosc=""):
         if wartosc:
             self.content.text += '''
-&lt;!-- Disabler  --&gt;
-&lt;script type='text/javascript' src='public/ibisDisabler.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript'&gt;
+<!-- Disabler  --&gt;
+<script type='text/javascript' src='public/ibisDisabler.js'></script>
+<script type='text/javascript'>
 setIbisDisabler('{0}','{1}',{2});
-&lt;/script&gt;
-&lt;!-- End Disabler  --&gt;
+</script>
+<!-- End Disabler  -->
 '''.format(id_disablera, id_disablowane, wartosc)
 
         else:
             self.content.text += '''
-&lt;!-- Disabler  --&gt;
-&lt;script type='text/javascript' src='public/ibisDisabler.js'&gt;&lt;/script&gt;
-&lt;script type='text/javascript'&gt;
+<!-- Disabler  -->
+<script type='text/javascript' src='public/ibisDisabler.js'></script>
+<script type='text/javascript'>
 setIbisDisabler('{0}','{1}');
-&lt;/script&gt;
-&lt;!-- End Disabler  --&gt;
+</script&gt;
+<!-- End Disabler  -->
 '''.format(id_disablera, id_disablowane)
 
     def concept_select(self, id_tresc, id_data):
