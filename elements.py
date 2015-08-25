@@ -801,8 +801,16 @@ class Question(SurveyElements):
             self.xml.append(control_data.xml)
 
             control_disabler = ControlMulti(self.id + '_dis')
-            caf = Cafeteria(**{'id':'98', 'content':'Nic nie zwróciło mojej uwagi'})
-            control_disabler.cafeteria.append(caf)
+            if not self.statements:
+                caf = Cafeteria(**{'id':'98', 'content':'Nic nie zwróciło mojej uwagi'})
+                control_disabler.cafeteria.append(caf)
+            else:
+                for el in self.statements:
+                    caf = Cafeteria(**{'id':el.id, 'content':el.content})
+                    caf.deactivate = 'true'
+                    control_disabler.cafeteria.append(caf)
+
+
             control_disabler.require = 'false'
             control_disabler.name = self.id + '_dis'
             control_disabler.to_xml()
@@ -811,9 +819,18 @@ class Question(SurveyElements):
 
             script_call = ScriptsCalls(self.id)
 
-            id_disablera = self.id + '_dis.98'
-            script_call.ibis_disabler(id_disablera, id_c_tresc )
-            script_call.ibis_disabler(id_disablera, id_c_data, '98')
+            if not self.statements:
+                id_disablera = self.id + '_dis.98'
+                script_call.ibis_disabler(id_disablera, id_c_tresc )
+                script_call.ibis_disabler(id_disablera, id_c_data, '98')
+
+
+            else:
+                for el in self.statements:
+                    id_disablera = self.id + '_dis.' + el.id
+                    script_call.ibis_disabler(id_disablera, id_c_tresc )
+                    script_call.ibis_disabler(id_disablera, id_c_data, el.id)
+
             script_call.concept_select(id_c_tresc, id_c_data)
 
             self.xml.append(script_call.to_xml())

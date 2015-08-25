@@ -4383,6 +4383,98 @@ delimiter: &quot;|&quot;
 </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_concept_select_custom_disabler(self):
+        input_ = """Q CS Q1 COS
+A B
+_
+97 Odmowa
+98 Nie wiem"""
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey SMSComp="false"
+                  createtime="{0}"
+                  creator="CHANGEIT"
+                  exitpage=""
+                  layoutid="ShadesOfGray"
+                  localeCode="pl"
+                  name="CHANGEIT"
+                  sensitive="false"
+                  showbar="false"
+                  time="60000">
+                  <block id="Default"
+                         quoted="false"
+                         random="false"
+                         rotation="false"
+                         name="">
+<page hideBackButton="false" id="Q1_p" name="">
+<question id="Q1" name="">
+<control_layout id="Q1.labelka" layout="default" style="">
+<content>COS</content>
+</control_layout>
+<control_layout id="Q1_tresc" layout="default" style="">
+<content>A | B</content>
+</control_layout>
+<control_open id="Q1_data" length="25" lines="1" mask=".*" name="Q1_data | ConceptSelect" require="true" results="true" style="display:none;">
+<content/>
+</control_open>
+<control_multi id="Q1_dis" itemlimit="0" layout="vertical" name="Q1_dis" random="false" require="false" results="true" rotation="false" style="">
+<list_item disablerest="true" id="97" name="" style="">
+<content>Odmowa</content>
+</list_item>
+<list_item disablerest="true" id="98" name="" style="">
+<content>Nie wiem</content>
+</list_item>
+</control_multi>
+<control_layout id="Q1.js" layout="default" style="">
+<content>&amp;lt;!-- Disabler  --&amp;gt;
+&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script type='text/javascript'&amp;gt;
+setIbisDisabler('Q1_dis.97','Q1_tresc');
+&amp;lt;/script&amp;gt;
+&amp;lt;!-- End Disabler  --&amp;gt;
+
+&amp;lt;!-- Disabler  --&amp;gt;
+&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script type='text/javascript'&amp;gt;
+setIbisDisabler('Q1_dis.97','Q1_data',97);
+&amp;lt;/script&amp;gt;
+&amp;lt;!-- End Disabler  --&amp;gt;
+
+&amp;lt;!-- Disabler  --&amp;gt;
+&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script type='text/javascript'&amp;gt;
+setIbisDisabler('Q1_dis.98','Q1_tresc');
+&amp;lt;/script&amp;gt;
+&amp;lt;!-- End Disabler  --&amp;gt;
+
+&amp;lt;!-- Disabler  --&amp;gt;
+&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script type='text/javascript'&amp;gt;
+setIbisDisabler('Q1_dis.98','Q1_data',98);
+&amp;lt;/script&amp;gt;
+&amp;lt;!-- End Disabler  --&amp;gt;
+
+&lt;!-- Concept Select  --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/Selection_sog.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/Selection_sog.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+var sel = new Selection({{
+textContainerId: &quot;Q1_tresc&quot;,
+openContainerId: &quot;Q1_data&quot;,
+delimiter: &quot;|&quot;
+}});
+&lt;!-- End ConceptSelect --&gt;</content>
+</control_layout>
+</question>
+</page>
+</block>
+<vars></vars>
+<procedures>
+<procedure id="PROC" shortdesc=""></procedure>
+</procedures>
+</survey>'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
 
 
 
