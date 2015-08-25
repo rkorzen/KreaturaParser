@@ -1380,7 +1380,7 @@ setIbisDisabler('{0}','{1}',{2});
 <script type='text/javascript' src='public/ibisDisabler.js'></script>
 <script type='text/javascript'>
 setIbisDisabler('{0}','{1}');
-</script&gt;
+</script>
 <!-- End Disabler  -->
 '''.format(id_disablera, id_disablowane)
 
