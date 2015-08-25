@@ -1366,7 +1366,7 @@ bm.createBasket("{0}", {{
     def ibis_disabler(self, id_disablera, id_disablowane, wartosc=""):
         if wartosc:
             self.content.text += '''
-<!-- Disabler  --&gt;
+<!-- Disabler  -->
 <script type='text/javascript' src='public/ibisDisabler.js'></script>
 <script type='text/javascript'>
 setIbisDisabler('{0}','{1}',{2});
