@@ -187,6 +187,9 @@ def parse(text_input):
 
     # dla każdej linii musimy sprawdzić co to jest
     for line in text_input:
+        if line.startswith('\\'):
+            continue
+
         line = line.strip() # usuwam nadmiarowe spacje itp
         structure = recognize(line)  # rozpoznaję strukturę
 
