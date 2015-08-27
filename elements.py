@@ -5,6 +5,23 @@ from lxml import etree
 from KreaturaParser.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
 
 
+def make_caf_to_dim(cafeteria, tabs=0):
+    """:returns string
+    :param cafeteria: cafeteria or statements list
+    :param tabs: level of indent
+    """
+
+    out = ""
+    ile = len(cafeteria)
+    for caf in cafeteria:
+        out += '    '*tabs + 'x'+caf.id + ' "' + caf.content + '"'
+        if cafeteria.index(caf) == ile-1:
+            out += '\n'
+        else:
+            out += ",\n"
+
+    return out            
+
 
 def unix_time(dt):
     epoch = datetime.datetime.utcfromtimestamp(0)
@@ -39,6 +56,7 @@ class SurveyElements:
         self.dontknow = False
         self.xml = False
         self.warnings = []
+        self.dim_out = ""
 
     def __eq__(self, other):
         return (self.id == other.id and
@@ -78,6 +96,11 @@ class SurveyElements:
             except ValueError as e:
                 raise ValueError("Błąd w postcode elementu {0}, {1}".format(self.id, e))
 
+    def to_dim(self):
+        for child in self.childs:
+            child.to_dim()
+            self.dim_out += child.dim_out
+
 
 class Survey:
     """
@@ -91,6 +114,7 @@ class Survey:
         self.id = False   # just for a case... and for find_by_id function
         self.createtime = unix_creation_time(datetime.datetime.now())
         self.xml = False
+        self.dim_out = ""
 
     def __eq__(self, other):
         return self.childs == other.childs and self.id == other.id
@@ -141,6 +165,11 @@ class Survey:
         procedures.append(procedure)
 
         self.xml.append(procedures)
+
+    def to_dim(self):
+        for child in self.childs:
+            child.to_dim()
+            self.dim_out += child.dim_out
 
 
 class Block(SurveyElements):
@@ -846,7 +875,6 @@ class Question(SurveyElements):
             css_lay.to_xml()
             self.xml.append(css_lay.xml)
 
-
     @staticmethod
     def min_max_choice(special_markers, control):
         self = control
@@ -871,6 +899,74 @@ class Question(SurveyElements):
                     raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
                                      'być może  po --min: jest spacja. Format to --min:x')
 
+    def to_dim(self):
+        if self.typ == "S":
+            single = ControlSingle(self.id)
+            single.cafeteria = self.cafeteria
+            single.content = self.content
+
+            single.to_dim()
+            self.dim_out += single.dim_out
+
+        elif self.typ == "M":
+            single = ControlMulti(self.id)
+            single.cafeteria = self.cafeteria
+            single.content = self.content
+
+            single.to_dim()
+            self.dim_out += single.dim_out
+
+        elif self.typ == "L":
+            self.dim_out += "    " + self.id + '"' + self.content + '";\n\n'
+
+        elif self.typ == "G":
+            out = """    {id} "{content}"
+        [
+            flametatype = "dynamicgrid"
+        ]
+    loop
+    {{
+{stw}
+    }} fields -
+    (
+        slice ""
+        categorical [1..1]
+        {{
+{caf}
+        }};
+    ) expand grid;
+""".format(**{'id': self.id,
+             'content': self.content,
+             'stw': make_caf_to_dim(self.statements, 2),
+             'caf': make_caf_to_dim(self.cafeteria, 3)
+    })
+
+            self.dim_out += out
+
+        elif self.typ == "O":
+            self.dim_out += '''    {0} "{1}" text;\n\n'''.format(self.id, self.content)
+
+        else:
+            stat, caf = None, None
+            if self.statements:
+                stat = make_caf_to_dim(self.statements, 2)
+            if self.cafeteria:
+                caf = make_caf_to_dim(self.cafeteria, 3)
+
+            self.dim_out += '''   {0} "" loop
+    {{
+{2}
+    }} fields -
+    (
+        slice "{1}"
+        Categorical [1..]
+        {{
+{3}
+        }};
+
+    ) expand grid;'
+
+'''.format(self.id, self.content, stat, caf)
 
 class Control:
     def __init__(self, id_, **kwargs):
@@ -990,6 +1086,7 @@ class ControlSingle(Control):
         for key in kwargs:
             if kwargs[key]:
                 setattr(self, key, kwargs[key])
+        self.dim_out = ""
 
     def to_xml(self):
         Control.to_xml(self)
@@ -1060,6 +1157,14 @@ endif
         else:
             raise ValueError("Brak kafeterii w pytaniu: ", self.id)
 
+    def to_dim(self):
+        self.dim_out += self.id + ' "{0}"'.format(self.content) + '\n'
+        self.dim_out += """Categorical [1..1]
+    {{
+{0}
+    }};
+""".format(make_caf_to_dim(self.cafeteria, 2))
+
 
 class ControlMulti(ControlSingle):
     # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false"
@@ -1067,6 +1172,16 @@ class ControlMulti(ControlSingle):
     def __init__(self, id_, **kwargs):
         ControlSingle.__init__(self, id_, **kwargs)
         self.tag = 'control_multi'
+
+    def to_dim(self):
+        self.dim_out += self.id + ' "{0}"'.format(self.content) + '\n'
+        self.dim_out += """Categorical [1..]
+    {{
+{0}
+    }};
+""".format(make_caf_to_dim(self.cafeteria, 2))
+
+
 
 
 class ControlNumber(Control):

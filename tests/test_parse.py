@@ -2821,9 +2821,43 @@ A"""
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_single_to_dim(self):
+        input_ = """Q S Q4 W jakiej wielkości miejscowości mieszkasz? Chodzi o miejsce Twojego pobytu przez większą część roku, nawet, jeśli jest to pobyt tymczasowy, a nie o miejsce stałego zameldowania.
+1 wieś
+2 miasto do 20 tys. mieszkańców
+3 miasto 20.000-49.999 mieszkańców
+4 miasto 50.000-99.999 mieszkańców
+5 miasto 100.000-199.999 mieszkańców
+6 miasto 200.000-499.999 mieszkańców
+7 miasto 500.000 mieszkańców lub większe
+8 nie wiem/ trudno powiedzieć"""
+
+        survey = parse(input_)
+        survey.to_dim()
+        got = survey.dim_out
+        want = '''Q4 "W jakiej wielkości miejscowości mieszkasz? Chodzi o miejsce Twojego pobytu przez większą część roku, nawet, jeśli jest to pobyt tymczasowy, a nie o miejsce stałego zameldowania."
+Categorical [1..1]
+    {
+        x1 "wieś",
+        x2 "miasto do 20 tys. mieszkańców",
+        x3 "miasto 20.000-49.999 mieszkańców",
+        x4 "miasto 50.000-99.999 mieszkańców",
+        x5 "miasto 100.000-199.999 mieszkańców",
+        x6 "miasto 200.000-499.999 mieszkańców",
+        x7 "miasto 500.000 mieszkańców lub większe",
+        x8 "nie wiem/ trudno powiedzieć"
+
+    };
+'''
+
+        self.assertEqual(got, want)
+
 
 # Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):
+    def setUp(self):
+        self.maxDiff = None
+
     def test_control_multi_xml(self):
         line = """Q M Q1 COS
 A"""
@@ -3119,6 +3153,37 @@ A
 
             </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
+
+    def test_multi_to_dim(self):
+        self.maxDiff = None
+        input_ = """Q M Q4 W jakiej wielkości miejscowości mieszkasz? Chodzi o miejsce Twojego pobytu przez większą część roku, nawet, jeśli jest to pobyt tymczasowy, a nie o miejsce stałego zameldowania.
+1 wieś
+2 miasto do 20 tys. mieszkańców
+3 miasto 20.000-49.999 mieszkańców
+4 miasto 50.000-99.999 mieszkańców
+5 miasto 100.000-199.999 mieszkańców
+6 miasto 200.000-499.999 mieszkańców
+7 miasto 500.000 mieszkańców lub większe
+8 nie wiem/ trudno powiedzieć"""
+
+        survey = parse(input_)
+        survey.to_dim()
+        got = survey.dim_out
+        want = '''Q4 "W jakiej wielkości miejscowości mieszkasz? Chodzi o miejsce Twojego pobytu przez większą część roku, nawet, jeśli jest to pobyt tymczasowy, a nie o miejsce stałego zameldowania."
+Categorical [1..]
+    {
+        x1 "wieś",
+        x2 "miasto do 20 tys. mieszkańców",
+        x3 "miasto 20.000-49.999 mieszkańców",
+        x4 "miasto 50.000-99.999 mieszkańców",
+        x5 "miasto 100.000-199.999 mieszkańców",
+        x6 "miasto 200.000-499.999 mieszkańców",
+        x7 "miasto 500.000 mieszkańców lub większe",
+        x8 "nie wiem/ trudno powiedzieć"
+
+    };
+'''
+        self.assertEqual(got, want)
 
 
 # Number
@@ -4080,6 +4145,40 @@ _
 '''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_dinamic_grid_to_dim_single(self):
+        input_ = """Q G Q1 COS
+a
+b
+_
+stw 1
+stw 2
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        got = survey.dim_out
+        # print(got)
+        want = """    Q1 "COS"
+        [
+            flametatype = "dynamicgrid"
+        ]
+    loop
+    {
+        x1 "stw 1",
+        x2 "stw 2"
+
+    } fields -
+    (
+        slice ""
+        categorical [1..1]
+        {
+            x1 "a",
+            x2 "b"
+
+        };
+    ) expand grid;
+"""
+
+        self.assertEqual(got, want)
 
 # highlighter
 class TestHiglighter(KreaturaTestCase):
@@ -4396,19 +4495,18 @@ A B"""
 </list_item>
 </control_multi>
 <control_layout id="Q1.js" layout="default" style="">
-<content>&amp;lt;!-- Disabler  --&amp;gt;
-&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script type='text/javascript'&amp;gt;
+<content>&lt;script type='text/javascript' src='public/ibisDisabler.js'&gt;&lt;/script&gt;
+&lt;!-- Disabler  --&gt;
+&lt;script type='text/javascript'&gt;
 setIbisDisabler('Q1_dis.98','Q1_tresc');
-&amp;lt;/script&amp;gt;
-&amp;lt;!-- End Disabler  --&amp;gt;
+&lt;/script&gt;
+&lt;!-- End Disabler  --&gt;
 
-&amp;lt;!-- Disabler  --&amp;gt;
-&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script type='text/javascript'&amp;gt;
+&lt;!-- Disabler  --&gt;
+&lt;script type='text/javascript'&gt;
 setIbisDisabler('Q1_dis.98','Q1_data',98);
-&amp;lt;/script&amp;gt;
-&amp;lt;!-- End Disabler  --&amp;gt;
+&lt;/script&gt;
+&lt;!-- End Disabler  --&gt;
 
 &lt;!-- Concept Select  --&gt;
 &lt;link rel=&quot;stylesheet&quot; href=&quot;public/Selection_sog.css&quot; type=&quot;text/css&quot;&gt;
@@ -4419,6 +4517,7 @@ textContainerId: &quot;Q1_tresc&quot;,
 openContainerId: &quot;Q1_data&quot;,
 delimiter: &quot;|&quot;
 }});
+&lt;/script&gt;
 &lt;!-- End ConceptSelect --&gt;</content>
 </control_layout>
 </question>
@@ -4475,33 +4574,30 @@ _
 </list_item>
 </control_multi>
 <control_layout id="Q1.js" layout="default" style="">
-<content>&amp;lt;!-- Disabler  --&amp;gt;
-&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script type='text/javascript'&amp;gt;
+<content>&lt;script type='text/javascript' src='public/ibisDisabler.js'&gt;&lt;/script&gt;
+&lt;!-- Disabler  --&gt;
+&lt;script type='text/javascript'&gt;
 setIbisDisabler('Q1_dis.97','Q1_tresc');
-&amp;lt;/script&amp;gt;
-&amp;lt;!-- End Disabler  --&amp;gt;
+&lt;/script&gt;
+&lt;!-- End Disabler  --&gt;
 
-&amp;lt;!-- Disabler  --&amp;gt;
-&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script type='text/javascript'&amp;gt;
+&lt;!-- Disabler  --&gt;
+&lt;script type='text/javascript'&gt;
 setIbisDisabler('Q1_dis.97','Q1_data',97);
-&amp;lt;/script&amp;gt;
-&amp;lt;!-- End Disabler  --&amp;gt;
+&lt;/script&gt;
+&lt;!-- End Disabler  --&gt;
 
-&amp;lt;!-- Disabler  --&amp;gt;
-&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script type='text/javascript'&amp;gt;
+&lt;!-- Disabler  --&gt;
+&lt;script type='text/javascript'&gt;
 setIbisDisabler('Q1_dis.98','Q1_tresc');
-&amp;lt;/script&amp;gt;
-&amp;lt;!-- End Disabler  --&amp;gt;
+&lt;/script&gt;
+&lt;!-- End Disabler  --&gt;
 
-&amp;lt;!-- Disabler  --&amp;gt;
-&amp;lt;script type='text/javascript' src='public/ibisDisabler.js'&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script type='text/javascript'&amp;gt;
+&lt;!-- Disabler  --&gt;
+&lt;script type='text/javascript'&gt;
 setIbisDisabler('Q1_dis.98','Q1_data',98);
-&amp;lt;/script&amp;gt;
-&amp;lt;!-- End Disabler  --&amp;gt;
+&lt;/script&gt;
+&lt;!-- End Disabler  --&gt;
 
 &lt;!-- Concept Select  --&gt;
 &lt;link rel=&quot;stylesheet&quot; href=&quot;public/Selection_sog.css&quot; type=&quot;text/css&quot;&gt;
@@ -4512,6 +4608,7 @@ textContainerId: &quot;Q1_tresc&quot;,
 openContainerId: &quot;Q1_data&quot;,
 delimiter: &quot;|&quot;
 }});
+&lt;/script&gt;
 &lt;!-- End ConceptSelect --&gt;</content>
 </control_layout>
 </question>

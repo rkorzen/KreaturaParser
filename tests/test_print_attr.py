@@ -37,6 +37,7 @@ precode = False
 size = []
 parent_id = False
 content = False
+dim_out = ""
 xml = False
 quoted = False
 warnings = []'''.splitlines())

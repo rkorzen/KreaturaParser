@@ -411,11 +411,12 @@ def parse(text_input):
 
 
 if __name__ == "__main__":
-    with open(r'c:\badania\ADHOC.2015\126042.08\IBIS\skrypt\tobago 2.txt', 'r') as f:
+    #with open(r'c:\badania\ADHOC.2015\126042.08\IBIS\skrypt\tobago 2.txt', 'r') as f:
+    with open(r'c:\users\korzeniewskir\Desktop\x.txt', 'r') as f:
         f = f.read()
-
         survey = parse(f)
-        survey.to_xml()
+        survey.to_dim()
+        print(survey.dim_out)
 
 
 
