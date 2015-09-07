@@ -2937,6 +2937,47 @@ B'''
         #print(etree.tostring(survey.xml, pretty_print=True).decode())
         self.assertXmlEqual(got, want)
 
+    def test_postcode_with_if(self):
+        text = '''Q S Q1 COS
+POST if($Q1:1 == "1");else;goto next;endif
+A
+B'''
+        survey = parse(text)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = """<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false" name="">
+      <question id="Q1" name="">
+        <control_layout id="Q1.labelka" layout="default" style="">
+          <content>COS</content>
+        </control_layout>
+        <control_single id="Q1" layout="vertical" style="" itemlimit="0" name="Q1 | COS" random="false" require="true" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>A</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>B</content>
+          </list_item>
+        </control_single>
+      </question>
+      <postcode><![CDATA[if($Q1:1 == "1")
+else
+  goto next
+endif
+]]></postcode>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>""".format(survey.createtime)
+
+        #print(etree.tostring(survey.xml, pretty_print=True).decode())
+        self.assertXmlEqual(got, want)
+
 # Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):
     def setUp(self):
