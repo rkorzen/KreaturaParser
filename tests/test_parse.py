@@ -60,6 +60,7 @@ Q S Q1 Cos"""
 
         result = parse(text_input)
         self.assertEqual(expected, result)
+        self.assertEqual(block.postcode, result.childs[0].postcode)
 
     def test_block_parrent(self):
         input_ = """B B0
@@ -632,31 +633,77 @@ Q O Q2 --p:Q1_p COS
 
     def test_caf_screenout(self):
         input_ = """Q S Q1 A
-1 a --so"""
+1 a --so
+2 b --so"""
 
-        caf = Cafeteria()
-        caf.id = '1'
-        caf.content = 'a'
-        caf.screenout = True
+#         caf = Cafeteria()
+#         caf.id = '1'
+#         caf.content = 'a'
+#         caf.screenout = True
+#
+#         q = Question('Q1')
+#         q.typ = "S"
+#         q.content = 'A'
+#         q.cafeteria.append(caf)
+#
+#         p = Page('Q1_p')
+#         p.childs.append(q)
+#         p.postcode = """if ($Q1:1 == "1")
+#   #OUT = "1"
+#   goto KONKURS
+# else
+# endif"""
+#         b = Block('Default')
+#         b.childs.append(p)
+#         survey = Survey()
+#         survey.append(b)
+#         survey.to_xml()
 
-        q = Question('Q1')
-        q.typ = "S"
-        q.content = 'A'
-        q.cafeteria.append(caf)
+        result = parse(input_)
+        result.to_xml()
 
-        p = Page('Q1_p')
-        p.childs.append(q)
-        p.postcode = """if ($Q1:1 == "1")
-  #OUT = "1"
+        got = etree.tostring(result.xml)
+        want = """  <survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+    <block id="Default" name="" quoted="false" random="false" rotation="false">
+      <page hideBackButton="false" id="Q1_p" name="">
+        <question id="Q1" name="">
+          <control_layout id="Q1.labelka" layout="default" style="">
+            <content>A</content>
+          </control_layout>
+          <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 | A" random="false" require="true" results="true" rotation="false" style="">
+            <list_item id="1" name="" style="">
+              <content>a</content>
+            </list_item>
+            <list_item id="2" name="" style="">
+              <content>b</content>
+            </list_item>
+          </control_single>
+        </question>
+        <postcode>if ($Q1:1 == &quot;1&quot;)
+  #OUT = &quot;1&quot;
   goto KONKURS
 else
-endif"""
-        b = Block('Default')
-        b.childs.append(p)
-        survey = Survey()
-        survey.append(b)
-        result = parse(input_)
-        self.assertEqual(survey, result)
+endif
+
+if ($Q1:2 == &quot;1&quot;)
+  #OUT = &quot;1&quot;
+  goto KONKURS
+else
+endif</postcode>
+      </page>
+    </block>
+    <vars></vars>
+    <procedures>
+      <procedure id="PROC" shortdesc=""></procedure>
+    </procedures>
+  </survey>""".format(result.createtime)
+        #want = etree.tostring(want)
+        #result.createtime = survey.createtime
+
+        # print(got)
+        # print(want)
+        #self.assertEqual(survey, result)
+        self.assertXmlEqual(got, want)
 
     def test_nesting(self):
         input_ = """B MAIN
@@ -802,7 +849,6 @@ POST $A1="2"'''
         expected.childs[0].precode = '$A1="1"'
         expected.childs[0].postcode = '$A1="2"'
         expected.to_xml()
-
         e_xml = """<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
   <block id="B0" name="" quoted="false" random="false" rotation="false">
     <precode><![CDATA[$A1="1"]]></precode>
@@ -1524,8 +1570,8 @@ A --so"""
                                        </question>
                                  <postcode>
 <![CDATA[if ($Q1:1 == "1")
-#OUT = "1"
-goto KONKURS
+  #OUT = "1"
+  goto KONKURS
 else
 endif]]></postcode>
                                  </page>
@@ -1588,14 +1634,15 @@ B --so"""
                                        </question>
                                  <postcode>
 <![CDATA[if ($Q1:1 == "1")
-#OUT = "1"
-goto KONKURS
+  #OUT = "1"
+  goto KONKURS
 else
 endif
 
+
 if ($Q1:2 == "1")
-#OUT = "1"
-goto KONKURS
+  #OUT = "1"
+  goto KONKURS
 else
 endif]]></postcode>
                                  </page>
@@ -1919,12 +1966,13 @@ A"""
                                                                  </list_item>
                                                  </control_single>
                                        </question>
-<postcode>
-<![CDATA[if ($Q1:2 == "1")
-#OUT = "1"
-goto KONKURS
+<postcode><![CDATA[if ($Q1:2 == "1")
+  #OUT = "1"
+  goto KONKURS
 else
-endif]]>
+endif
+
+]]>
 </postcode>
                                  </page>
                                  <page id="Q2_p"
@@ -2852,6 +2900,42 @@ Categorical [1..1]
 
         self.assertEqual(got, want)
 
+    def test_postcode(self):
+        text = '''Q S Q1 COS
+POST #TEST = "1"
+A
+B'''
+        survey = parse(text)
+        survey.to_xml()
+
+        got = etree.tostring(survey.xml)
+        want = """<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false" name="">
+      <question id="Q1" name="">
+        <control_layout id="Q1.labelka" layout="default" style="">
+          <content>COS</content>
+        </control_layout>
+        <control_single id="Q1" layout="vertical" style="" itemlimit="0" name="Q1 | COS" random="false" require="true" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>A</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>B</content>
+          </list_item>
+        </control_single>
+      </question>
+      <postcode><![CDATA[#TEST = "1"]]></postcode>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>""".format(survey.createtime)
+
+        #print(etree.tostring(survey.xml, pretty_print=True).decode())
+        self.assertXmlEqual(got, want)
 
 # Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):

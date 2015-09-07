@@ -25,7 +25,7 @@ class TestPrintAttr(TestCase):
         # zmiana postcode - z false na ""
         expected = sorted('''statements = []
 rotation = False
-postcode = ""
+postcode = False
 random = False
 childs = []
 typ = False

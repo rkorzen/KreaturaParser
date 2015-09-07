@@ -157,7 +157,7 @@ def cafeteria_parser(line):
     # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     cafeteria_pattern = Patterns.caf_pattern
     caf = cafeteria_pattern.match(line)
-    print(caf.groups())
+    # print(caf.groups())
     # print(line)
     if caf.group(2):           # id
         cafeteria.id = caf.group(2)
@@ -186,7 +186,7 @@ def cafeteria_parser(line):
 
         hide = Patterns.hide_pattern.findall(cafeteria.content)
         if hide:
-            print('AAA')
+
             cafeteria.hide = hide[0]
             cafeteria.content = cafeteria.content.replace('--hide:' + hide[0], '')
 

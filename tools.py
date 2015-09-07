@@ -66,7 +66,7 @@ def build_precode(precode, tag):
     count_ifs = [x.startswith('if') for x in text].count(True)
     count_elses = [x.startswith('else') for x in text].count(True)
     count_endifs = [x.startswith('endif') for x in text].count(True)
-
+    #print(count_ifs, count_elses, count_endifs)
     if count_ifs is not count_elses or count_ifs is not count_endifs:
         raise ValueError('Liczba if, else, endif nie zgadza się')
 

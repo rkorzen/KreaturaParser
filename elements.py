@@ -42,7 +42,7 @@ class SurveyElements:
         # self.precode = ''
         self.precode = False
         # self.postcode = ''
-        self.postcode = ""
+        self.postcode = False
         self.rotation = False
         self.random = False
         self.hide = False
@@ -241,7 +241,10 @@ class Page(SurveyElements):
             child.to_xml()
 
             # aktualizuję postcode strony tym  co zebrane w głębi
-            self.postcode = child.postcode
+            if child.postcode:
+                if not self.postcode:
+                    self.postcode = ""
+                self.postcode += child.postcode
             self.warnings = child.warnings
 
             # w gridzie to_xml dla question zwraca element page wraz z dziećmi.. trzeba to podmienić,
@@ -425,8 +428,9 @@ class Question(SurveyElements):
                 self.xml.append(open_.xml)
 
                 if self.dontknow:
-                    print(self.dontknow)
-                # if 'dezaktywacja' in special_markers:
+                    pass
+                    #print(self.dontknow)
+                    # if 'dezaktywacja' in special_markers:
                     script_call = ScriptsCalls(self.id)
                     script_call.dezaktywacja_opena(self.dontknow)
 
@@ -801,7 +805,8 @@ class Question(SurveyElements):
                 number = ControlNumber(self.id + '.number' + caf.id)
                 number.name = "Pozycja Odp" + caf.id
                 if caf.hide:
-                    print(caf.hide)
+                    pass
+                    #print(caf.hide)
 
                 number.to_xml()
                 question.append(number.xml)
@@ -1148,13 +1153,10 @@ class ControlSingle(Control):
                 self.xml.append(list_item.xml)
 
                 if caf.screenout:
-                    self.postcode += """
-if (${0}:{1} == "1")
-#OUT = "1"
-goto KONKURS
-else
-endif
-""".format(self.id, caf.id)
+                    if not self.postcode:
+                        self.postcode = ""
+
+                    self.postcode += """if (${0}:{1} == "1");#OUT = "1";goto KONKURS;else;endif;;""".format(self.id, caf.id)
         else:
             raise ValueError("Brak kafeterii w pytaniu: ", self.id)
 

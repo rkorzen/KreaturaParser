@@ -345,10 +345,12 @@ def parse(text_input):
 
             """
 
-            if statement.screenout:
-                current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-                    current_question.id, statement.id
-                )
+            # if statement.screenout:
+            #     if not current_page.postcode:
+            #         current_page.postcode = ""
+            #     current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
+            #         current_question.id, statement.id
+            #     )
 
             if statement.gotonext:
                 # print("statement", statement)
@@ -393,13 +395,17 @@ def parse(text_input):
 
         # region postcode
         if structure == "POSTCODE":
+            #print('AAAA')
+
             if type(current_element) is Question:
+                #print(current_page)
                 current_page.postcode = line.split('POST ')[1]
+                #print('A', current_page.postcode)
             else:
                 current_element.postcode = line.split('POST ')[1]
         # endregion
 
-        # region postcode
+        # region BLANK
         if structure == "BLANK":
             collect_statements = False
             # current_page = None
@@ -419,7 +425,7 @@ if __name__ == "__main__":
         f = f.read()
         survey = parse(f)
         survey.to_dim()
-        print(survey.dim_out)
+        #print(survey.dim_out)
 
 
 
