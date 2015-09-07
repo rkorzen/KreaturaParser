@@ -968,6 +968,7 @@ class Question(SurveyElements):
 
 '''.format(self.id, self.content, stat, caf)
 
+
 class Control:
     def __init__(self, id_, **kwargs):
         self.id = id_
@@ -1180,8 +1181,6 @@ class ControlMulti(ControlSingle):
 {0}
     }};
 """.format(make_caf_to_dim(self.cafeteria, 2))
-
-
 
 
 class ControlNumber(Control):
