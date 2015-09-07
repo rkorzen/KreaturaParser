@@ -59,7 +59,7 @@ def build_precode(precode, tag):
     prec = etree.Element(tag)
 
     text = precode.split(';')
-
+    #print(text)
     # pobieżna walidacja
     # czy ilość if else i endif jest taka sama
 

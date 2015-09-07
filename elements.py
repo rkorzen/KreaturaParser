@@ -1156,7 +1156,7 @@ class ControlSingle(Control):
                     if not self.postcode:
                         self.postcode = ""
 
-                    self.postcode += """if (${0}:{1} == "1");#OUT = "1";goto KONKURS;else;endif;;""".format(self.id, caf.id)
+                    self.postcode += """;;if (${0}:{1} == "1");#OUT = "1";goto KONKURS;else;endif;;""".format(self.id, caf.id)
         else:
             raise ValueError("Brak kafeterii w pytaniu: ", self.id)
 

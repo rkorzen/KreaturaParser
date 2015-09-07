@@ -2978,6 +2978,16 @@ endif
         #print(etree.tostring(survey.xml, pretty_print=True).decode())
         self.assertXmlEqual(got, want)
 
+    def test_postcode_with_2_ifs(self):
+        text = """Q S S6 Na kogo głosował(a) Pan(i) w drugiej turze wyborów prezydenckich?
+POST if(#ROK >= "1985" && $S6:2=="1");gr2="10";else;endif;;if(#ROK < "1985" && $S6:2=="1");gr2="01";else;endif
+1 a --so"""
+
+        survey = parse(text)
+        survey.to_xml()
+
+        print(etree.tostring(survey.xml, pretty_print=True).decode())
+
 # Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):
     def setUp(self):
