@@ -234,7 +234,11 @@ class TestCafeteria(TestCase):
         line5 = '2 Nie --goto:S7_p'
         line6 = "01 Ballantine's"
         line7 = 'A--hide:$P4B:{0} == "1"'
-        line8 = "<p><strong>Aloe Balsam 100 %</strong> to najwyższej jakości, delikatny jak chusteczki papier toaletowy (3- warstwowy) z dodatkiem balsamu z aloesu i witaminy E.<br/> Przebadany dermatologicznie, o PH przyjaznym dla sk&oacute;ry.</p><p>Doskonale zadba nawet o najbardziej wrażliwą sk&oacute;rę.</p>"
+        line8 = "<p><strong>Aloe Balsam 100 %</strong> to najwyższej jakości, delikatny jak chusteczki papier" \
+                " toaletowy (3- warstwowy) z dodatkiem balsamu z aloesu i witaminy E.<br/> Przebadany " \
+                "dermatologicznie," \
+                " o PH przyjaznym dla sk&oacute;ry.</p><p>Doskonale zadba nawet o najbardziej wrażliwą" \
+                " sk&oacute;rę.</p>"
 
         self.assertEqual('CAFETERIA', recognize(line))
         self.assertEqual('CAFETERIA', recognize(line2))

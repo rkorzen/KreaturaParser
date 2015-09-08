@@ -4,8 +4,7 @@ from KreaturaParser.elements import Cafeteria, make_caf_to_dim
 __author__ = 'KorzeniewskiR'
 
 
-
-class TestMake_caf_to_dim(TestCase):
+class TestMakeCafeteriaToDim(TestCase):
 
     def setUp(self):
         self.lista = []
@@ -18,9 +17,7 @@ class TestMake_caf_to_dim(TestCase):
         self.lista.append(caf1)
         self.lista.append(caf2)
 
-
     def test_make_caf_to_dim(self):
         got = make_caf_to_dim(self.lista)
         want = '''x1 "A",\nx2 "B"\n'''
         self.assertEqual(got, want)
-

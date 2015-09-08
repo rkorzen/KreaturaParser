@@ -3,6 +3,7 @@ from lxml import etree
 from KreaturaParser.tests.testing_tools import KreaturaTestCase
 from KreaturaParser.elements import Block
 
+
 class TestBlock(KreaturaTestCase):
 
     def test_class_exist(self):

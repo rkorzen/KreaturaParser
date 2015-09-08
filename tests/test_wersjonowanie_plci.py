@@ -5,7 +5,7 @@ from KreaturaParser.tools import wersjonowanie_plci
 __author__ = 'KorzeniewskiR'
 
 
-class TestWersjonowanie_plci(TestCase):
+class TestWersjonowaniePlci(TestCase):
     def test_wersjonowanie_plci(self):
         in_ = 'Pan(i) Pana(i) Panem(nią)'
         got = wersjonowanie_plci(in_)

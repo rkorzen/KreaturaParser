@@ -46,13 +46,13 @@ class TestTable(KreaturaTestCase):
         self.assertXmlEqual(got, want)
 
     def test_to_xml_no_row(self):
-        want = """<control_table id="T1" random='false' rotation='false' rrdest='row' style=''><row forcestable='true'
-         style=''><cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1' layout="default"
-         style=""><content></content></control_layout></cell></row></control_table>"""
+        # want = """<control_table id="T1" random='false' rotation='false' rrdest='row' style=''><row forcestable='true'
+        # style=''><cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1' layout="default"
+        # style=""><content></content></control_layout></cell></row></control_table>"""
 
         # cl = ControlLaout('Q1')
         # cell = Cell()
-        row = Row()
+        # row = Row()
         #
         # cell.add_control(cl)
         # row.add_cell(cell)
@@ -65,9 +65,9 @@ class TestTable(KreaturaTestCase):
         self.assertRaises(ValueError, self.table.to_xml)
 
     def test_to_xml_no_cell_on_row(self):
-        want = """<control_table id="T1" random='false' rotation='false' rrdest='row' style=''><row forcestable='true'
-         style=''><cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1' layout="default"
-         style=""><content></content></control_layout></cell></row></control_table>"""
+        # want = """<control_table id="T1" random='false' rotation='false' rrdest='row' style=''><row forcestable='true'
+        # style=''><cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1' layout="default"
+        # style=""><content></content></control_layout></cell></row></control_table>"""
 
         # cl = ControlLaout('Q1')
         # cell = Cell()

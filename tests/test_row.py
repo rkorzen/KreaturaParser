@@ -4,6 +4,7 @@ from KreaturaParser.elements import Cell
 from KreaturaParser.elements import ControlLayout
 from lxml import etree
 
+
 class TestRow(KreaturaTestCase):
     def setUp(self):
         self.row = Row()
@@ -31,7 +32,8 @@ class TestRow(KreaturaTestCase):
         self.row.add_cell(cell)
         self.row.to_xml()
 
-        want = """<row forcestable='true' style=''><cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1' layout="default" style=""><content></content></control_layout></cell></row>"""
+        want = """<row forcestable='true' style=''><cell colspan='1' forcestable='false' rowspan='1' style=''>
+        <control_layout id='Q1' layout="default" style=""><content></content></control_layout></cell></row>"""
         got = etree.tostring(self.row.xml)
 
         self.assertXmlEqual(got, want)

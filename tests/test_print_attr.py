@@ -1,6 +1,7 @@
 from unittest import TestCase, main
 from KreaturaParser.tools import show_attr
 
+
 class SomeObject:
     def __init__(self):
         self.x = 'x'
@@ -31,14 +32,14 @@ childs = []
 typ = False
 cafeteria = []
 hide = False
-dontknow = False
+dontknow = None
 id = B0
 precode = False
 size = []
 parent_id = False
 content = False
 dim_out = ""
-xml = False
+xml = None
 quoted = False
 warnings = []'''.splitlines())
 

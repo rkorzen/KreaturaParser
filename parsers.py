@@ -6,34 +6,23 @@ from KreaturaParser.elements import Block, Page, Question, Cafeteria
 
 
 class Patterns:
-
-    # region recognize
     # example: B B1 B0 --ran --hide: $A1:{0} == "1"
     block_pattern = re.compile("^(B)(( )[\w_.]+){1,2}(( --ran)|( --rot))?( --hide:.*)?$")
 
     # example: P P0 --hide: $A1:{0} == "1"
     # example: P P0 --parent:Q --hide: $A1:97 == "1"
-    # page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*((--hide:)(.*)))*$")  # z grupowaniem
-    page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*(--parent:)([\w_.]+))?([ ])*(((--hide:)(.*)))*$")  # z grupowaniem
+    page_pattern = re.compile("^(P )([\w_.]+)*(([ ])*(--parent:)([\w_.]+))?([ ])*((--hide:)(.*))*$")  # z grupowaniem
+
     # example: Q O Q1 Coś tam --rot --hide
     question_pattern = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|T|G|SLIDER|SLIDERS|H|R|CS)([0-9]+_[0-9]+)? [\w_.]+ (.*)$")
-    #                        #                           typ                      size             id       parent                     5
-    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER|SLIDERS|H|R|CS)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$")
+    question_pattern_advanced = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER|SLIDERS|H|R|CS)([0-9]+_[0-9]+)? "
+                                           "([\w_.]+)( --p:([\w_.]+))? (.*)$")
     precode_pattern = re.compile("^PRE .*$")
     postcode_pattern = re.compile("^POST .*$")
     comment_line_pattern = re.compile("^//.*$")
 
-    # caf_patrn = re.compile("[\w !@#$%^&*()_+-=.,'\":;\\|\[\]\{\}`]+")
-    # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
-    # caf_patte<img src="public/1.jpg" alt="Vitaral">rn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    # w miarę dobry: caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ,.\-+\(\)&\\\\/\?!„”;\<\>=\"\$]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
-    # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w +\-&()\\\\/]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
-    #caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!’'„”;:\<\>=\"\$]+)(( )?--hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+))?( --so| --gn|--goto:([\w_.]+)*)?$")
-    # caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.\-+\(\)&\\\\/\?!’'„”;:\<\>=\"\$]+)$")
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.–%\-+\(\)&\\\\/\?!’'„”;:-\<\>=\"{}\$]+)$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.–%\-+\(\)&\\\\/\?!’'„”;:-<>=\"\{}\$]+)$")
     blanck_pattern = re.compile("^$")
-    # endregion
 
     parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
     hide_pattern = re.compile("--hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+)")
@@ -95,10 +84,7 @@ def question_parser(line):
     :rtype: Question
 
     """
-    #                  typ                      size             id       parent                     5
-    # r = re.compile("^Q (S|M|L|N|O|LHS|B|SDG|G|B|T|SLIDER)([0-9]+_[0-9]+)? ([\w_.]+)( --p:([\w_.]+))? (.*)$").match(line)
     r = Patterns.question_pattern_advanced.match(line)
-    # print(r.groups())
     question = Question(r.group(3))  # id
     question.typ = r.group(1)
 
@@ -114,7 +100,6 @@ def question_parser(line):
     # hp = hide_pattern.find(question.content)
     #
     # print(hp.groups())
-
 
     ''' sprawdzam, czy w treści jest " --dk:"
     jeśli jest to przeczyszczam q.content i ustawian q.dontknow
@@ -153,12 +138,9 @@ def cafeteria_parser(line):
 
     """
     cafeteria = Cafeteria()
-    # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    # cafeteria_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w&\\\\ /]+)( --hide:([\w\d ='\":\{\}\$#]+))?( --so| --gn)?$")
     cafeteria_pattern = Patterns.caf_pattern
     caf = cafeteria_pattern.match(line)
-    # print(caf.groups())
-    # print(line)
+
     if caf.group(2):           # id
         cafeteria.id = caf.group(2)
 
@@ -179,8 +161,6 @@ def cafeteria_parser(line):
 
         goto = Patterns.goto_pattern.findall(cafeteria.content)
         if goto:
-        #if '--goto:' in cafeteria.content:
-            # goto = caf.group(8)
             cafeteria.goto = goto[0][1]
             cafeteria.content = cafeteria.content.replace('--goto:' + goto[0][1], '')
 

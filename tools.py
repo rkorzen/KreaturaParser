@@ -59,14 +59,14 @@ def build_precode(precode, tag):
     prec = etree.Element(tag)
 
     text = precode.split(';')
-    #print(text)
+    # print(text)
     # pobieżna walidacja
     # czy ilość if else i endif jest taka sama
 
     count_ifs = [x.startswith('if') for x in text].count(True)
     count_elses = [x.startswith('else') for x in text].count(True)
     count_endifs = [x.startswith('endif') for x in text].count(True)
-    #print(count_ifs, count_elses, count_endifs)
+    # print(count_ifs, count_elses, count_endifs)
     if count_ifs is not count_elses or count_ifs is not count_endifs:
         raise ValueError('Liczba if, else, endif nie zgadza się')
 
@@ -107,31 +107,31 @@ def clean_labels(text):
         return matchobj.group(0) if matched in tags else ''
 
     tekst_bez_znacznikow = tags_re.sub(tags_filter, text)
-    return(tekst_bez_znacznikow)
+    return tekst_bez_znacznikow
 
 
 def wersjonowanie_plci(text):
 
-    dict_ = {'Pan(i)':'#SEX_M#',
-             'Pan/i':'#SEX_M#',
-             'Pan/Pani':'#SEX_M#',
-             'Pana(i)':'#SEX_D#',
-             'Pana(-i)':'#SEX_D#',
-             'Pana/i':'#SEX_D#',
-             'Pana/Pani':'#SEX_D#',
-             'Panu(i)':'#SEX_C#',
-             'Panu/i':'#SEX_C#',
+    dict_ = {'Pan(i)': '#SEX_M#',
+             'Pan/i': '#SEX_M#',
+             'Pan/Pani': '#SEX_M#',
+             'Pana(i)': '#SEX_D#',
+             'Pana(-i)': '#SEX_D#',
+             'Pana/i': '#SEX_D#',
+             'Pana/Pani': '#SEX_D#',
+             'Panu(i)': '#SEX_C#',
+             'Panu/i': '#SEX_C#',
              'Pani(u)': '#SEX_C#',
-             'Pana(ią)':'#SEX_B#',
-             'Panem(ią)':'#SEX_N#',
-             'Panem(nią)':'#SEX_N#',
-             'y(a)':'#END_Y#',
-             '(a)':'#END_A#',
-             'em/am':'#END_EM#',
-             'em(am)':'#END_EM#',
-             'e(am)':"#END_EM#",
-             'by/aby':'#END_A#by',
-             'Panu/Pani':'#SEX_C#',
+             'Pana(ią)': '#SEX_B#',
+             'Panem(ią)': '#SEX_N#',
+             'Panem(nią)': '#SEX_N#',
+             'y(a)': '#END_Y#',
+             '(a)': '#END_A#',
+             'em/am': '#END_EM#',
+             'em(am)': '#END_EM#',
+             'e(am)': "#END_EM#",
+             'by/aby': '#END_A#by',
+             'Panu/Pani': '#SEX_C#',
              # u'„': '&bdquo;',
              # u'”': '&rdquo;',
              'zadowolony/ zadowolona': 'zadowolon#END_Y#',

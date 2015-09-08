@@ -1,6 +1,7 @@
+from lxml import etree
 from unittest import TestCase
 from KreaturaParser.elements import Page
-from lxml import etree
+
 
 class TestPage(TestCase):
 

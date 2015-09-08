@@ -1,5 +1,3 @@
-__author__ = 'KorzeniewskiR'
-
 from unittest import TestCase
 from doctest import Example
 from lxml.doctestcompare import LXMLOutputChecker

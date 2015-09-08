@@ -32,7 +32,8 @@ class TestCell(KreaturaTestCase):
         left = ControlLayout('Q1')
         left.content = 'COS'
         cell.add_control(left)
-        want = """<cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1' layout="default" style=""><content>COS</content></control_layout></cell>"""
+        want = """<cell colspan='1' forcestable='false' rowspan='1' style=''><control_layout id='Q1'
+        layout="default" style=""><content>COS</content></control_layout></cell>"""
         cell.to_xml()
         got = etree.tostring(cell.xml).decode("utf-8")
         self.assertXmlEqual(got, want)

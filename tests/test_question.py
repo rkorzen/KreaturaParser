@@ -2,6 +2,7 @@ from KreaturaParser.tests.testing_tools import KreaturaTestCase
 from KreaturaParser.elements import Question
 from lxml import etree
 
+
 class TestQuestion(KreaturaTestCase):
     def test_to_xml(self):
         question = Question('Q1')

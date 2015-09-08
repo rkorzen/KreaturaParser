@@ -1,13 +1,9 @@
-__author__ = 'KorzeniewskiR'
-
-from KreaturaParser.kparser import parse
-
-
 from lxml import etree
+from KreaturaParser.kparser import parse
 from KreaturaParser.tests.testing_tools import KreaturaTestCase
 
 
-class Test_Fix1(KreaturaTestCase):
+class TestFix1(KreaturaTestCase):
     def test_colon_in_cafeteria(self):
         input_ = """Q M Q1 COS
 1 A: B

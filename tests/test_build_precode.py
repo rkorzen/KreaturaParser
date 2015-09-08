@@ -2,6 +2,7 @@ from unittest import TestCase
 from KreaturaParser.tools import build_precode
 from lxml import etree
 
+
 class TestBuildPrecode(TestCase):
 
     def test_simple_precode(self):

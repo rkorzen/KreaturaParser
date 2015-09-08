@@ -1,7 +1,9 @@
 # coding: utf-8
 from KreaturaParser.tests.testing_tools import KreaturaTestCase
 from KreaturaParser.parsers import Patterns
-import re
+# import re
+
+
 class TestPatterns(KreaturaTestCase):
 
     def test_goto_pattern(self):
@@ -27,7 +29,6 @@ class TestPatterns(KreaturaTestCase):
         self.assertEqual(expected1, str(r4))
         self.assertEqual(expected2, str(r5))
 
-
     def test_hide_pattern(self):
         line1 = 'A --hide:$P4B:{0} == "1"'
         line2 = 'A--hide:$P4B:{0} == "1"'
@@ -39,7 +40,6 @@ class TestPatterns(KreaturaTestCase):
         expected = ['$P4B:{0} == "1"']
         self.assertEqual(expected, r1)
         self.assertEqual(expected, r2)
-
 
     def test_cafeteria_patter(self):
         line1 = 'A--hide:$P4B:{0} == "1"'

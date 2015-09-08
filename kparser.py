@@ -1,4 +1,11 @@
 # coding: utf-8
+import re
+# from lxml import etree
+from KreaturaParser.parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, \
+    Patterns
+from KreaturaParser.elements import Question, Survey, Page, Block
+from KreaturaParser.tools import find_parent
+
 """
 Author: Rafał Korzeniewski
 Mail: korzeniewski@gmail.com
@@ -8,13 +15,6 @@ Main module for Kreatura Parser Project.
 The main function is parse
 
 """
-import re
-
-from KreaturaParser.parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
-from KreaturaParser.elements import Question, Survey, Page, Block
-from lxml import etree
-from KreaturaParser.tools import find_parent
-
 
 
 def recognize(line):
@@ -93,10 +93,6 @@ def recognize(line):
     if comment_line_pattern.match(line):
         return "COMMENT"
 
-    # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w &\\\\/]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    # caf_patrn = re.compile("[\w !@#$%^&*()_+-=.,'\":;\\|\[\]\{\}`]+")
-    # caf_patrn = re.compile("^((\d+)(\.d|\.c)? )?([\w !@#$%^&*()_+-=.,'\":;\\\\|\[\]\{\}`]+)( --hide:([/:#\$\[\]\w\d\{\} \";'=]+))?( --so| --gn)?$")
-    # if caf_patrn.match(line) and not line.startswith("B ") and not line.startswith("P "):
     caf_pattern = Patterns.caf_pattern
     if caf_pattern.match(line):
         return "CAFETERIA"
@@ -190,7 +186,7 @@ def parse(text_input):
         if line.startswith('\\'):
             continue
 
-        line = line.strip() # usuwam nadmiarowe spacje itp
+        line = line.strip()  # usuwam nadmiarowe spacje itp
         structure = recognize(line)  # rozpoznaję strukturę
 
         # w zależności od tego co to jest reagujemy tworząc odpowiednie obiekty
@@ -395,12 +391,8 @@ def parse(text_input):
 
         # region postcode
         if structure == "POSTCODE":
-            #print('AAAA')
-
             if type(current_element) is Question:
-                #print(current_page)
                 current_page.postcode = line.split('POST ')[1]
-                #print('A', current_page.postcode)
             else:
                 current_element.postcode = line.split('POST ')[1]
         # endregion
@@ -420,12 +412,11 @@ def parse(text_input):
 
 
 if __name__ == "__main__":
-    #with open(r'c:\badania\ADHOC.2015\126042.08\IBIS\skrypt\tobago 2.txt', 'r') as f:
+    # with open(r'c:\badania\ADHOC.2015\126042.08\IBIS\skrypt\tobago 2.txt', 'r') as f:
     with open(r'c:\users\korzeniewskir\Desktop\x.txt', 'r') as f:
         f = f.read()
         survey = parse(f)
         survey.to_dim()
-        #print(survey.dim_out)
 
 
 

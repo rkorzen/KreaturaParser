@@ -53,8 +53,8 @@ class SurveyElements:
         self.statements = []
         self.size = []
         self.content = False
-        self.dontknow = False
-        self.xml = False
+        self.dontknow = None
+        self.xml = None
         self.warnings = []
         self.dim_out = ""
 
@@ -311,14 +311,14 @@ class Question(SurveyElements):
 
         if '--minchoose:' in self.content:
             pattern = re.compile('--minchoose:\d+')
-            minchoose= pattern.search(self.content).group()
+            minchoose = pattern.search(self.content).group()
 
             special_markers.append(minchoose.replace('--', ''))
             self.content = self.content.replace(minchoose, '')
 
         if '--maxchoose:' in self.content:
             pattern = re.compile('--maxchoose:\d+')
-            maxchoose= pattern.search(self.content).group()
+            maxchoose = pattern.search(self.content).group()
 
             special_markers.append(maxchoose.replace('--', ''))
             self.content = self.content.replace(maxchoose, '')
@@ -368,7 +368,6 @@ class Question(SurveyElements):
             layout.content = '<div class="basket_instrukcja">' + wersjonowanie_plci(self.content) + '</div>'
             layout.to_xml()
             self.xml.append(layout.xml)
-
 
         else:
             self.xml = etree.Element('question')
@@ -429,19 +428,15 @@ class Question(SurveyElements):
                 self.xml.append(open_.xml)
 
                 if self.dontknow:
-                    pass
-                    #print(self.dontknow)
-                    # if 'dezaktywacja' in special_markers:
                     script_call = ScriptsCalls(self.id)
                     script_call.dezaktywacja_opena(self.dontknow)
-
                     self.xml.append(script_call.to_xml())
 
         # endregion
 
         # region control_single/multi
         if self.typ == "S" or self.typ == "M":
-            if not self.cafeteria: # []
+            if not self.cafeteria:  # []
                 raise ValueError("Brak kafeterii w pytaniu ", self.id)
 
             if self.typ == "S":
@@ -493,7 +488,6 @@ class Question(SurveyElements):
                     open_.to_xml()
                     self.xml.append(open_.xml)
 
-
             # obrazki zamiast kafeterii
             if 'images' in special_markers:
 
@@ -525,8 +519,8 @@ class Question(SurveyElements):
                 if el.startswith('min:'):
                     try:
                         # print('BBB')
-                        min = el.split(':')
-                        control.minchoose = min[1]
+                        min_ = el.split(':')
+                        control.minchoose = min_[1]
                         # print(control.minchoice)
                     except:
                         raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
@@ -560,7 +554,7 @@ class Question(SurveyElements):
 
         # region js tables
         if self.typ == "T":
-            if not self.statements: # []
+            if not self.statements:  # []
                 raise ValueError("Brak stwierdzen w pytaniu ", self.id, "Być może zapomniałeś o _, "
                                                                         "albo chciales zastosowac inny typ pytania")
             hide_stw_pattern = None
@@ -654,8 +648,8 @@ class Question(SurveyElements):
                         open_.to_xml()
                         question.append(open_.xml)
 
-
                 self.xml.append(question)
+
             question_sc = etree.Element('question')
             question_sc.set('id', self.id + 'script_calls')
 
@@ -680,7 +674,8 @@ class Question(SurveyElements):
                     left = self.cafeteria[0].content
                     right = self.cafeteria[1].content
                 except IndexError as e:
-                    raise ValueError('W pytaniu ' + self.id + ' powinny być podane oba końce skali - czyli dwa elementy kafeterii', e)
+                    raise ValueError('W pytaniu ' + self.id + ' powinny być podane oba końce skali - '
+                                                              'czyli dwa elementy kafeterii', e)
 
             if not left:
                 num.name = self.id + ' ' + clean_labels(self.content)
@@ -688,7 +683,8 @@ class Question(SurveyElements):
 
                 self.xml.append(num.xml)
             else:
-                num.name = "{0} | {1} - {2} | {3} ".format(self.id, clean_labels(left), clean_labels(right), clean_labels(self.content))
+                num.name = "{0} | {1} - {2} | {3} ".format(self.id, clean_labels(left), clean_labels(right),
+                                                           clean_labels(self.content))
                 table = ControlTable(self.id+'_table')
                 row = Row()
                 l_cell = Cell()
@@ -749,9 +745,8 @@ class Question(SurveyElements):
 
             # print(self.cafeteria)
             for c, caf in enumerate(self.cafeteria):
-                self.cafeteria[c].content = '<img src="public/{0}/{1}.jpg" alt = "{2}">'.format(self.id, caf.id, caf.content)
-
-
+                self.cafeteria[c].content = '<img src="public/{0}/{1}.jpg" alt = "{2}">'.format(self.id, caf.id,
+                                                                                                caf.content)
             source = ControlSingle(self.id)
             source.require = 'false'
             source.cafeteria = self.cafeteria
@@ -781,7 +776,7 @@ class Question(SurveyElements):
     max: {max},
     maxreplace: true
 }});
-'''.format(**{'id':basket.id, 'label': statement.content.strip(), 'max': baskets_count})
+'''.format(**{'id': basket.id, 'label': statement.content.strip(), 'max': baskets_count})
 
             script_call = ScriptsCalls(self.id)
             script_call.baskets(basket_calls)
@@ -808,9 +803,8 @@ class Question(SurveyElements):
 
                 number = ControlNumber(self.id + '.number' + caf.id)
                 number.name = "Pozycja Odp" + caf.id
-                if caf.hide:
-                    pass
-                    #print(caf.hide)
+                # if caf.hide:
+                #     pass
 
                 number.to_xml()
                 question.append(number.xml)
@@ -825,8 +819,8 @@ class Question(SurveyElements):
         # region ConceptSelect
         if self.typ == "CS":
             if not self.cafeteria:
-                raise ValueError('W pytaniu {} brak tekstu do ConceptSelecta. Powinien to być 1 element'.format(self.id))
-
+                raise ValueError('W pytaniu {} brak tekstu do ConceptSelecta. '
+                                 'Powinien to być 1 element'.format(self.id))
 
             cs_tekst = " | ".join(self.cafeteria[0].content.split())
             id_c_tresc = self.id + '_tresc'
@@ -844,14 +838,13 @@ class Question(SurveyElements):
 
             control_disabler = ControlMulti(self.id + '_dis')
             if not self.statements:
-                caf = Cafeteria(**{'id':'98', 'content':'Nic nie zwróciło mojej uwagi'})
+                caf = Cafeteria(**{'id': '98', 'content': 'Nic nie zwróciło mojej uwagi'})
                 control_disabler.cafeteria.append(caf)
             else:
                 for el in self.statements:
-                    caf = Cafeteria(**{'id':el.id, 'content':el.content})
+                    caf = Cafeteria(**{'id': el.id, 'content': el.content})
                     caf.deactivate = 'true'
                     control_disabler.cafeteria.append(caf)
-
 
             control_disabler.require = 'false'
             control_disabler.name = self.id + '_dis'
@@ -863,14 +856,12 @@ class Question(SurveyElements):
 
             if not self.statements:
                 id_disablera = self.id + '_dis.98'
-                script_call.ibis_disabler(id_disablera, id_c_tresc )
+                script_call.ibis_disabler(id_disablera, id_c_tresc)
                 script_call.ibis_disabler(id_disablera, id_c_data, '98')
-
-
             else:
                 for el in self.statements:
                     id_disablera = self.id + '_dis.' + el.id
-                    script_call.ibis_disabler(id_disablera, id_c_tresc )
+                    script_call.ibis_disabler(id_disablera, id_c_tresc)
                     script_call.ibis_disabler(id_disablera, id_c_data, el.id)
 
             script_call.concept_select(id_c_tresc, id_c_data)
@@ -945,10 +936,10 @@ class Question(SurveyElements):
         }};
     ) expand grid;
 """.format(**{'id': self.id,
-             'content': self.content,
-             'stw': make_caf_to_dim(self.statements, 2),
-             'caf': make_caf_to_dim(self.cafeteria, 3)
-    })
+              'content': self.content,
+              'stw': make_caf_to_dim(self.statements, 2),
+              'caf': make_caf_to_dim(self.cafeteria, 3)
+              })
 
             self.dim_out += out
 
@@ -994,6 +985,7 @@ class Control:
         self.cafeteria = []
         self.statements = []
         self.xml = ""
+        self.postcode = False
         for key in kwargs:
             if kwargs[key]:
                 setattr(self, key, kwargs[key])
@@ -1073,9 +1065,6 @@ class ControlOpen(Control):
         content = etree.Element('content')
         if self.content:
             content.text = self.content
-
-
-
         self.xml.append(content)
 
 
@@ -1160,7 +1149,8 @@ class ControlSingle(Control):
                     if not self.postcode:
                         self.postcode = ""
 
-                    self.postcode += """;;if (${0}:{1} == "1");#OUT = "1";goto KONKURS;else;endif;;""".format(self.id, caf.id)
+                    self.postcode += """;;if (${0}:{1} == "1");#OUT = "1";goto KONKURS;else;endif;;""".format(self.id,
+                                                                                                              caf.id)
         else:
             raise ValueError("Brak kafeterii w pytaniu: ", self.id)
 
@@ -1555,7 +1545,7 @@ class Cell:
     def __init__(self):
         self.colspan = '1'
         self.forcestable = 'false'
-        self.rowspan='1'
+        self.rowspan = '1'
         self.style = ''
         self.xml = None
         self.control = None
