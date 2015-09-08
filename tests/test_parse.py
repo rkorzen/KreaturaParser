@@ -3800,6 +3800,264 @@ t.print();
 </survey>""".format(survey.createtime)
         self.assertXmlEqual(got, want)
 
+    def test_statements_with_hide(self):
+        input_ = '''Q T Q1 COS
+a
+b
+_
+A--hide:$Q1:{0} == "1"
+B'''
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray"
+                          localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+<block id="Default" name="" quoted="false" random="false" rotation="false">
+<page hideBackButton="false" id="Q1_p" name="">
+<question id="Q1" name="">
+<control_layout id="Q1.labelka" layout="default" style="">
+<content>COS</content>
+</control_layout>
+<control_layout id="Q1_1_txt" layout="default" style="">
+<hide><![CDATA[$Q1:1 == "1"]]></hide>
+<content>A</content>
+</control_layout>
+<control_single id="Q1_1" itemlimit="0" layout="vertical" name="Q1_1 | A" random="false" require="true"
+               results="true" rotation="false" style="">
+<hide><![CDATA[$Q1:1 == "1"]]></hide>
+<list_item id="1" name="" style="">
+<content>a</content>
+</list_item>
+<list_item id="2" name="" style="">
+<content>b</content>
+</list_item>
+</control_single>
+<control_layout id="Q1_2_txt" layout="default" style="">
+<hide><![CDATA[$Q1:2 == "1"]]></hide>
+<content>B</content>
+</control_layout>
+<control_single id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true"
+               results="true" rotation="false" style="">
+<hide><![CDATA[$Q1:2 == "1"]]></hide>
+<list_item id="1" name="" style="">
+<content>a</content>
+</list_item>
+<list_item id="2" name="" style="">
+<content>b</content>
+</list_item>
+</control_single>
+
+<control_layout id="Q1.js" layout="default" style="">
+<content>
+&lt;!-- tabela js --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+
+jQuery(document).ready(function(){{
+// ustawienia:
+
+// wspolny prefix kontrolek
+// zwróć uwagę by nie zaczynało się tak id page/question
+t = new Table(&quot;Q1_&quot;);
+
+// jeśli ma być transpozycja, odkomentuj poniższe
+//t.transposition();
+
+// jeśli nie ma być randoma, zakomentuj to
+t.shuffle();
+
+t.print();
+}});
+&lt;/script&gt;
+
+&lt;!-- custom css --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;</content>
+
+</control_layout>
+</question>
+</page>
+</block>
+<vars></vars>
+<procedures>
+<procedure id="PROC" shortdesc=""></procedure>
+</procedures>
+</survey>""".format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+
+    def test_statements_hide_diffrent(self):
+        input_ = '''Q T Q1 COS
+a
+b
+_
+A--hide:$K1:{0} == "1"
+B--hide:$K2:{0} == "1"'''
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray"
+                          localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+<block id="Default" name="" quoted="false" random="false" rotation="false">
+<page hideBackButton="false" id="Q1_p" name="">
+<question id="Q1" name="">
+<control_layout id="Q1.labelka" layout="default" style="">
+<content>COS</content>
+</control_layout>
+<control_layout id="Q1_1_txt" layout="default" style="">
+<hide><![CDATA[$K1:1 == "1"]]></hide>
+<content>A</content>
+</control_layout>
+<control_single id="Q1_1" itemlimit="0" layout="vertical" name="Q1_1 | A" random="false" require="true"
+               results="true" rotation="false" style="">
+<hide><![CDATA[$K1:1 == "1"]]></hide>
+<list_item id="1" name="" style="">
+<content>a</content>
+</list_item>
+<list_item id="2" name="" style="">
+<content>b</content>
+</list_item>
+</control_single>
+<control_layout id="Q1_2_txt" layout="default" style="">
+<hide><![CDATA[$K2:2 == "1"]]></hide>
+<content>B</content>
+</control_layout>
+<control_single id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true"
+               results="true" rotation="false" style="">
+<hide><![CDATA[$K2:2 == "1"]]></hide>
+<list_item id="1" name="" style="">
+<content>a</content>
+</list_item>
+<list_item id="2" name="" style="">
+<content>b</content>
+</list_item>
+</control_single>
+
+<control_layout id="Q1.js" layout="default" style="">
+<content>
+&lt;!-- tabela js --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+
+jQuery(document).ready(function(){{
+// ustawienia:
+
+// wspolny prefix kontrolek
+// zwróć uwagę by nie zaczynało się tak id page/question
+t = new Table(&quot;Q1_&quot;);
+
+// jeśli ma być transpozycja, odkomentuj poniższe
+//t.transposition();
+
+// jeśli nie ma być randoma, zakomentuj to
+t.shuffle();
+
+t.print();
+}});
+&lt;/script&gt;
+
+&lt;!-- custom css --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;</content>
+
+</control_layout>
+</question>
+</page>
+</block>
+<vars></vars>
+<procedures>
+<procedure id="PROC" shortdesc=""></procedure>
+</procedures>
+</survey>""".format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+
+
+    def test_statements_hide_and_no_hide(self):
+        input_ = '''Q T Q1 COS
+a
+b
+_
+A--hide:$K1:{0} == "1"
+B--hide:"0"'''
+        survey = parse(input_)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+
+        want = """<survey SMSComp="false" createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray"
+                          localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000">
+<block id="Default" name="" quoted="false" random="false" rotation="false">
+<page hideBackButton="false" id="Q1_p" name="">
+<question id="Q1" name="">
+<control_layout id="Q1.labelka" layout="default" style="">
+<content>COS</content>
+</control_layout>
+<control_layout id="Q1_1_txt" layout="default" style="">
+<hide><![CDATA[$K1:1 == "1"]]></hide>
+<content>A</content>
+</control_layout>
+<control_single id="Q1_1" itemlimit="0" layout="vertical" name="Q1_1 | A" random="false" require="true"
+               results="true" rotation="false" style="">
+<hide><![CDATA[$K1:1 == "1"]]></hide>
+<list_item id="1" name="" style="">
+<content>a</content>
+</list_item>
+<list_item id="2" name="" style="">
+<content>b</content>
+</list_item>
+</control_single>
+<control_layout id="Q1_2_txt" layout="default" style="">
+<content>B</content>
+</control_layout>
+<control_single id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true"
+               results="true" rotation="false" style="">
+<list_item id="1" name="" style="">
+<content>a</content>
+</list_item>
+<list_item id="2" name="" style="">
+<content>b</content>
+</list_item>
+</control_single>
+
+<control_layout id="Q1.js" layout="default" style="">
+<content>
+&lt;!-- tabela js --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/tables.css&quot; type=&quot;text/css&quot;&gt;
+&lt;script type='text/javascript' src='public/tables.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+
+jQuery(document).ready(function(){{
+// ustawienia:
+
+// wspolny prefix kontrolek
+// zwróć uwagę by nie zaczynało się tak id page/question
+t = new Table(&quot;Q1_&quot;);
+
+// jeśli ma być transpozycja, odkomentuj poniższe
+//t.transposition();
+
+// jeśli nie ma być randoma, zakomentuj to
+t.shuffle();
+
+t.print();
+}});
+&lt;/script&gt;
+
+&lt;!-- custom css --&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;public/custom.css&quot; type=&quot;text/css&quot;&gt;</content>
+
+</control_layout>
+</question>
+</page>
+</block>
+<vars></vars>
+<procedures>
+<procedure id="PROC" shortdesc=""></procedure>
+</procedures>
+</survey>""".format(survey.createtime)
+        self.assertXmlEqual(got, want)
 
 # slider
 class TestSlider(KreaturaTestCase):
@@ -4315,6 +4573,7 @@ stw 2
 
         self.assertEqual(got, want)
 
+
 # highlighter
 class TestHiglighter(KreaturaTestCase):
     def test_highlighter(self):
@@ -4755,7 +5014,6 @@ delimiter: &quot;|&quot;
 </procedures>
 </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
-
 
 
 # errors

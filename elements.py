@@ -335,7 +335,7 @@ class Question(SurveyElements):
         # endregion
 
         # TODO: tutaj duużo do zrobienia - wszystkie typy
-
+        # region begin
         if self.typ in ('G', 'SDG', 'R'):
             # w tym przypadku niestety question w to_xml musi zwrócić page
 
@@ -379,6 +379,7 @@ class Question(SurveyElements):
             layout.content = wersjonowanie_plci(self.content)
             layout.to_xml()
             self.xml.append(layout.xml)
+        # endregion
 
         # region control_layout
         if self.typ is "L":
@@ -562,7 +563,7 @@ class Question(SurveyElements):
             if not self.statements: # []
                 raise ValueError("Brak stwierdzen w pytaniu ", self.id, "Być może zapomniałeś o _, "
                                                                         "albo chciales zastosowac inny typ pytania")
-
+            hide_stw_pattern = None
             for stwierdzenie in self.statements:
 
                 el_id = self.id + '_' + stwierdzenie.id
@@ -570,7 +571,10 @@ class Question(SurveyElements):
                 layout = ControlLayout(el_id + '_txt')
                 layout.content = stwierdzenie.content
                 if stwierdzenie.hide:
-                    layout.hide = stwierdzenie.hide.format(stwierdzenie.id)
+                    hide_stw_pattern = stwierdzenie.hide
+
+                if hide_stw_pattern and hide_stw_pattern not in ['"0"', '&quot;0&quot;']:
+                    layout.hide = hide_stw_pattern.format(stwierdzenie.id)
 
                 layout.to_xml()
                 self.xml.append(layout.xml)
@@ -583,8 +587,8 @@ class Question(SurveyElements):
                 control.cafeteria = self.cafeteria
                 control.name = el_id + ' | ' + clean_labels(stwierdzenie.content)
 
-                if stwierdzenie.hide:
-                    control.hide = stwierdzenie.hide.format(stwierdzenie.id)
+                if hide_stw_pattern and hide_stw_pattern not in ['"0"', '&quot;0&quot;']:
+                    control.hide = hide_stw_pattern.format(stwierdzenie.id)
 
                 # nie wiem na razie jak tu powinno być z postcodem
                 control.postcode = self.postcode
