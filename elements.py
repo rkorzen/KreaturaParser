@@ -3,6 +3,7 @@ import datetime
 import re
 from lxml import etree
 from KreaturaParser.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
+from KreaturaParser.tools import find_parent, filter_parser
 
 
 def make_caf_to_dim(cafeteria, tabs=0):
@@ -13,8 +14,16 @@ def make_caf_to_dim(cafeteria, tabs=0):
 
     out = ""
     ile = len(cafeteria)
+    #print(dir(cafeteria[0]))
+    #print(cafeteria.other)
     for caf in cafeteria:
         out += '    '*tabs + 'x'+caf.id + ' "' + caf.content + '"'
+
+        if caf.deactivate:
+            out += ' DK'
+
+        if caf.other:
+            out += ' other'
         if cafeteria.index(caf) == ile-1:
             out += '\n'
         else:
@@ -57,6 +66,7 @@ class SurveyElements:
         self.xml = None
         self.warnings = []
         self.dim_out = ""
+        self.web_out = ""
 
     def __eq__(self, other):
         return (self.id == other.id and
@@ -101,6 +111,11 @@ class SurveyElements:
             child.to_dim()
             self.dim_out += child.dim_out
 
+    def to_web(self):
+        for child in self.childs:
+            child.to_web()
+            self.web_out += child.web_out
+
 
 class Survey:
     """
@@ -115,6 +130,7 @@ class Survey:
         self.createtime = unix_creation_time(datetime.datetime.now())
         self.xml = False
         self.dim_out = ""
+        self.web_out = ""
 
     def __eq__(self, other):
         return self.childs == other.childs and self.id == other.id
@@ -170,6 +186,11 @@ class Survey:
         for child in self.childs:
             child.to_dim()
             self.dim_out += child.dim_out
+
+    def to_web(self):
+        for child in self.childs:
+            child.to_web()
+            self.web_out += child.web_out
 
 
 class Block(SurveyElements):
@@ -264,6 +285,12 @@ class Page(SurveyElements):
         #     postcode.text = etree.CDATA(self.postcode)
         #    self.xml.append(postcode)
 
+    def to_web(self):
+        if self.precode:
+            self.childs[0].precode = self.precode
+        for child in self.childs:
+            child.to_web()
+            self.web_out += child.web_out
 
 class Question(SurveyElements):
     """Question"""
@@ -920,7 +947,8 @@ class Question(SurveyElements):
             self.dim_out += "    " + self.id + '"' + self.content + '";\n\n'
 
         elif self.typ == "G":
-            out = """    {id} "{content}"
+            out = """
+    {id} "{content}"
         [
             flametatype = "dynamicgrid"
         ]
@@ -946,6 +974,44 @@ class Question(SurveyElements):
         elif self.typ == "O":
             self.dim_out += '''    {0} "{1}" text;\n\n'''.format(self.id, self.content)
 
+        elif self.typ == "N":
+            numeric = ControlNumber(self.id)
+            numeric.content = self.content
+            numeric.to_dim()
+            self.dim_out += numeric.dim_out
+
+        elif self.typ in ["B", "SDG"]:
+            out = """
+    {id} "{content}"
+        [
+            flametatype = "mbdragndrop",
+            toolPath = "[%ImageCacheBase%]/images/mbtools/",
+            rowBtnWidth = 200,
+            rowBtnType = "Text",
+            dropType = "buckets",
+            rowContainWidth = 1000,
+            rowBtnHeight = 200
+        ]
+    loop
+    {{
+{stw}
+    }} fields -
+    (
+        slice ""
+        categorical [1..]
+        {{
+{caf}
+        }};
+    ) expand grid;
+""".format(**{'id': self.id,
+              'content': self.content,
+              'stw': make_caf_to_dim(self.statements, 2),
+              'caf': make_caf_to_dim(self.cafeteria, 3)
+              })
+
+            self.dim_out += out
+
+
         else:
             stat, caf = None, None
             if self.statements:
@@ -968,6 +1034,21 @@ class Question(SurveyElements):
 
 '''.format(self.id, self.content, stat, caf)
 
+    def to_web(self):
+
+        #print(self.id, self.precode)
+        if not self.precode:
+            self.web_out += "    " + self.id + '.Ask()\n'
+        else:
+            filter = filter_parser(self.precode)
+            if filter:
+                self.web_out += filter.format(self.id)
+
+        if self.typ in ["S", "M"]:
+            for caf in self.cafeteria:
+                if caf.screenout:
+                    self.web_out += '    if {0}.ContainsAny("x{1}") then IOM.SbScreenOut()\n\n'.format(self.id, caf.id)
+
 
 class Control:
     def __init__(self, id_, **kwargs):
@@ -986,6 +1067,7 @@ class Control:
         self.statements = []
         self.xml = ""
         self.postcode = False
+        self.dim_out = None
         for key in kwargs:
             if kwargs[key]:
                 setattr(self, key, kwargs[key])
@@ -1066,6 +1148,20 @@ class ControlOpen(Control):
         if self.content:
             content.text = self.content
         self.xml.append(content)
+
+    def to_dim(self):
+        self.dim_out += '\n    ' + self.id + ' "' + self.content + '"\n'
+        self.dim_out += '''
+    'style(
+    '    Width = "3em";
+    ')
+    'codes(
+    '{
+    '    - "Nie wiem" DK,
+    '    - "Te leki nie są dostępne na receptę" NA
+    '}
+    text;
+'''
 
 
 class ControlSingle(Control):
@@ -1155,8 +1251,8 @@ class ControlSingle(Control):
             raise ValueError("Brak kafeterii w pytaniu: ", self.id)
 
     def to_dim(self):
-        self.dim_out += self.id + ' "{0}"'.format(self.content) + '\n'
-        self.dim_out += """Categorical [1..1]
+        self.dim_out += '\n    ' + self.id + ' "{0}"'.format(self.content) + '\n'
+        self.dim_out += """    Categorical [1..1]
     {{
 {0}
     }};
@@ -1171,8 +1267,8 @@ class ControlMulti(ControlSingle):
         self.tag = 'control_multi'
 
     def to_dim(self):
-        self.dim_out += self.id + ' "{0}"'.format(self.content) + '\n'
-        self.dim_out += """Categorical [1..]
+        self.dim_out += '\n    ' + self.id + ' "{0}"'.format(self.content) + '\n'
+        self.dim_out += """    Categorical [1..]
     {{
 {0}
     }};
@@ -1218,6 +1314,21 @@ class ControlNumber(Control):
         # w sumie chyna nigdy nie użyłem wartości wpisanej domyślnie w control_number
         # gdyby była taka potrzeba.. to coś tu trzeba będzie zmienic
         content = etree.SubElement(self.xml, 'content')
+
+    def to_dim(self):
+        self.dim_out = ""
+        self.dim_out += '\n    ' + self.id + ' "' + self.content + '"\n'
+        self.dim_out += '''
+    'style(
+    '    Width = "3em";
+    ')
+    'codes(
+    '{
+    '    - "Nie wiem" DK,
+    '    - "Te leki nie są dostępne na receptę" NA
+    '}
+    long;
+'''
 
 
 class Cafeteria:

@@ -1,6 +1,6 @@
 # coding: utf-8
 from lxml import etree
-
+import re
 
 def show_attr(element):
     """Drukuje atrybuty"""
@@ -142,3 +142,35 @@ def wersjonowanie_plci(text):
         text = text.replace(key, dict_[key])
     return text
 
+
+def filter_parser(input_):
+
+    data = input_.split(';')
+
+    for x in data:
+        data[data.index(x)] = data[data.index(x)].strip()
+
+    try:
+        goto = data.index('goto next')
+    except ValueError as e:
+        goto = False
+
+    data = data[0].replace('if', '').replace('(', '').replace(')', '').replace('$', '')
+    warunek =data.strip()
+    filtr_pattern = re.compile('([\w\d_]+):(\d*) == "(\d)"')
+    warunek = filtr_pattern.match(warunek)
+
+    if not goto:
+        return False
+
+    if not warunek:
+        return False
+
+    warunek = warunek.groups()
+    id_ = warunek[0]
+    answer_position = warunek[1]
+    flaga = warunek[2]
+    if (goto == 1 and flaga == "0") or (goto == 2 and flaga == "1"):
+        return '\n    if {0}.ContainsAny("x{1}") then {{}}.Ask()\n\n'.format(id_, answer_position)
+    else:
+        return '\n    if not {0}.ContainsAny("x{1}") then {{}}.Ask()\n\n'.format(id_, answer_position)

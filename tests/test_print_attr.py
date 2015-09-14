@@ -41,6 +41,7 @@ content = False
 dim_out = ""
 xml = None
 quoted = False
+web_out = ""
 warnings = []'''.splitlines())
 
         self.assertEqual(expected, result)

@@ -2885,8 +2885,9 @@ A"""
         survey = parse(input_)
         survey.to_dim()
         got = survey.dim_out
-        want = '''Q4 "W jakiej wielkości miejscowości mieszkasz?"
-Categorical [1..1]
+        want = '''
+    Q4 "W jakiej wielkości miejscowości mieszkasz?"
+    Categorical [1..1]
     {
         x1 "wieś",
         x2 "miasto do 20 tys. mieszkańców",
@@ -3309,8 +3310,9 @@ A
         survey = parse(input_)
         survey.to_dim()
         got = survey.dim_out
-        want = '''Q4 "W jakiej wielkości miejscowości mieszkasz?"
-Categorical [1..]
+        want = '''
+    Q4 "W jakiej wielkości miejscowości mieszkasz?"
+    Categorical [1..]
     {
         x1 "wieś",
         x2 "miasto do 20 tys. mieszkańców",
@@ -4567,7 +4569,8 @@ stw 2
         survey.to_dim()
         got = survey.dim_out
         # print(got)
-        want = """    Q1 "COS"
+        want = """
+    Q1 "COS"
         [
             flametatype = "dynamicgrid"
         ]

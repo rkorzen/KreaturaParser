@@ -416,8 +416,10 @@ if __name__ == "__main__":
     with open(r'c:\users\korzeniewskir\Desktop\x.txt', 'r') as f:
         f = f.read()
         survey = parse(f)
-        survey.to_dim()
-        print(survey.dim_out)
+        #survey.to_dim()
+        survey.to_web()
+        #print(survey.dim_out)
+        print(survey.web_out)
 
 
 
