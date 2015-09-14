@@ -417,7 +417,7 @@ if __name__ == "__main__":
         f = f.read()
         survey = parse(f)
         survey.to_dim()
-
+        print(survey.dim_out)
 
 
 
