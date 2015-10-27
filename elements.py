@@ -653,6 +653,16 @@ class Question(SurveyElements):
                 else:
                     control = ControlSingle(el_id)
 
+                # rotation
+                if '--rot' in stwierdzenie.content:
+                    stwierdzenie.content = stwierdzenie.content.replace('--rot', '')
+                    control.rotation = 'true'
+
+                # random
+                if '--ran' in stwierdzenie.content:
+                    stwierdzenie.content = stwierdzenie.content.replace('--ran', '')
+                    control.random = 'true'
+
                 lay.content = stwierdzenie.content
                 # print(lay.content)
                 control.cafeteria = self.cafeteria

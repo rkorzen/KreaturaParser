@@ -21,11 +21,11 @@ class Patterns:
     postcode_pattern = re.compile("^POST .*$")
     comment_line_pattern = re.compile("^//.*$")
 
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.–%\-+\(\)&\\\\/\?!’'„”;:-<>=\"\{}\$]+)$")
+    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.–%\-+\(\)&\\\\/\?!’'„”;:-<>=\"\{}\$\|]+)$")
     blanck_pattern = re.compile("^$")
 
     parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
-    hide_pattern = re.compile("--hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|]+)")
+    hide_pattern = re.compile("--hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|()-]+)")
     goto_pattern = re.compile("--goto:( )?([\w_.]+)")
 
 
@@ -164,8 +164,10 @@ def cafeteria_parser(line):
         goto = Patterns.goto_pattern.findall(cafeteria.content)
         if goto:
             cafeteria.goto = goto[0][1]
-            cafeteria.content = cafeteria.content.replace('--goto:' + goto[0][1], '')
-
+            # todo: ogarnać to w bardziej elegencki i uniwersalny sposób
+            cafeteria.content = re.sub('--goto:(\s)*[\w_]+',"",cafeteria.content)
+            #cafeteria.content = cafeteria.content.replace('--goto:' + goto[0][1], '')
+            #cafeteria.content = cafeteria.content.replace('--goto: ' + goto[0][1], '')
         hide = Patterns.hide_pattern.findall(cafeteria.content)
         if hide:
 

@@ -4593,6 +4593,152 @@ stw 2
 
         self.assertEqual(got, want)
 
+    def test_grid_with_rotation(self):
+        """Fix isue#8"""
+        line = '''Q G Q1 COS
+1 a
+_
+1 stw a--multi--rot'''
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl"
+         name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false">
+      <question id="Q1instr">
+        <control_layout id="Q1_lab_instr" layout="default" style="">
+          <content>&lt;div class="grid_instrukcja"&gt;COS&lt;/div&gt;</content>
+        </control_layout>
+      </question>
+      <question id="Q1_1">
+        <control_layout id="Q1_1_txt" layout="default" style="">
+          <content>stw a</content>
+        </control_layout>
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false"
+         require="true" results="true" rotation="true">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+        </control_multi>
+      </question>
+      <question id="Q1script_calls">
+      <control_layout id="Q1.js" layout="default" style="">
+        <content>&lt;!-- Script: listcolumn --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla list kolumn
+  // u&#380;yj, gdy listy maj&#261; by&#263; podzielone na kolumny - np gdy bardzo d&#322;uga lista
+  // new IbisListColumn("Q1_1",2);
+&lt;/script&gt;
+&lt;!-- end: listcolumn --&gt;
+
+&lt;!-- Script: SuperImages --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/superImages.css'/&gt;
+&lt;script type='text/javascript' src='public/superImages.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla SuperImages
+  // u&#380;yj je&#347;li maj&#261; by&#263; w gridzie obrazki zamiast kafeterii tekstowej
+  // s1 = new SuperImages("Q1_1", {{zoom: false}});
+&lt;/script&gt;
+&lt;!-- end: SuperImages --&gt;
+
+&lt;!-- Script: MerryGoRound --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/merryGoRound.css'/&gt;
+&lt;script type='text/javascript' src='public/merryGoRound.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+    mgr = new MerryGoRound(jQuery("div.question").slice(1,-1),{{randomQuestion: false}});
+&lt;/script&gt;
+&lt;!-- end: MerryGoRound --&gt;
+
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+      </control_layout>
+      </question>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
+    def test_grid_with_random(self):
+        """Fix isue#8"""
+        line = '''Q G Q1 COS
+1 a
+_
+1 stw a--multi--ran'''
+        survey = parse(line)
+        survey.to_xml()
+        got = etree.tostring(survey.xml)
+        want = '''<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl"
+         name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false">
+      <question id="Q1instr">
+        <control_layout id="Q1_lab_instr" layout="default" style="">
+          <content>&lt;div class="grid_instrukcja"&gt;COS&lt;/div&gt;</content>
+        </control_layout>
+      </question>
+      <question id="Q1_1">
+        <control_layout id="Q1_1_txt" layout="default" style="">
+          <content>stw a</content>
+        </control_layout>
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="true"
+         require="true" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+        </control_multi>
+      </question>
+      <question id="Q1script_calls">
+      <control_layout id="Q1.js" layout="default" style="">
+        <content>&lt;!-- Script: listcolumn --&gt;
+&lt;link rel="stylesheet" href="public/listcolumn/listcolumn.css" type="text/css"&gt;
+&lt;script type='text/javascript' src='public/listcolumn/listcolumn.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla list kolumn
+  // u&#380;yj, gdy listy maj&#261; by&#263; podzielone na kolumny - np gdy bardzo d&#322;uga lista
+  // new IbisListColumn("Q1_1",2);
+&lt;/script&gt;
+&lt;!-- end: listcolumn --&gt;
+
+&lt;!-- Script: SuperImages --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/superImages.css'/&gt;
+&lt;script type='text/javascript' src='public/superImages.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+  // przyk&#322;ad dla SuperImages
+  // u&#380;yj je&#347;li maj&#261; by&#263; w gridzie obrazki zamiast kafeterii tekstowej
+  // s1 = new SuperImages("Q1_1", {{zoom: false}});
+&lt;/script&gt;
+&lt;!-- end: SuperImages --&gt;
+
+&lt;!-- Script: MerryGoRound --&gt;
+&lt;link rel='stylesheet' type='text/css' href='public/merryGoRound.css'/&gt;
+&lt;script type='text/javascript' src='public/merryGoRound.js'&gt;&lt;/script&gt;
+&lt;script type='text/javascript'&gt;
+    mgr = new MerryGoRound(jQuery("div.question").slice(1,-1),{{randomQuestion: false}});
+&lt;/script&gt;
+&lt;!-- end: MerryGoRound --&gt;
+
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;
+</content>
+      </control_layout>
+      </question>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+'''.format(survey.createtime)
+        self.assertXmlEqual(got, want)
+
 
 # highlighter
 class TestHiglighter(KreaturaTestCase):
