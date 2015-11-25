@@ -170,10 +170,19 @@ class TestPrecode(TestCase):
         line = 'PRE $Q1="1";$Q2="2"'
         self.assertEqual("PRECODE", recognize(line))
 
+    def test_dim_style_commented_precode(self):
+        line = "PRE ' if cos then cos"
+        self.assertEqual("PRECODE", recognize(line))
+
+
 
 class TestPostcode(TestCase):
     def test_simple_precode(self):
         line = 'POST $Q1="1";$Q2="2"'
+        self.assertEqual("POSTCODE", recognize(line))
+
+    def test_dim_style_commented_postcode(self):
+        line = "POST ' if cos then cos"
         self.assertEqual("POSTCODE", recognize(line))
 
 

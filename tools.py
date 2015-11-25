@@ -144,33 +144,44 @@ def wersjonowanie_plci(text):
 
 
 def filter_parser(input_):
+    """
+    filter_parser stara się tłumaczyć ibisowe filtry precodu/postcodu na routingu dim.
 
-    data = input_.split(';')
 
-    for x in data:
-        data[data.index(x)] = data[data.index(x)].strip()
+    """
 
-    try:
-        goto = data.index('goto next')
-    except ValueError as e:
-        goto = False
 
-    data = data[0].replace('if', '').replace('(', '').replace(')', '').replace('$', '')
-    warunek =data.strip()
-    filtr_pattern = re.compile('([\w\d_]+):(\d*) == "(\d)"')
-    warunek = filtr_pattern.match(warunek)
+    if input_.strip().startswith("'"):  # dim style
+        return input_
+    else:       # ibis translations
+        data = input_.split(';')
 
-    if not goto:
-        return False
+        for x in data:
+            data[data.index(x)] = data[data.index(x)].strip()
 
-    if not warunek:
-        return False
+        try:
+            goto = data.index('goto next')
+        except ValueError as e:
+            goto = False
 
-    warunek = warunek.groups()
-    id_ = warunek[0]
-    answer_position = warunek[1]
-    flaga = warunek[2]
-    if (goto == 1 and flaga == "0") or (goto == 2 and flaga == "1"):
-        return '\n    if {0}.ContainsAny("x{1}") then {{}}.Ask()\n\n'.format(id_, answer_position)
-    else:
-        return '\n    if not {0}.ContainsAny("x{1}") then {{}}.Ask()\n\n'.format(id_, answer_position)
+        data = data[0].replace('if', '').replace('(', '').replace(')', '').replace('$', '')
+        warunek = data.strip()
+        filtr_pattern = re.compile('([\w\d_]+):(\d*) == "(\d)"')
+        warunek = filtr_pattern.match(warunek)
+
+        if not goto:
+            return False
+
+        if not warunek:
+            return False
+
+        warunek = warunek.groups()
+        id_ = warunek[0]
+        answer_position = warunek[1]
+        flaga = warunek[2]
+
+        # rozpoznane patterny zwraca do uzupelnienia
+        if (goto == 1 and flaga == "0") or (goto == 2 and flaga == "1"):
+            return '\n    if {0}.ContainsAny("x{1}") then {{}}.Ask()\n\n'.format(id_, answer_position)
+        else:
+            return '\n    if not {0}.ContainsAny("x{1}") then {{}}.Ask()\n\n'.format(id_, answer_position)

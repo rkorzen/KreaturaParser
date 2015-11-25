@@ -1047,13 +1047,22 @@ class Question(SurveyElements):
 
     def to_web(self):
 
-        #print(self.id, self.precode)
-        if not self.precode:
-            self.web_out += "    " + self.id + '.Ask()\n'
-        else:
+        if self.precode:
             filter = filter_parser(self.precode)
-            if filter:
-                self.web_out += filter.format(self.id)
+
+            if filter.strip().startswith("'"):
+                self.web_out += filter + '\n'
+
+            elif filter:
+                try:
+                    self.web_out += filter.format(self.id)
+                except:
+                    raise(Exception("OJ"))
+
+        self.web_out += "    " + self.id + '.Ask()\n'
+
+
+
 
         if self.typ in ["S", "M"]:
             for caf in self.cafeteria:

@@ -5203,6 +5203,22 @@ class TestErrors(KreaturaTestCase):
         self.assertRaises(ValueError, survey.to_xml)
 
 
+class TestDimensionsStyles(KreaturaTestCase):
+    def test_precode(self):
+        text_input = """Q S Q1 COS
+PRE ' xxx
+1 a
+2 b"""
+        survey = parse(text_input)
+        survey.to_xml()
+        survey.to_web()
+        survey.to_dim()
+
+        print("XML:\n" + str(survey.xml))
+        print("ROUTING:\n" + survey.web_out)
+        print("METADATA:\n" + survey.dim_out)
+
+
 # warnings
 class TestWarnings(KreaturaTestCase):
     def test_many_columns_warning(self):
