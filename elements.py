@@ -60,6 +60,7 @@ class SurveyElements:
         self.typ = False
         self.cafeteria = []
         self.statements = []
+        self.categories = []
         self.size = []
         self.content = False
         self.dontknow = None

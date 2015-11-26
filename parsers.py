@@ -28,6 +28,7 @@ class Patterns:
     hide_pattern = re.compile("--hide:([/:#\$\[\]\w\d\{\} \";'!=\&\|()-]+)")
     goto_pattern = re.compile("--goto:( )?([\w_.]+)")
 
+    loop_pattern = re.compile("^FOR CATEGORIES:$")
 
 def block_parser(line):
     """

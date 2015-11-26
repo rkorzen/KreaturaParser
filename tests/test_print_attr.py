@@ -31,6 +31,7 @@ random = False
 childs = []
 typ = False
 cafeteria = []
+categories = []
 hide = False
 dontknow = None
 id = B0
