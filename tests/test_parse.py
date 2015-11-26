@@ -5214,10 +5214,22 @@ PRE ' xxx
         survey.to_web()
         survey.to_dim()
 
-        print("XML:\n" + str(survey.xml))
-        print("ROUTING:\n" + survey.web_out)
-        print("METADATA:\n" + survey.dim_out)
+        dim_exp = '''
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        x1 "a",
+        x2 "b"
 
+    };
+'''
+
+        web_exp = '''    ' xxx
+    Q1.Ask()
+'''
+
+        self.assertEqual(survey.dim_out, dim_exp)
+        self.assertEqual(survey.web_out, web_exp)
 
 # warnings
 class TestWarnings(KreaturaTestCase):

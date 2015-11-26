@@ -150,9 +150,8 @@ def filter_parser(input_):
 
     """
 
-
     if input_.strip().startswith("'"):  # dim style
-        return input_
+        return '    ' + input_
     else:       # ibis translations
         data = input_.split(';')
 

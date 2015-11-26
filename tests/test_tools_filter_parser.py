@@ -19,5 +19,5 @@ class TestFilter_parser(TestCase):
     def test_dim_style_precode(self):
         input_ = "' if cos the cos"
         result = filter_parser(input_)
-        expected = "' if cos the cos"
+        expected = "    ' if cos the cos"
         self.assertEqual(expected, result)

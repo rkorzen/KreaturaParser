@@ -288,6 +288,9 @@ class Page(SurveyElements):
     def to_web(self):
         if self.precode:
             self.childs[0].precode = self.precode
+        if self.postcode:
+            self.childs[0].postcode = self.postcode
+
         for child in self.childs:
             child.to_web()
             self.web_out += child.web_out
@@ -1061,13 +1064,17 @@ class Question(SurveyElements):
 
         self.web_out += "    " + self.id + '.Ask()\n'
 
-
-
-
         if self.typ in ["S", "M"]:
             for caf in self.cafeteria:
                 if caf.screenout:
                     self.web_out += '    if {0}.ContainsAny("x{1}") then IOM.SbScreenOut()\n\n'.format(self.id, caf.id)
+
+        if self.postcode:
+
+            filter = filter_parser(self.postcode)
+
+            if filter.strip().startswith("'"):
+                self.web_out += filter + '\n'
 
 
 class Control:
