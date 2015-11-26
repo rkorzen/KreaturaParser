@@ -1,8 +1,7 @@
 # coding: utf-8
 import re
 # from lxml import etree
-from KreaturaParser.parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, \
-    Patterns
+from KreaturaParser.parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
 from KreaturaParser.elements import Question, Survey, Page, Block
 from KreaturaParser.tools import find_parent
 
@@ -93,6 +92,10 @@ def recognize(line):
     if comment_line_pattern.match(line):
         return "COMMENT"
 
+    loop_pattern = Patterns.loop_pattern
+    if loop_pattern.match(line):
+        return "LOOP"
+
     caf_pattern = Patterns.caf_pattern
     if caf_pattern.match(line):
         return "CAFETERIA"
@@ -173,6 +176,7 @@ def parse(text_input):
     current_page = None
     current_question = None
     collect_statements = False
+    collect_categories = False
 
     # sprawdzamy czy są wewnątrz bloki programow
 
@@ -202,7 +206,7 @@ def parse(text_input):
 
             """
             collect_statements = False
-
+            collect_categories = False
             """
                 pojawił się blok, więc poprzednia strona powinna być pusta,
                 Jeśli następny element będzie typy QUESTION, to będzie wiadomo,
@@ -238,6 +242,7 @@ def parse(text_input):
             """
 
             collect_statements = False
+            collect_categories = False
             # endregion
 
             current_page = page_parser(line)
@@ -270,7 +275,7 @@ def parse(text_input):
         if structure == "QUESTION":
             # region reset
             collect_statements = False
-
+            collect_categories = False
             # endregion
 
             current_question = question_parser(line)
@@ -361,6 +366,9 @@ def parse(text_input):
                     # print('CC', next_page_precode)
             if collect_statements:
                 current_question.statements.append(statement)
+            elif collect_categories:
+                print('AAAA')
+                current_question.categories.append(statement)
             else:
                 # print(current_question.cafeteria)
                 current_question.cafeteria.append(statement)
@@ -381,6 +389,11 @@ def parse(text_input):
 
         # endregion
 
+        # region loop for categories
+        if structure == "LOOP":
+            collect_categories = True
+            collect_statements = False
+        # endregion
         # region precode
         if structure == "PRECODE":
             if type(current_element) is Question:

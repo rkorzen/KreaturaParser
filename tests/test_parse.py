@@ -5202,7 +5202,7 @@ class TestErrors(KreaturaTestCase):
 
         self.assertRaises(ValueError, survey.to_xml)
 
-
+# dimensions
 class TestDimensionsStyles(KreaturaTestCase):
     def test_precode(self):
         text_input = """Q S Q1 COS
@@ -5230,6 +5230,26 @@ PRE ' xxx
 
         self.assertEqual(survey.dim_out, dim_exp)
         self.assertEqual(survey.web_out, web_exp)
+
+# loops
+class TestLoop(KreaturaTestCase):
+    def test_loop_for_categories(self):
+        in_ = """Q G Q1 COS
+1 odp a
+2 odp b
+_
+1 stw a [cat]
+2 stw b [cat]
+
+FOR CATEGORIES:
+1 cat 1
+2 cat 2"""
+
+        survey = parse(in_)
+        categories = survey.childs[0].childs[0].childs[0].categories
+
+        self.assertEqual(str(categories), '[1,cat 1, 2,cat 2]')
+
 
 # warnings
 class TestWarnings(KreaturaTestCase):

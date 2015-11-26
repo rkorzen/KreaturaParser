@@ -271,5 +271,13 @@ class TestComment(TestCase):
         input_ = "// this is a comment"
         self.assertEqual("COMMENT", recognize(input_))
 
+class TestLoop(TestCase):
+    def test_loop_recognize(self):
+        line = "FOR CATEGORIES:"
+        result = recognize(line)
+
+        self.assertEqual('LOOP', result)
+
+
 if __name__ == '__main__':
     main()

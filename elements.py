@@ -6,7 +6,7 @@ from KreaturaParser.tools import build_precode, find_parent, clean_labels, wersj
 from KreaturaParser.tools import find_parent, filter_parser
 
 
-def make_caf_to_dim(cafeteria, tabs=0):
+def make_caf_to_dim(cafeteria, tabs=0, prov_letter = 'x'):
     """:returns string
     :param cafeteria: cafeteria or statements list
     :param tabs: level of indent
@@ -17,7 +17,7 @@ def make_caf_to_dim(cafeteria, tabs=0):
     #print(dir(cafeteria[0]))
     #print(cafeteria.other)
     for caf in cafeteria:
-        out += '    '*tabs + 'x'+caf.id + ' "' + caf.content + '"'
+        out += '    '*tabs + prov_letter + caf.id + ' "' + caf.content + '"'
 
         if caf.deactivate:
             out += ' DK'
@@ -961,7 +961,7 @@ class Question(SurveyElements):
         elif self.typ == "L":
             self.dim_out += "    " + self.id + '"' + self.content + '";\n\n'
 
-        elif self.typ == "G":
+        elif self.typ == "G" and not self.categories:
             out = """
     {id} "{content}"
         [
@@ -982,6 +982,34 @@ class Question(SurveyElements):
               'content': self.content,
               'stw': make_caf_to_dim(self.statements, 2),
               'caf': make_caf_to_dim(self.cafeteria, 3)
+              })
+
+            self.dim_out += out
+
+        elif self.typ == "G" and self.categories:
+            out = """
+    {id} - loop
+    {{
+{cat}
+    }} ran fields -
+    (
+        LR " {content}" loop
+        {{
+{stw}
+        }} fields -
+        (
+            slice ""
+            categorical [1..1]
+            {{
+{caf}
+            }};
+        ) expand grid;
+    ) expand;
+""".format(**{'id': self.id,
+              'content': self.content,
+              'cat': make_caf_to_dim(self.categories, 2, 'c'),
+              'stw': make_caf_to_dim(self.statements, 3, 'l'),
+              'caf': make_caf_to_dim(self.cafeteria, 4)
               })
 
             self.dim_out += out
