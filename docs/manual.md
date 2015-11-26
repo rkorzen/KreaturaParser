@@ -4,8 +4,8 @@
 | Author   | Rafał Korzeniewski                       |
 | email    | korzeniewski@gmail.com                   |
 | web      | http://rkorzen.pythonanywhere.com/parser |
-| Date:    | September 18, 2015                       |
-| Version  | 1.03                                     |
+| Date:    | November 26, 2015                        | 
+| Version  | 1.05                                     |
 
 
 # Change Log
@@ -70,6 +70,7 @@ Survey Parser
     - [Podstawy](#podstawy)
     - [FOR CATEGORIES](#for-categories)
   - [Prawa strona](#prawa-strona)
+  - [precod i postcode](#precod-i-postcode)
 - [PYTHON RECIPES](#python-recipes)
   - [json to dict example](#json-to-dict-example)
 
@@ -1617,6 +1618,33 @@ Abu uzyskać wejśćie do części web dodaj na początku linię
     if C2_3.ContainsAny("x2") then C4_3.Ask()
 
 ```
+
+<a name="precod-i-postcode"></a>
+## precod i postcode
+W części przypadkó IBISowy precod jest tłumaczony na język dimensions.
+Czasem jednak chyba wygdniej byłoby podać taki prekod i postkod explicite.
+Obecnie jest to rozwiązane w formie komentarza dimensions, czyli np <code>PRE ' xxx</code>
+
+przykład:
+
+```
+//to_web
+Q L Q1 cos
+PRE ' xxx
+POST ' yyy
+```
+
+wyjście:
+
+```
+    ' xxx
+    Q1.Ask()
+    ' yyy
+
+```
+
+
+
 
 <a name="python-recipes"></a>
 # PYTHON RECIPES
