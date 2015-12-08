@@ -5,6 +5,7 @@ from lxml import etree
 from KreaturaParser.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
 from KreaturaParser.tools import find_parent, filter_parser
 
+WERSJONOWANIE = True
 
 def make_caf_to_dim(cafeteria, tabs=0, prov_letter = 'x'):
     """:returns string
@@ -132,6 +133,7 @@ class Survey:
         self.xml = False
         self.dim_out = ""
         self.web_out = ""
+        # self.wersjonowanie = True
 
     def __eq__(self, other):
         return self.childs == other.childs and self.id == other.id
@@ -382,10 +384,16 @@ class Question(SurveyElements):
             instr.set('id', self.id + 'instr')
 
             layout = ControlLayout(self.id + '_lab_instr')
-            if self.typ is "R":
-                layout.content = '<div class="ranking_instrukcja">' + wersjonowanie_plci(self.content) + "</div>"
+
+            if WERSJONOWANIE:
+                tresc =  wersjonowanie_plci(self.content)
             else:
-                layout.content = '<div class="grid_instrukcja">' + wersjonowanie_plci(self.content) + "</div>"
+                tresc = self.content
+
+            if self.typ is "R":
+                layout.content = '<div class="ranking_instrukcja">' + tresc + "</div>"
+            else:
+                layout.content = '<div class="grid_instrukcja">' + tresc + "</div>"
             layout.to_xml()
 
             instr.append(layout.xml)
@@ -396,8 +404,13 @@ class Question(SurveyElements):
             self.xml.set('id', self.id)
             self.xml.set('name', '')
 
+            if WERSJONOWANIE:
+                tresc =  wersjonowanie_plci(self.content)
+            else:
+                tresc = self.content
+
             layout = ControlLayout(self.id + '.labelka')
-            layout.content = '<div class="basket_instrukcja">' + wersjonowanie_plci(self.content) + '</div>'
+            layout.content = '<div class="basket_instrukcja">' + tresc + '</div>'
             layout.to_xml()
             self.xml.append(layout.xml)
 
@@ -407,7 +420,13 @@ class Question(SurveyElements):
             self.xml.set('name', '')
 
             layout = ControlLayout(self.id + '.labelka')
-            layout.content = wersjonowanie_plci(self.content)
+
+            if WERSJONOWANIE:
+                tresc =  wersjonowanie_plci(self.content)
+            else:
+                tresc = self.content
+
+            layout.content = tresc
             layout.to_xml()
             self.xml.append(layout.xml)
         # endregion
@@ -422,7 +441,12 @@ class Question(SurveyElements):
                     else:
                         id_suf = '_' + str(caf.id)
                     layout_ = ControlLayout(self.id + id_suf + '_txt')
-                    layout_.content = wersjonowanie_plci(caf.content)
+                    if WERSJONOWANIE:
+                        tresc =  wersjonowanie_plci(caf.content)
+                    else:
+                        tresc = self.content
+
+                    layout_.content = tresc
                     layout_.to_xml()
                     self.xml.append(layout_.xml)
 
@@ -1427,7 +1451,10 @@ class Cafeteria:
         self.xml.set('name', "")
         self.xml.set('style', "")
         content = etree.Element('content')
-        content.text = wersjonowanie_plci(self.content)
+        if WERSJONOWANIE:
+            content.text = wersjonowanie_plci(self.content)
+        else:
+            content.text = self.content
         self.xml.append(content)
         # print(self.hide)
         if self.deactivate:
