@@ -778,6 +778,19 @@ class Question(SurveyElements):
 
         # endregion
 
+        # region sliders
+        if self.typ == "SLIDERS":
+            if self.cafeteria:
+                try:
+                    left = self.cafeteria[0].content
+                    right = self.cafeteria[1].content
+                except IndexError as e:
+                    raise ValueError('W pytaniu ' + self.id + ' powinny być podane oba końce skali - '
+                                                              'czyli dwa elementy kafeterii', e)
+
+
+        # endregion
+
         # region highlighter
         if self.typ == "H":
             script_call = ScriptsCalls(self.id)

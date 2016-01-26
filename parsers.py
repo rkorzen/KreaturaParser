@@ -30,6 +30,7 @@ class Patterns:
 
     loop_pattern = re.compile("^FOR CATEGORIES:$")
 
+
 def block_parser(line):
     """
     :param line: String

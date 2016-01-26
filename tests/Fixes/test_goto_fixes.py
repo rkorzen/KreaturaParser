@@ -162,7 +162,8 @@ endif]]>
 class TestFix4(KreaturaTestCase):
     def test_sliders(self):
         input_ = """Q SLIDERS Q1 COS
-cokolwiek
+left: left_end
+right: right_end
 _
 01 A
 02 B
@@ -276,14 +277,14 @@ _
 
 &lt;script type='text/javascript' src='public/slider/slider.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript'&gt;
-     sliderOpts = {
+     sliderOpts = {{
           value: 0,
           min: 1,
           max: 5,
           step: 1,
           animate:"slow",
           orientation: 'horizontal'
-     };
+     }};
 new IbisSlider("Q1_1", sliderOpts);new IbisSlider("Q1_2", sliderOpts);new IbisSlider("Q1_3", sliderOpts);
 &lt;/script&gt;</content>
 </control_layout>
