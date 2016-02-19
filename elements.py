@@ -2,7 +2,7 @@
 import datetime
 import re
 from lxml import etree
-from KreaturaParser.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
+from KreaturaParser.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci, wersjonowanie_plci_dim
 from KreaturaParser.tools import find_parent, filter_parser
 
 WERSJONOWANIE = True
@@ -189,7 +189,7 @@ class Survey:
         for child in self.childs:
             child.to_dim()
             self.dim_out += child.dim_out
-
+            self.dim_out = wersjonowanie_plci_dim(self.dim_out)
     def to_web(self):
         for child in self.childs:
             child.to_web()
@@ -753,6 +753,7 @@ class Question(SurveyElements):
                                                            clean_labels(self.content))
                 table = ControlTable(self.id+'_table')
                 row = Row()
+
                 l_cell = Cell()
                 l_cell.add_control(ControlLayout(self.id + 'left', **{'content': left}))
 
@@ -780,15 +781,77 @@ class Question(SurveyElements):
 
         # region sliders
         if self.typ == "SLIDERS":
+
+            # ustawienia:
             if self.cafeteria:
                 try:
                     left = self.cafeteria[0].content
+                except IndexError as e:
+                    left = "Lewy koniec skali"
+
+                try:
                     right = self.cafeteria[1].content
                 except IndexError as e:
-                    raise ValueError('W pytaniu ' + self.id + ' powinny być podane oba końce skali - '
-                                                              'czyli dwa elementy kafeterii', e)
+                    right = "Prawy koniec skali"
+
+            min, max = 1, 10  # domyślne ustawienia dla sliderOpts.min i sliderOpts.max
+
+            for marker in special_markers:
+                if marker.startswith("minchoose"):
+                    min = marker.split(':')[1]
+                if marker.startswith("maxchoose"):
+                    max = marker.split(':')[1]
+
+            # tabelka
+            hide_ptrn = ""
+            for stmnt in self.statements:
+                table = ControlTable("{}_{}_table".format(self.id, stmnt.id))
+                if stmnt.hide:
+                    hide_ptrn = stmnt.hide
+
+                if hide_ptrn:
+                    table.hide = hide_ptrn.format(stmnt.id)
+                row = Row()
+
+                statement_tekst = ControlLayout("{}_{}_table_stmnt".format(self.id, stmnt.id))
+                statement_tekst.content = stmnt.content
+
+                lewy_tekst = ControlLayout("{}_{}_table_left".format(self.id, stmnt.id))
+                lewy_tekst.content = left
+
+                prawy_tekst = ControlLayout("{}_{}_table_right".format(self.id, stmnt.id))
+                prawy_tekst.content = right
+
+                numeric = ControlNumber("{}_{}".format(self.id, stmnt.id))
+                numeric.name = "{}_{} | {}".format(self.id, stmnt.id, self.content)
+
+                cell_statement, cell_left, cell_middle, cell_right = Cell(), Cell(), Cell(), Cell()
+
+                cell_statement.add_control(statement_tekst)
+                cell_left.add_control(lewy_tekst)
+                cell_middle.add_control(numeric)
+                cell_right.add_control(prawy_tekst)
+
+                row.add_cell(cell_statement)
+                row.add_cell(cell_left)
+                row.add_cell(cell_middle)
+                row.add_cell(cell_right)
+
+                table.add_row(row)
+                table.to_xml()
+
+                self.xml.append(table.xml)
 
 
+            # dodajemy skrypt js
+            script_call = ScriptsCalls(self.id, **{'statements':self.statements,
+                                                   'cafeteria':self.cafeteria,
+                                                   'min':min,
+                                                   'max':max,
+                                                   'random': self.random})
+
+            script_call.sliders()
+            self.xml.append(script_call.to_xml())
         # endregion
 
         # region highlighter
@@ -1495,7 +1558,7 @@ class ScriptsCalls:
 
         self.content = etree.SubElement(self.control, 'content')
         self.content.text = ""
-
+        self.random = False
         self.columns = ''
         for key in kwargs:
             if kwargs[key]:
@@ -1614,6 +1677,46 @@ new IbisSlider("{0}", sliderOpts);
 </script>
 <!-- ControlScript ENDS HERE: slider -->
 '''.format(self.id)
+
+    def sliders(self):
+
+        call_slider = ""
+        for el in self.statements:
+            call_slider += 'new IbisSlider("{0}", sliderOpts);\n'.format(self.id+'_'+el.id)
+
+        self.content.text += '''
+<link rel="stylesheet" href="public/slider/css/ui-lightness/jquery-ui-1.8.9.custom.css" type="text/css">
+<link rel="stylesheet" href="public/slider/slider.css" type="text/css">
+<link rel="stylesheet" href="public/custom.css" type="text/css">
+
+<script type='text/javascript' src='public/slider/js/jquery-ui-1.8.9.custom.min.js'></script>
+
+<script type='text/javascript' src='public/slider/slider.js'></script>
+<script type='text/javascript'>
+	 sliderOpts = {{
+		  value: 0,
+		  min: {2},
+		  max: {3},
+		  step: 1,
+		  animate:"slow",
+		  orientation: 'horizontal'
+	 }};
+{1}
+</script>
+'''.format(self.id, call_slider, self.min, self.max)
+        if self.random:
+             self.content.text += '''
+<script type='text/javascript' src='public/rotate_tables.js'></script>
+<!-- get the file from https://github.com/rkorzen/ibisjs
+     optionally uncomment the line bellow (only for tests - never for production!!)
+-->
+<!--
+<script type='text/javascript' src='https://rawgit.com/rkorzen/ibisjs/master/rotate_tables.js'></script>
+<link rel='stylesheet' href='https://rawgit.com/rkorzen/ibisjs/master/rotate_tables.css' type='text/css'>
+-->
+'''
+
+
 
     def dinamic_grid(self):
         self.content.text += '''<!-- Script: listcolumn -->
@@ -1783,7 +1886,7 @@ class ControlTable:
         self.rrdest = 'row'
         self.style = ''
         self.xml = None
-
+        self.hide = False
     def add_row(self, row):
         if isinstance(row, Row):
             self.rows.append(row)
@@ -1806,6 +1909,12 @@ class ControlTable:
                 row.to_xml()
                 self.xml.append(row.xml)
 
+
         except ValueError as e:
             # print(str(e))
             raise ValueError("W tabeli " + self.id, e)
+
+        if self.hide:
+            hide = etree.Element('hide')
+            hide.text = etree.CDATA(self.hide)
+            self.xml.append(hide)

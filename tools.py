@@ -1,5 +1,6 @@
 # coding: utf-8
 from lxml import etree
+from collections import OrderedDict
 import re
 
 def show_attr(element):
@@ -111,34 +112,62 @@ def clean_labels(text):
 
 
 def wersjonowanie_plci(text):
+    dict_ = OrderedDict()
+    dict_['Pan(i)'] = '#SEX_M#'
+    dict_['Pan/i'] = '#SEX_M#'
+    dict_['Pan(ni)'] = "#SEX_M"
+    dict_['Pan/Pani'] = '#SEX_M#'
+    dict_['Pana(i)'] = '#SEX_D#'
+    dict_['Pana(-i)'] = '#SEX_D#'
+    dict_['Pana(ni)'] = '#SEX_D#'
+    dict_['Pana/i'] = '#SEX_D#'
+    dict_['Pana/Pani'] = '#SEX_D#'
+    dict_['Panu(i)'] = '#SEX_C#'
+    dict_['Panu/i'] = '#SEX_C#'
+    dict_['Pani(u)'] = '#SEX_C#'
+    dict_['Pana(ią)'] = '#SEX_B#'
+    dict_['Panem(ią)'] = '#SEX_N#'
+    dict_['Panem(nią)'] = '#SEX_N#'
+    dict_['y(a)'] = '#END_Y#'
+    dict_['(a)'] = '#END_A#'
+    dict_['em/am'] = '#END_EM#'
+    dict_['em(am)'] = '#END_EM#'
+    dict_['e(am)'] = "#END_EM#"
+    dict_['by/aby'] = '#END_A#by'
+    dict_['Panu/Pani'] = '#SEX_C#'
 
-    dict_ = {'Pan(i)': '#SEX_M#',
-             'Pan/i': '#SEX_M#',
-             'Pan/Pani': '#SEX_M#',
-             'Pana(i)': '#SEX_D#',
-             'Pana(-i)': '#SEX_D#',
-             'Pana/i': '#SEX_D#',
-             'Pana/Pani': '#SEX_D#',
-             'Panu(i)': '#SEX_C#',
-             'Panu/i': '#SEX_C#',
-             'Pani(u)': '#SEX_C#',
-             'Pana(ią)': '#SEX_B#',
-             'Panem(ią)': '#SEX_N#',
-             'Panem(nią)': '#SEX_N#',
-             'y(a)': '#END_Y#',
-             '(a)': '#END_A#',
-             'em/am': '#END_EM#',
-             'em(am)': '#END_EM#',
-             'e(am)': "#END_EM#",
-             'by/aby': '#END_A#by',
-             'Panu/Pani': '#SEX_C#',
-             # u'„': '&bdquo;',
-             # u'”': '&rdquo;',
-             'zadowolony/ zadowolona': 'zadowolon#END_Y#',
-             'zadowolony/zadowolona': 'zadowolon#END_Y#',
-             'zadowolona/zadowolony': 'zadowolon#END_Y#'}
+    for key in dict_.keys():
+        text = text.replace(key, dict_[key])
+    return text
 
-    for key in dict_:
+def wersjonowanie_plci_dim(text):
+    dict_ = OrderedDict()
+    dict_['Pan(i)'] = '{#Pan}'
+    dict_['Pan/i'] = '{#Pan}'
+    dict_['Pan(ni)'] = '{#Pan}'
+    dict_['Pan/Pani'] = '{#Pan}'
+    dict_['Pana(i)'] = '{#Pana}'
+    dict_['Pana(-i)'] = '{#Pana}'
+    dict_['Pana/i'] = '{#Pana}'
+    dict_['Pana(ni)'] = '{#Pana}'
+    dict_['Pana/Pani'] =  '{#Pana}'
+    dict_['Panu(i)'] =  '{#Panu}'
+    dict_['Panu/i'] =  '{#Panu}'
+    dict_['Pani(u)'] =  '{#Panu}'
+    dict_['Panu/Pani'] =  '{#Panu}'
+    dict_['Pana(ią)'] = '{#PanaPania}'
+    dict_['Panem(ią)'] =  '{#Panem}'
+    dict_['Panem(nią)'] =  '{#Panem}'
+    dict_['y(a)'] =  '{#y}'
+    dict_['y/a'] =  '{#y}'
+    dict_['(a)'] =  '{#a}'
+    dict_['em/am'] =  '{#em}'
+    dict_['em(am)'] =  '{#em}'
+    dict_['e(am)'] =  '{#em}'
+    dict_['by/aby'] =  '{#a}by'
+
+    for key in dict_.keys():
+        print(key, type(key), dict_[key])
         text = text.replace(key, dict_[key])
     return text
 

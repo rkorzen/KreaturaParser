@@ -52,3 +52,13 @@ FOR CATEGORIES:
 
         self.assertEqual(expected, result)
 
+    def test_wersjonowanie(self):
+        text_input = """Q S Q1 Czy może Pan(i)  powiedzieć, o co Panu(i) chodzi
+1 chętny/a
+2 niechętny(a)
+"""
+        survey = parse(text_input)
+        survey.to_dim()
+        result = survey.dim_out
+        print(result)
+
