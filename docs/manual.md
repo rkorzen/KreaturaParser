@@ -59,6 +59,7 @@ Survey Parser
   - [Numeric](#numeric)
   - [Tabelka JS](#tabelka-js)
   - [Slider](#slider)
+  - [Sliders](#sliders)
   - [Gridy](#gridy)
   - [Koszyczki](#koszyczki)
   - [Highlighter](#highlighter)
@@ -1051,6 +1052,52 @@ prawy koniec
 ```
 
 Ubiera to w tabelkę kreaturową z opisami końców skali
+
+
+<a name="sliders"></a>
+## Sliders
+
+
+```
+Q SLIDERS Q1 TRESC
+Lewy koniec
+Prawy koniec
+_
+A
+B
+C
+```
+
+Tworzy tabelę kreaturową:
+A | lewy koniec | numeric | prawy koniec
+
+Dodaje wywołanie skryptów
+
+Opcjonalnie można wywołać z opcją --ran
+```
+Q SLIDERS Q1 TRESC --ran
+Lewy koniec
+Prawy koniec
+_
+A
+B
+C
+```
+wtedy tabelki na ekranie będą randomizowane/
+Uwaga! Do randomizacji tabelek jest specjalny skrypt
+
+jego wywołanie jest ujęte przy wywołaniu skrypty. Opcjonalnie można zaciągnąć go bezpośrednio z githuba, 
+lepiej jednak nie robić tego na produkcji.
+
+  ```html
+  <script type='text/javascript' src='public/rotate_tables.js'></script>
+  <!-- get the file from https://github.com/rkorzen/ibisjs
+       optionally uncomment the line bellow (only for tests - never for production!!)
+  <script type='text/javascript' src='https://rawgit.com/rkorzen/ibisjs/master/rotate_tables.js'></script>
+  <link rel='stylesheet' href='https://rawgit.com/rkorzen/ibisjs/master/rotate_tables.css' type='text/css'>-->
+  ```
+
+
 
 <a name="gridy"></a>
 ## Gridy
