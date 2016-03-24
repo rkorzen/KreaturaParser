@@ -472,7 +472,7 @@ class Question(SurveyElements):
                     open_.to_xml()
                     self.xml.append(open_.xml)
             else:
-                open_ = ControlOpen(self.id)
+                open_ = ControlOpen(self.id+"_OPEN")
                 open_.name = self.id + ' | ' + clean_labels(self.content)
                 if 'not_require' in special_markers:
                     open_.require = 'false'
@@ -484,7 +484,7 @@ class Question(SurveyElements):
                 self.xml.append(open_.xml)
 
                 if self.dontknow:
-                    script_call = ScriptsCalls(self.id)
+                    script_call = ScriptsCalls(self.id+"_OPEN")
                     script_call.dezaktywacja_opena(self.dontknow)
                     self.xml.append(script_call.to_xml())
 
