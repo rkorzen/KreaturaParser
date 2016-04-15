@@ -12,7 +12,7 @@
 
 | Data       | Version | Description                                       | Author             |
 |------------|---------|---------------------------------------------------|--------------------|
-| 18.09.2015 | 1.00    | Publikacja dokumenty                              | Rafał Korzeniewski |
+| 18.09.2015 | 1.00    | Publikacja dokumentu                              | Rafał Korzeniewski |
 | 21.09.2015 | 1.01    | Spore zmiany formy, układu. Drobne zmiany treści, | Rafał Korzeniewski |
 | 22.09.2015 | 1.02    | Przyklady dla Dimensions                          | Rafał Korzeniewski |     
 | 05.10.2015 | 1.03    | PYTHON RECIPES                                    | Rafał Korzeniewski |
