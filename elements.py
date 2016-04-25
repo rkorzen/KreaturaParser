@@ -1534,6 +1534,7 @@ class Cafeteria:
         self.goto = None
         self.xml = None
         self.connected = False
+        self.img = None
 
         for key in kwargs:
             if kwargs[key]:

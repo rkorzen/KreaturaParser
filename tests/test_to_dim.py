@@ -100,11 +100,32 @@ B|c\\2.jpg
             labelstyle(
                 Image = "images\c\2.jpg",
                 ImagePosition = "ImageOnly"
-            )
+            )1
 
     };
 '''
         survey = parse(input_)
         survey.to_dim()
         result = survey.dim_out
+        #self.assertMultiLineEqual(result, expected)
         self.assertTxtEqual(result, expected)
+
+    def test_przyklad(self):
+        A = """
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Proin venenatis libero ante, in posuere felis  egestas vel.
+Vivamus tristique et mi eget convallis. Vestibulum id quam porta, semper leo quis, finibus orci.
+Pellentesque vel sapien elementum, iaculis diam in,  fringilla nisi. Morbi interdum luctus dolor sit amet euismod.
+Donec in rhoncus purus, ac venenatis justo. Nulla ac purus ut tortor molestie facilisis sed sit amet tellus.
+Vivamus consequat risus vel  consequat rhoncus.
+"""
+        B = """
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Proin venenatis libero ante, in posuere felis egestas vel.
+Vivamus tristique et mi eget convallis. Vestibulum id quam porta, semper leo quis, finibus orci.
+Pellentesque vel sapien elementum, iaculis diam in, fringilla nisi. Morbi interdum luctus dolor sit amet euismod.
+Donec in rhoncus purus, ac venenatis justo. Nulla ac purus ut tortor molestie facilisis sed sit amet tellus.
+Vivamus consequat risus vel consequat rhoncus.
+"""
+        #self.assertMultiLineEqual(A, B)
+        self.assertTxtEqual(A, B)
