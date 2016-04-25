@@ -1,6 +1,6 @@
 # coding: utf-8
 import re
-# from lxml import etree
+from lxml import etree
 from KreaturaParser.parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
 from KreaturaParser.elements import Question, Survey, Page, Block
 from KreaturaParser.tools import find_parent
@@ -426,13 +426,17 @@ def parse(text_input):
 
 if __name__ == "__main__":
     # with open(r'c:\badania\ADHOC.2015\126042.08\IBIS\skrypt\tobago 2.txt', 'r') as f:
-    with open(r'c:\users\korzeniewskir\Desktop\x.txt', 'r') as f:
+    with open(r'C:\badania\ADHOC.2016\127461.04\DIME\skrypt\test.txt', 'r') as f:
         f = f.read()
         survey = parse(f)
+        survey.to_xml()
+        with open(r"C:\badania\ADHOC.2016\127461.04\DIME\skrypt\out.xml", 'wb') as out:
+            out.write(etree.tostring(survey.xml))
+
         #survey.to_dim()
-        survey.to_web()
+        #survey.to_web()
         #print(survey.dim_out)
-        print(survey.web_out)
+        #print(survey.web_out)
 
 
 

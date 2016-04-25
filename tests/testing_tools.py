@@ -13,3 +13,7 @@ class KreaturaTestCase(TestCase):
         if not checker.check_output(want, got, 4096):
             message = checker.output_difference(Example("", want), got, 4096)
             raise AssertionError(message)
+
+    def assertTxtEqual(self, expected, actual):
+        msg = "'"+actual+"' != '"+expected+"'"
+        assert expected == actual, msg

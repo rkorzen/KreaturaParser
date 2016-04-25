@@ -62,3 +62,49 @@ FOR CATEGORIES:
         result = survey.dim_out
         print(result)
 
+    def test_control_single_with_i(self):
+        text_input = """Q S Q1 COS
+1 odp a --i
+2 odp b
+"""
+        survey = parse(text_input)
+        survey.to_dim()
+        result = survey.dim_out
+        print(result)
+        expected = """
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        x1 "<i>odp a</i>",
+        x2 "odp b"
+
+    };
+"""
+        self.assertEqual(result, expected)
+
+    def test_img_caf(self):
+        input_ = """Q S Q1 COS
+A|1.jpg
+B|c\\2.jpg
+"""
+        expected = r'''
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        x1 "A"
+            labelstyle(
+                Image = "images\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        x2 "B"
+            labelstyle(
+                Image = "images\c\2.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+'''
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+        self.assertTxtEqual(result, expected)

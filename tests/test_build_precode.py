@@ -19,3 +19,18 @@ class TestBuildPrecode(TestCase):
     def test_value_error(self):
         input_ = 'if (cos);endif'
         self.assertRaises(ValueError, build_precode, input_, 'precode')
+
+    def test_build_precode_not_ibis(self):
+        input_ = "if cos then Q1.Ask()"
+        result = build_precode(input_, 'precode', "dim")
+        self.assertEquals(input_, result)
+
+
+    def test_build_precode_not_ibis_many_lines(self):
+        input_ = 'dim x;x="";if cos then x="a"'
+        result = build_precode(input_, 'precode', "dim")
+
+        expected  = '''dim x
+x=""
+if cos then x="a"'''
+        self.assertEquals(expected, result)
