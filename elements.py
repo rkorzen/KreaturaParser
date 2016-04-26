@@ -1082,7 +1082,7 @@ class Question(SurveyElements):
             self.dim_out += single.dim_out
 
         elif self.typ == "L":
-            self.dim_out += "    " + self.id + '"' + self.content + '";\n\n'
+            self.dim_out += "    " + self.id + ' "' + self.content + '" info;\n\n'
 
         elif self.typ == "G" and not self.categories:
             if '--byslice' in self.content:
