@@ -1085,7 +1085,37 @@ class Question(SurveyElements):
             self.dim_out += "    " + self.id + '"' + self.content + '";\n\n'
 
         elif self.typ == "G" and not self.categories:
-            out = """
+            if '--byslice' in self.content:
+                content = self.content.replace('--byslice', '')
+                out = """
+    {id} ""
+        [
+            flametatype = "dynamicgrid"
+        ]
+    loop
+    {{
+{stw}
+    }} fields -
+    (
+        slice "{content}
+
+        <b>{{@}}</b>
+        {{obraz}}
+        "
+        categorical [1..1]
+        {{
+{caf}
+        }};
+    ) expand grid;
+""".format(**{'id': self.id,
+                          'content': content,
+                          'stw': make_caf_to_dim(self.statements, 2),
+                          'caf': make_caf_to_dim(self.cafeteria, 3)
+                          })
+
+
+            else:
+                out = """
     {id} "{content}"
         [
             flametatype = "dynamicgrid"
@@ -1110,7 +1140,33 @@ class Question(SurveyElements):
             self.dim_out += out
 
         elif self.typ == "G" and self.categories:
-            out = """
+            if '--byslice' in self.content:
+                out = """
+                    {id} - loop
+                    {{
+                {cat}
+                    }} ran fields -
+                    (
+                        LR " {content}" loop
+                        {{
+                {stw}
+                        }} fields -
+                        (
+                            slice ""
+                            categorical [1..1]
+                            {{
+                {caf}
+                            }};
+                        ) expand grid;
+                    ) expand;
+                """.format(**{'id': self.id,
+                              'content': self.content,
+                              'cat': make_caf_to_dim(self.categories, 2, 'c'),
+                              'stw': make_caf_to_dim(self.statements, 3, 'l'),
+                              'caf': make_caf_to_dim(self.cafeteria, 4)
+                              })
+            else:
+                out = """
     {id} - loop
     {{
 {cat}
@@ -1214,7 +1270,18 @@ class Question(SurveyElements):
                 except:
                     raise(Exception("OJ"))
 
-        self.web_out += "    " + self.id + '.Ask()\n'
+        if '--byslice' in self.content:
+            self.web_out += """
+    Dim {0}_iter
+    For Each {0}_iter in {0}.Categories
+        {0}[{0}_iter].slice.Label.Style.ImagePosition=imagepositions.ipImageOnly
+        {0}[{0}_iter].slice.Label.Inserts["obraz"]= "<div align='center'><mrRef RefType='img' src='" + {0}_iter.Label.Style.Image + "' alt='image'/></div>"
+        {0}[{0}_iter].Ask()
+    next             
+""".format(self.id)
+
+        else:
+            self.web_out += "    " + self.id + '.Ask()\n'
 
         if self.typ in ["S", "M"]:
             for caf in self.cafeteria:
@@ -1726,14 +1793,14 @@ new IbisSlider("{0}", sliderOpts);
 
 <script type='text/javascript' src='public/slider/slider.js'></script>
 <script type='text/javascript'>
-	 sliderOpts = {{
-		  value: 0,
-		  min: {2},
-		  max: {3},
-		  step: 1,
-		  animate:"slow",
-		  orientation: 'horizontal'
-	 }};
+     sliderOpts = {{
+          value: 0,
+          min: {2},
+          max: {3},
+          step: 1,
+          animate:"slow",
+          orientation: 'horizontal'
+     }};
 {1}
 </script>
 '''.format(self.id, call_slider, self.min, self.max)

@@ -129,3 +129,6 @@ Vivamus consequat risus vel consequat rhoncus.
 """
         #self.assertMultiLineEqual(A, B)
         self.assertTxtEqual(A, B)
+
+    def test_grid_by_slice(self):
+        self.fail()

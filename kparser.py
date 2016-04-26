@@ -429,9 +429,10 @@ if __name__ == "__main__":
     with open(r'C:\badania\ADHOC.2016\127461.04\DIME\skrypt\test.txt', 'r') as f:
         f = f.read()
         survey = parse(f)
-        survey.to_xml()
-        with open(r"C:\badania\ADHOC.2016\127461.04\DIME\skrypt\out.xml", 'wb') as out:
-            out.write(etree.tostring(survey.xml))
+        survey.to_dim()
+        with open(r"C:\badania\ADHOC.2016\127461.04\DIME\skrypt\out.xml", 'w') as out:
+            out.write(survey.dim_out)
+            #out.write(etree.tostring(survey.xml))
 
         #survey.to_dim()
         #survey.to_web()

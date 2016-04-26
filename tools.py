@@ -168,6 +168,7 @@ def wersjonowanie_plci_dim(text):
     dict_['em(am)'] =  '{#em}'
     dict_['e(am)'] =  '{#em}'
     dict_['by/aby'] =  '{#a}by'
+    dict_['ął(ęła)'] = '{#al}'
 
     for key in dict_.keys():
         #print(key, type(key), dict_[key])
