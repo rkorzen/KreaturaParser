@@ -53,38 +53,40 @@ def find_by_id(parent, child_id):
                     return r
 
 
-def build_precode(precode, tag):
+def build_precode(precode, tag, technique="ibis"):
     """Designed to build precode, postcode or hide - elements with CDATA"""
 
-    is_inside_if = False
-    prec = etree.Element(tag)
+    if technique == "ibis":
+        is_inside_if = False
+        prec = etree.Element(tag)
+        text = precode.split(';')
+        # print(text)
+        # pobieżna walidacja
+        # czy ilość if else i endif jest taka sama
 
-    text = precode.split(';')
-    # print(text)
-    # pobieżna walidacja
-    # czy ilość if else i endif jest taka sama
+        count_ifs = [x.startswith('if') for x in text].count(True)
+        count_elses = [x.startswith('else') for x in text].count(True)
+        count_endifs = [x.startswith('endif') for x in text].count(True)
+        # print(count_ifs, count_elses, count_endifs)
+        if count_ifs is not count_elses or count_ifs is not count_endifs:
+            raise ValueError('Liczba if, else, endif nie zgadza się')
 
-    count_ifs = [x.startswith('if') for x in text].count(True)
-    count_elses = [x.startswith('else') for x in text].count(True)
-    count_endifs = [x.startswith('endif') for x in text].count(True)
-    # print(count_ifs, count_elses, count_endifs)
-    if count_ifs is not count_elses or count_ifs is not count_endifs:
-        raise ValueError('Liczba if, else, endif nie zgadza się')
+        for i, t in enumerate(text):
+            t = t.strip()
 
-    for i, t in enumerate(text):
-        t = t.strip()
+            if t.startswith('if'):
+                is_inside_if = True
+            if t.startswith('endif'):
+                is_inside_if = False
 
-        if t.startswith('if'):
-            is_inside_if = True
-        if t.startswith('endif'):
-            is_inside_if = False
+            if not t.startswith('if') and not t.startswith('else') and not t.startswith('endif') and is_inside_if:
+                text[i] = '  ' + text[i]
+        text = '\n'.join(text)
 
-        if not t.startswith('if') and not t.startswith('else') and not t.startswith('endif') and is_inside_if:
-            text[i] = '  ' + text[i]
-    text = '\n'.join(text)
-
-    prec.text = etree.CDATA(text)
-
+        prec.text = etree.CDATA(text)
+    else:
+        prec = precode.split(';')
+        prec = '\n'.join(prec)
     return prec
 
 
@@ -140,6 +142,7 @@ def wersjonowanie_plci(text):
         text = text.replace(key, dict_[key])
     return text
 
+
 def wersjonowanie_plci_dim(text):
     dict_ = OrderedDict()
     dict_['Pan(i)'] = '{#Pan}'
@@ -165,9 +168,10 @@ def wersjonowanie_plci_dim(text):
     dict_['em(am)'] =  '{#em}'
     dict_['e(am)'] =  '{#em}'
     dict_['by/aby'] =  '{#a}by'
+    dict_['ął(ęła)'] = '{#al}'
 
     for key in dict_.keys():
-        print(key, type(key), dict_[key])
+        #print(key, type(key), dict_[key])
         text = text.replace(key, dict_[key])
     return text
 

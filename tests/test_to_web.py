@@ -37,3 +37,6 @@ POST ' xxx
 
         self.assertEqual(expected, result)
 
+
+    def test_grid_by_slice(self):
+        self.fail()
