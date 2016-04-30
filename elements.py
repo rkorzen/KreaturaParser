@@ -2,9 +2,9 @@
 import datetime
 import re
 from lxml import etree
-from KreaturaParser.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci, wersjonowanie_plci_dim
-from KreaturaParser.tools import find_parent, filter_parser
-
+from tools import build_precode, find_parent, clean_labels, wersjonowanie_plci, wersjonowanie_plci_dim
+from tools import find_parent, filter_parser
+from spss import baskets_syntax
 WERSJONOWANIE = True
 
 def make_caf_to_dim(cafeteria, tabs=0, prov_letter = 'x'):
@@ -69,6 +69,7 @@ class SurveyElements:
         self.warnings = []
         self.dim_out = ""
         self.web_out = ""
+        self.spss_out = ""
 
     def __eq__(self, other):
         return (self.id == other.id and
@@ -118,6 +119,11 @@ class SurveyElements:
             child.to_web()
             self.web_out += child.web_out
 
+    def to_spss(self):
+        for child in self.childs:
+            child.to_spss()
+            self.spss_out += child.spss_out
+
 
 class Survey:
     """
@@ -133,6 +139,7 @@ class Survey:
         self.xml = False
         self.dim_out = ""
         self.web_out = ""
+        self.spss_out = ""
         # self.wersjonowanie = True
 
     def __eq__(self, other):
@@ -190,10 +197,16 @@ class Survey:
             child.to_dim()
             self.dim_out += child.dim_out
             self.dim_out = wersjonowanie_plci_dim(self.dim_out)
+
     def to_web(self):
         for child in self.childs:
             child.to_web()
             self.web_out += child.web_out
+
+    def to_spss(self):
+        for child in self.childs:
+            child.to_spss()
+            self.spss_out += child.spss_out
 
 
 class Block(SurveyElements):
@@ -1204,6 +1217,10 @@ class Question(SurveyElements):
 
             if filter.strip().startswith("'"):
                 self.web_out += filter + '\n'
+
+    def to_spss(self):
+        if self.typ in ["LHS", "B"]:
+            self.spss_out = baskets_syntax(self)
 
 
 class Control:

@@ -1,6 +1,6 @@
 # coding: utf-8
 import re
-from KreaturaParser.elements import Block, Page, Question, Cafeteria
+from elements import Block, Page, Question, Cafeteria
 
 # TODO: przenieść patterny w jedno miejsce (są używane przynajmniej w dwóch i stamtąd ich używać!)
 
