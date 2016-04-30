@@ -94,7 +94,7 @@ class TestQuestionParser(TestCase):
         self.assertEqual(expected, result)
 
     def test_open_question_with_size_and_hide_parser(self):
-        line = 'Q O90_4 Q0 Treść --hide:$A1="1"'
+        line = 'Q O90_4 Q0 Treść--hide:$A1="1"'
         expected = Question("Q0")
         expected.typ = "O"
         expected.content = "Treść"
@@ -122,7 +122,7 @@ class TestQuestionParser(TestCase):
         self.assertEqual(expected, result)
 
     def test_grid_with_random_and_hide(self):
-        line = 'Q G Q0 Treść --ran --hide:$A1:1 == "1"'
+        line = 'Q G Q0 Treść --ran--hide:$A1:1 == "1"'
         expected = Question("Q0")
         expected.typ = "G"
         expected.content = "Treść"

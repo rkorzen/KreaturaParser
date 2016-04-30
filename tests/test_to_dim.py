@@ -1,10 +1,9 @@
 from unittest import main
-from KreaturaParser.kparser import parse, print_tree
-from KreaturaParser.elements import Block, Page, Question, Cafeteria, Survey
+from kparser import parse, print_tree
+from elements import Block, Page, Question, Cafeteria, Survey
 from lxml import etree
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from tests.testing_tools import KreaturaTestCase
 # from KreaturaParser.tools import show_attr
-
 
 class TestParse(KreaturaTestCase):
 
@@ -50,7 +49,7 @@ FOR CATEGORIES:
     ) expand;
 """
 
-        self.assertEqual(expected, result)
+        self.assertTxtEqual(expected, result)
 
     def test_wersjonowanie(self):
         text_input = """Q S Q1 Czy może Pan(i)  powiedzieć, o co Panu(i) chodzi
@@ -60,7 +59,17 @@ FOR CATEGORIES:
         survey = parse(text_input)
         survey.to_dim()
         result = survey.dim_out
-        print(result)
+
+        expected = '''
+    Q1 "Czy może {#Pan}  powiedzieć, o co {#Panu} chodzi"
+    Categorical [1..1]
+    {
+        x1 "chętn{#y}",
+        x2 "niechętn{#y}"
+
+    };
+'''
+        self.assertTxtEqual(expected, result)
 
     def test_control_single_with_i(self):
         text_input = """Q S Q1 COS
@@ -80,7 +89,7 @@ FOR CATEGORIES:
 
     };
 """
-        self.assertEqual(result, expected)
+        self.assertTxtEqual(result, expected)
 
     def test_img_caf(self):
         input_ = """Q S Q1 COS
@@ -100,35 +109,14 @@ B|c\\2.jpg
             labelstyle(
                 Image = "images\c\2.jpg",
                 ImagePosition = "ImageOnly"
-            )1
+            )
 
     };
 '''
         survey = parse(input_)
         survey.to_dim()
         result = survey.dim_out
-        #self.assertMultiLineEqual(result, expected)
         self.assertTxtEqual(result, expected)
 
-    def test_przyklad(self):
-        A = """
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Proin venenatis libero ante, in posuere felis  egestas vel.
-Vivamus tristique et mi eget convallis. Vestibulum id quam porta, semper leo quis, finibus orci.
-Pellentesque vel sapien elementum, iaculis diam in,  fringilla nisi. Morbi interdum luctus dolor sit amet euismod.
-Donec in rhoncus purus, ac venenatis justo. Nulla ac purus ut tortor molestie facilisis sed sit amet tellus.
-Vivamus consequat risus vel  consequat rhoncus.
-"""
-        B = """
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Proin venenatis libero ante, in posuere felis egestas vel.
-Vivamus tristique et mi eget convallis. Vestibulum id quam porta, semper leo quis, finibus orci.
-Pellentesque vel sapien elementum, iaculis diam in, fringilla nisi. Morbi interdum luctus dolor sit amet euismod.
-Donec in rhoncus purus, ac venenatis justo. Nulla ac purus ut tortor molestie facilisis sed sit amet tellus.
-Vivamus consequat risus vel consequat rhoncus.
-"""
-        #self.assertMultiLineEqual(A, B)
-        self.assertTxtEqual(A, B)
-
-    def test_grid_by_slice(self):
-        self.fail()
+    # def test_grid_by_slice(self):
+    #     self.fail()

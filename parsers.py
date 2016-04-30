@@ -118,9 +118,10 @@ def question_parser(line):
             else:
                 question.dontknow = r"Nie wiem / trudno powiedzieć"
 
-        if " --hide:" in line:           # hide
-            question.hide = line.split(" --hide:")[1]
-            question.content = question.content.split(' --hide:')[0]
+        if "--hide:" in line:           # hide
+            question.hide = line.split("--hide:")[1]
+            question.content = question.content.split('--hide:')[0]
+            print("AAA")
 
         if " --rot" in line:
             # print('AAAA')

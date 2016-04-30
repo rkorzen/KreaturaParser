@@ -1,8 +1,8 @@
 from unittest import main
-from KreaturaParser.kparser import parse, print_tree
-from KreaturaParser.elements import Block, Page, Question, Cafeteria, Survey
+from kparser import parse, print_tree
+from elements import Block, Page, Question, Cafeteria, Survey
 from lxml import etree
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from tests.testing_tools import KreaturaTestCase
 # from KreaturaParser.tools import show_attr
 
 
@@ -757,7 +757,7 @@ Q L Q3 cos
         want = print_tree(want)
         self.assertEqual(got, want)
 
-    def test_qestion_hide_xml(self):
+    def test_question_hide_xml(self):
         # TODO: hide dla question?
         input_ = '''Q O Q1 A --hide:#POKAZ_1 == "0"'''
         survey = parse(input_)
@@ -772,7 +772,7 @@ Q L Q3 cos
         <control_layout id="Q1.labelka" layout="default" style="">
           <content>A</content>
         </control_layout>
-        <control_open id="Q1" length="25" lines="1" mask=".*" name="Q1 | A" require="true" results="true" style="">
+        <control_open id="Q1_OPEN" length="25" lines="1" mask=".*" name="Q1 | A " require="true" results="true" style="">
           <content/>
         </control_open>
         <hide><![CDATA[#POKAZ_1 == "0"]]></hide>
@@ -939,7 +939,7 @@ class TestParseToXmlOpen(KreaturaTestCase):
                                                                  style="">
                                                                  <content>COS</content>
                                                  </control_layout>
-                                                 <control_open id="Q1"
+                                                 <control_open id="Q1_OPEN"
                                                                length="25"
                                                                lines="1"
                                                                mask=".*"
@@ -956,7 +956,6 @@ class TestParseToXmlOpen(KreaturaTestCase):
                         <procedures>
                           <procedure id="PROC" shortdesc=""></procedure>
                         </procedures>
-
                     </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
@@ -990,7 +989,7 @@ class TestParseToXmlOpen(KreaturaTestCase):
                                                                  style="">
                                                                  <content>COS</content>
                                                  </control_layout>
-                                                 <control_open id="Q1"
+                                                 <control_open id="Q1_OPEN"
                                                                length="25"
                                                                lines="1"
                                                                mask=".*"
@@ -1234,7 +1233,7 @@ B"""
                                                                  style="">
                                                                  <content>COS</content>
                                                  </control_layout>
-                                                 <control_open id="Q1"
+                                                 <control_open id="Q1_OPEN"
                                                                length="90"
                                                                lines="4"
                                                                mask=".*"
@@ -1285,7 +1284,7 @@ B"""
                                                                  style="">
                                                                  <content>COS</content>
                                                  </control_layout>
-                                                 <control_open id="Q1"
+                                                 <control_open id="Q1_OPEN"
                                                                length="90"
                                                                lines="4"
                                                                mask=".*"
@@ -1295,11 +1294,11 @@ B"""
                                                                name="Q1 | COS">
                                                                <content></content>
                                                  </control_open>
-<control_layout id="Q1.js" layout="default" style="">
+<control_layout id="Q1_OPEN.js" layout="default" style="">
 <content>
 &lt;!-- dezaktywacja opena --&gt;
 &lt;script type='text/javascript'&gt;
-    var opendisDest = "Q1";
+    var opendisDest = "Q1_OPEN";
     var opendisText = "Nie wiem / trudno powiedzieć";
     var opendisValue = "98";
 &lt;/script&gt;

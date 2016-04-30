@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from KreaturaParser.tools import show_attr
+from tools import show_attr
 
 
 class SomeObject:
@@ -13,11 +13,10 @@ class TestPrintAttr(TestCase):
         element = SomeObject()
         result = show_attr(element)
         expected = sorted('x = x\ny = y'.splitlines())
-
         self.assertEqual(expected, result)
 
     def test_block(self):
-        from KreaturaParser.kparser import parse
+        from kparser import parse
         input_ = 'B B0'
         survey = parse(input_)
         b = survey.childs[0]
@@ -40,6 +39,7 @@ size = []
 parent_id = False
 content = False
 dim_out = ""
+spss_out = ""
 xml = None
 quoted = False
 web_out = ""

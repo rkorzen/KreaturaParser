@@ -1,8 +1,8 @@
 from unittest import main
-from KreaturaParser.kparser import parse, print_tree
-from KreaturaParser.elements import Block, Page, Question, Cafeteria, Survey
+from kparser import parse, print_tree
+from elements import Block, Page, Question, Cafeteria, Survey
 from lxml import etree
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from tests.testing_tools import KreaturaTestCase
 # from KreaturaParser.tools import show_attr
 
 

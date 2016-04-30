@@ -5,6 +5,8 @@ from lxml import etree
 from tools import build_precode, find_parent, clean_labels, wersjonowanie_plci, wersjonowanie_plci_dim
 from tools import find_parent, filter_parser
 from spss import baskets_syntax
+
+
 WERSJONOWANIE = True
 
 def make_caf_to_dim(cafeteria, tabs=0, prov_letter = 'x'):
@@ -1052,6 +1054,10 @@ class Question(SurveyElements):
             css_lay.to_xml()
             self.xml.append(css_lay.xml)
 
+        if self.hide:
+            hide = etree.Element('hide')
+            hide.text = etree.CDATA(self.hide.format(self.id))
+            self.xml.append(hide)
     @staticmethod
     def min_max_choice(special_markers, control):
         self = control
