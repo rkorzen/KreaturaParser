@@ -427,7 +427,7 @@ new IbisSlider(&quot;Q1_03&quot;, sliderOpts);
         self.assertXmlEqual(got, want)
 
 
-    def test_sliders_with_hide(self):
+    def dtest_sliders_with_hide(self):
         input_ = """Q SLIDERS Q1 COS --ran
 left: left_end
 right: right_end
@@ -531,19 +531,29 @@ _
 
 &lt;script type='text/javascript' src='public/slider/slider.js'&gt;&lt;/script&gt;
 &lt;script type='text/javascript'&gt;
-	 sliderOpts = {{
-		  value: 0,
-		  min: 1,
-		  max: 10,
-		  step: 1,
-		  animate:&quot;slow&quot;,
-		  orientation: 'horizontal'
-	 }};
+ sliderOpts = {{
+      value: 0,
+      min: 1,
+      max: 10,
+      step: 1,
+      animate:&quot;slow&quot;,
+      orientation: 'horizontal'
+ }};
 new IbisSlider(&quot;Q1_01&quot;, sliderOpts);
 new IbisSlider(&quot;Q1_02&quot;, sliderOpts);
 new IbisSlider(&quot;Q1_03&quot;, sliderOpts);
 
 &lt;/script&gt;
+
+&lt;script type='text/javascript' src='public/rotate_tables.js'&gt;&lt;/script&gt;
+&lt;!-- get the file from https://github.com/rkorzen/ibisjs
+     optionally uncomment the line bellow (only for tests - never for production!!)
+--&gt;
+&lt;!--
+&lt;script type='text/javascript' src='https://rawgit.com/rkorzen/ibisjs/master/rotate_tables.js'&gt;&lt;/script&gt;
+&lt;link rel='stylesheet' href='https://rawgit.com/rkorzen/ibisjs/master/rotate_tables.css' type='text/css'&gt;
+--&gt;
+
 </content>
           </control_layout>
         </question>
