@@ -18,7 +18,6 @@ Uninstall:
 
     pip uninstall KreaturaParser
 
-
 ##Manual
 
 Checkout manual in [Docs](https://github.com/rkorzen/KreaturaParser/blob/master/KreaturaParser/docs/manual.md)
