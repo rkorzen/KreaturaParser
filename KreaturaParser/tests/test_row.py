@@ -1,8 +1,8 @@
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from lxml import etree
+from KreaturaParser.tools import KreaturaTestCase
 from KreaturaParser.elements import Row
 from KreaturaParser.elements import Cell
 from KreaturaParser.elements import ControlLayout
-from lxml import etree
 
 
 class TestRow(KreaturaTestCase):

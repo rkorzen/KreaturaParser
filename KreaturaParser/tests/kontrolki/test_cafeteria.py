@@ -1,6 +1,6 @@
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
-from KreaturaParser.elements import Cafeteria
 from lxml import etree
+from KreaturaParser.tools import KreaturaTestCase
+from KreaturaParser.elements import Cafeteria
 
 
 class TestCafeteria(KreaturaTestCase):

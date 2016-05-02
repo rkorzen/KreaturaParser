@@ -2,8 +2,8 @@ from unittest import main
 from lxml import etree
 from KreaturaParser.kparser import parse, print_tree
 from KreaturaParser.elements import Block, Page, Question, Cafeteria, Survey
-from testing_tools import KreaturaTestCase
-# from KreaturaParser.tools import show_attr
+from KreaturaParser.tools import KreaturaTestCase
+
 
 
 class TestParse(KreaturaTestCase):
@@ -2986,12 +2986,50 @@ endif
         text = """Q S S6 Na kogo głosował(a) Pan(i) w drugiej turze wyborów prezydenckich?
 POST if(#ROK >= "1985" && $S6:2=="1");gr2="10";else;endif;;if(#ROK < "1985" && $S6:2=="1");gr2="01";else;endif
 1 a --so"""
-
         survey = parse(text)
         survey.to_xml()
 
-        print(etree.tostring(survey.xml, pretty_print=True).decode())
+        expected = """<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="S6_p" hideBackButton="false" name="">
+      <question id="S6" name="">
+        <control_layout id="S6.labelka" layout="default" style="">
+          <content>Na kogo g&#322;osowa&#322;#END_A# #SEX_M# w drugiej turze wybor&#243;w prezydenckich?</content>
+        </control_layout>
+        <control_single id="S6" layout="vertical" style="" itemlimit="0" name="S6 | Na kogo g&#322;osowa&#322;(a) Pan(i) w drugiej turze wybor&#243;w prezydenckich?" random="false" require="true" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+        </control_single>
+      </question>
+      <postcode><![CDATA[if(#ROK >= "1985" && $S6:2=="1")
+  gr2="10"
+else
+endif
 
+if(#ROK < "1985" && $S6:2=="1")
+  gr2="01"
+else
+endif
+
+if ($S6:1 == "1")
+  #OUT = "1"
+  goto KONKURS
+else
+endif
+
+]]></postcode>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>""".format(survey.createtime)
+
+
+        result = etree.tostring(survey.xml, pretty_print=True)
+        self.assertXmlEqual(result, expected)
 
 # Multi
 class TestParseToXmlControlMulti(KreaturaTestCase):

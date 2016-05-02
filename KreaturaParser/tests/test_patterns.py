@@ -1,5 +1,5 @@
 # coding: utf-8
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.tools import KreaturaTestCase
 from KreaturaParser.parsers import Patterns
 # import re
 

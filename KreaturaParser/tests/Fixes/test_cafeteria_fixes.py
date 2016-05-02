@@ -1,6 +1,6 @@
 from lxml import etree
 from KreaturaParser.kparser import parse
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.tools import KreaturaTestCase
 
 
 class TestFix1(KreaturaTestCase):

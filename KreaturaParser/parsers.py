@@ -121,10 +121,8 @@ def question_parser(line):
         if "--hide:" in line:           # hide
             question.hide = line.split("--hide:")[1]
             question.content = question.content.split('--hide:')[0]
-            print("AAA")
 
         if " --rot" in line:
-            # print('AAAA')
             question.rotation = True
             question.content = question.content.replace(' --rot', '')
 

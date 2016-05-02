@@ -1,5 +1,5 @@
 from KreaturaParser.kparser import parse, print_tree
-from testing_tools import KreaturaTestCase
+from KreaturaParser.tools import KreaturaTestCase
 
 class TestParse(KreaturaTestCase):
 
@@ -75,7 +75,6 @@ FOR CATEGORIES:
         survey = parse(text_input)
         survey.to_dim()
         result = survey.dim_out
-        print(result)
         expected = """
     Q1 "COS"
     Categorical [1..1]

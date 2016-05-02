@@ -1,5 +1,5 @@
 from KreaturaParser.kparser import parse, print_tree
-from testing_tools import KreaturaTestCase
+from KreaturaParser.tools import KreaturaTestCase
 
 
 class TestParse(KreaturaTestCase):
@@ -33,6 +33,3 @@ POST ' xxx
 
         self.assertEqual(expected, result)
 
-
-    def test_grid_by_slice(self):
-        self.fail()

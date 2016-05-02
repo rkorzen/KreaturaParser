@@ -1,6 +1,6 @@
-from KreaturaParser.elements import ControlOpen
 from lxml import etree
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.elements import ControlOpen
+from KreaturaParser.tools import KreaturaTestCase
 
 
 class TestControlOpen(KreaturaTestCase):

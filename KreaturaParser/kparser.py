@@ -246,15 +246,6 @@ def parse(text_input):
             # endregion
 
             current_page = page_parser(line)
-            # print('AAA')
-            # print(current_page.parent_id)
-            # print('AA', next_page_precode)
-            # if next_page_precode[0] is not None:
-            #     print('AAA')
-
-            # if current_page.id != next_page_precode[0] and next_page_precode[0] is not None:
-            #     current_page.precode = next_page_precode[1]
-            #     next_page_precode = [None, None]
 
             if not current_block:
                 current_block = block_parser("B Default")
@@ -262,7 +253,6 @@ def parse(text_input):
 
             if current_page.parent_id:
                 block = find_parent(survey.childs, current_page.parent_id)
-                # print('BLOCK', block.id)
                 block.childs.append(current_page)
             else:
                 current_block.childs.append(current_page)
@@ -297,16 +287,12 @@ def parse(text_input):
                 survey.append(current_block)
 
             if not current_page:
-                # print('AAA', current_page)
                 tmp_line = "P " + current_question.id + "_p"
                 current_page = page_parser(tmp_line)
                 current_block.childs.append(current_page)
 
-            # print(current_page.id)
             current_page.childs.append(current_question)
             current_element = current_question
-
-            # print('AA', next_page_precode)
 
             if current_page.id != next_page_precode[0] and next_page_precode[0] is not None:
                 current_page.precode = next_page_precode[1]
@@ -322,12 +308,11 @@ def parse(text_input):
                 statement = cafeteria_parser(line)
             except AttributeError:
                 raise AttributeError('Błąd w linii: ', line)
-            # print('Statement', statement)
-            """jeśli nie ma numeru kafeterii to nadajemy go - albo dla kafeterii odpowiedzi (cafeteria),
-               albo dla kafeterii stwierdzen (statements), jeśli akurat je zbieramy.
 
-               To jest potrzebne do wyliczania filtrow screenout i gotonext
-            """
+            # jeśli nie ma numeru kafeterii to nadajemy go - albo dla kafeterii odpowiedzi (cafeteria),
+            # albo dla kafeterii stwierdzen (statements), jeśli akurat je zbieramy.
+            # To jest potrzebne do wyliczania filtrow screenout i gotonext
+
             if not statement.id:
                 if not collect_statements:
                     try:
@@ -367,7 +352,6 @@ def parse(text_input):
             if collect_statements:
                 current_question.statements.append(statement)
             elif collect_categories:
-                print('AAAA')
                 current_question.categories.append(statement)
             else:
                 # print(current_question.cafeteria)

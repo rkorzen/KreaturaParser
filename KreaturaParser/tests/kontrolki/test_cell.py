@@ -1,5 +1,5 @@
 from lxml import etree
-from KreaturaParser.tests.testing_tools import KreaturaTestCase
+from KreaturaParser.tools import KreaturaTestCase
 from KreaturaParser.elements import ControlLayout, Cell
 
 

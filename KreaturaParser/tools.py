@@ -3,6 +3,10 @@ from lxml import etree
 from collections import OrderedDict
 import re
 
+from unittest import TestCase
+from doctest import Example
+from lxml.doctestcompare import LXMLOutputChecker
+
 def show_attr(element):
     """Drukuje atrybuty"""
 
@@ -217,3 +221,24 @@ def filter_parser(input_):
             return '\n    if {0}.ContainsAny("x{1}") then {{}}.Ask()\n\n'.format(id_, answer_position)
         else:
             return '\n    if not {0}.ContainsAny("x{1}") then {{}}.Ask()\n\n'.format(id_, answer_position)
+
+
+# region testing tools
+
+
+class KreaturaTestCase(TestCase):
+
+    def assertXmlEqual(self, got, want):
+        checker = LXMLOutputChecker()
+        # 2048 - PARSE_HTML
+        # 4096 - PARSE_XML
+        # 8192 - NOPARSE_MARKUP
+        if not checker.check_output(want, got, 4096):
+            message = checker.output_difference(Example("", want), got, 4096)
+            raise AssertionError(message)
+
+    def assertTxtEqual(self, expected, actual):
+        msg = "'" + actual + "' != '" + expected + "'"
+        assert expected == actual, msg
+
+# end region

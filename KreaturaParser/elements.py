@@ -1481,8 +1481,6 @@ class ControlSingle(Control):
 
             caf_hide_pattern = ""  # na poczatek pusty hide pattern
             for caf in self.cafeteria:
-                # print('AAA', caf.other)
-                # print('AAA', caf.deactivate)
                 list_item = Cafeteria()
                 list_item.id = caf.id
 
