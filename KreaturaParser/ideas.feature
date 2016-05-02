@@ -123,3 +123,24 @@ Feature: [dim] auto dopełnianie odpowiedzi w skalach
         x9 '9',
         x10 '10 B'
       };
+
+Feature: [dim] tworzenie list na podstawie pytania single
+  Scenario:
+    in:
+      Q S Q1 COS --list:MARKI
+      A
+      B
+      C
+
+    out:
+      MARKI "" define
+      {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+      };
+
+      Q1 "COS"
+      {
+        MARKI use \\.MARKI -
+      };

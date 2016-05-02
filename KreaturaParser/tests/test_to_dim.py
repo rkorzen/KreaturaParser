@@ -113,5 +113,71 @@ B|c\\2.jpg
         result = survey.dim_out
         self.assertTxtEqual(result, expected)
 
-    # def test_grid_by_slice(self):
-    #     self.fail()
+    def test_define_and_use_list(self):
+        input_ = """Q S Q1 COS --list:MARKI
+A
+B
+C
+"""
+        expected = """
+    MARKI "" define
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+    };
+
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        MARKI use \\.MARKI -
+    };
+"""
+
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+
+        self.assertEqual(expected, result)
+
+    def test_use_defined_list(self):
+        input_ = """Q S Q1 COS --list:MARKI
+        --use:MARKI
+"""
+        expected = """
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        MARKI use \\.MARKI -
+    };
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+
+        self.assertEqual(expected, result)
+
+    def test_DnD_buckets_with_image_buttons(self):
+        self.fail()
+
+    def test_DnD_buckets_with_text_buttons(self):
+        self.fail()
+
+    def test_DnD_scale_with_image_buttons(self):
+        self.fail()
+
+    def test_DnD_scale_with_text_buttons(self):
+        self.fail()
+
+    def test_DnD_scale_love_hate(self):
+        self.fail()
+
+    def test_DnD_scale_gray(self):
+        self.fail()
+
+    def test_DnD_buckets_exclude(self):
+        self.fail()
+
+    def test_DnD_scale_exclude(self):
+        self.fail()
+
