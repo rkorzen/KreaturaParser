@@ -338,6 +338,168 @@ class Page(SurveyElements):
 
 class Question(SurveyElements):
     """Question"""
+
+    def caf_to_dim(self, tabs=0, prov_letter='x'):
+        """:returns string
+        :param cafeteria: cafeteria or statements list
+        :param tabs: level of indent
+        """
+        cafeteria = self.cafeteria
+        out = ""
+        ile = len(cafeteria)
+        for caf in cafeteria:
+
+            if '--i' in caf.content:
+                caf.content = caf.content.replace('--i', "")
+                caf.content = '<i>' + caf.content.strip() + '</i>'
+
+            if '--b' in caf.content:
+                caf.content = caf.content.replace('--b', "")
+                caf.content = '<b>' + caf.content + '</b>'
+
+            if '|' in caf.content:
+                caf.content = caf.content.split('|')
+                caf.img = caf.content[1]
+                caf.content = caf.content[0]
+
+            if caf.deactivate:
+                out += '    ' * tabs + ' - "' + caf.content + '"'
+                out += ' DK'
+
+            out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '"'
+
+            if caf.other:
+                out += ' other'
+
+            if caf.img:
+                out += r'''
+                labelstyle(
+                    Image = "images\{0}",
+                    ImagePosition = "ImageOnly"
+                )'''.format(caf.img)
+
+            if cafeteria.index(caf) == ile - 1:
+                out += '\n'
+            else:
+                out += ",\n"
+
+        return out
+
+    def special_markers(self):
+        """Find special markers in content
+
+        special markers:
+        IBIS
+        --multi                 : multianswer in grids, tables
+        --images                : image cafeteria
+        --listcolumn            : cafeteria in columns
+        --dezaktywacja          :
+        --minchoose:x           : multi min choose
+        --maxchoose:x           : multi max choose
+        --nr                    : not require
+        --custom_css            : add custom css to page
+
+        Dimensions
+        --list:name             : define and use cafeteria object
+        --use:name              : use cafeteria object
+
+
+        """
+
+        markers = {}
+        # multi - np do gridów, tabel
+        if '--multi' in self.content:
+            markers['multi'] = True
+            self.content = self.content.replace('--multi', '')
+
+        # obrazki zamiast kafeterii
+        if '--images' in self.content:
+            markers['images'] = True
+            self.content = self.content.replace('--images', '')
+
+        if '--listcolumn' in self.content:
+            pattern = re.compile('--listcolumn:(\d+)')
+            try:
+                s = pattern.search(self.content)
+                text_to_replace = s.group(0)
+                list_column = s.group(1)
+            except AttributeError:
+                list_column = '2'
+
+            markers['list_column'] = list_column
+            self.content = self.content.replace(text_to_replace, '')
+
+        if '--dezaktywacja' in self.content:
+            markers["dezaktywacja"] = True
+            self.content = self.content.replace('--dezaktywacja', '')
+
+        if '--minchoose:' in self.content:
+            pattern = re.compile('--minchoose:(\d+)')
+            try:
+                s = pattern.search(self.content)
+                text_to_replace = s.group(0)
+                minchoose = s.group(1)
+            except AttributeError:
+                raise ValueError("minchoose to powinna być liczba. prawidłowe użycie to --minchoose:x, błąd w ", self.content)
+
+            markers['minchoose'] = minchoose
+            self.content = self.content.replace(text_to_replace, '')
+
+        if '--maxchoose:' in self.content:
+            pattern = re.compile('--maxchoose:(\d+)')
+            try:
+                s = pattern.search(self.content)
+                text_to_replace = s.group(0)
+                maxchoose = s.group(1)
+            except AttributeError:
+                raise ValueError("maxchoose to powinna być liczba. prawidłowe użycie to --minchoose:x, błąd w ",
+                                 self.content)
+
+            markers['maxchoose'] = maxchoose
+            self.content = self.content.replace(text_to_replace, '')
+
+        # --nr czyli not require. Przydatne np przy liście openów nie wymaganych
+        if '--nr' in self.content:
+            self.content = self.content.replace('--nr', '')
+            markers['not_require'] = True
+
+        if '--custom_css' in self.content:
+            self.content = self.content.replace('--custom_css', '')
+            markers['custom_css'] = True
+
+        if '--use:' in self.content and '--list:' in self.content:  # this should be before --list and --use
+            raise ValueError("You should'nt use '--use:' and '--list:' at the same time")
+
+        if '--list:' in self.content:
+            pattern = re.compile('--list:([\d\w]+)')
+            try:
+                s = pattern.search(self.content)
+                list_ = s.group(1)
+                text_to_replace = s.group(0)
+            except AttributeError:
+                raise ValueError("Nazwa listy ma zły format: ",
+                                 self.content,
+                                 "prawidłowy format to '--list:xxxx', gdzie xxxx to znaki  z zakresu: 'a-z0-9_'")
+            markers['list'] = list_
+            self.content = self.content.replace(text_to_replace, '')
+
+
+        if '--use:' in self.content:
+            pattern = re.compile('--use:([\d\w]+)')
+            try:
+                s = pattern.search(self.content)
+                use = s.group(1)
+                text_to_replace = s.group(0)
+            except AttributeError:
+                raise ValueError("Nazwa listy ma zły format: ",
+                                 self.content,
+                                 "prawidłowy format to '--list:xxxx', gdzie xxxx to znaki  z zakresu: 'a-z0-9_'")
+            markers['use'] = use
+            self.content = self.content.replace(text_to_replace, '')
+
+
+        return markers
+
     def to_xml(self):
         """xml representation of Question element
 
@@ -354,56 +516,7 @@ class Question(SurveyElements):
                 temp_ids.append(caf.id)
         # endregion
 
-        # region special markers
-        # w pytaniach mogą być ukryte specjalne znaczniki
-        # np --multi - musze to uwzlędnić
-
-        special_markers = []
-        # multi - np do gridów, tabel
-        if '--multi' in self.content:
-            special_markers.append('multi')
-            self.content = self.content.replace('--multi', '')
-
-        # obrazki zamiast kafeterii
-        if '--images' in self.content:
-            special_markers.append('images')
-            self.content = self.content.replace('--images', '')
-
-        if '--listcolumn' in self.content:
-            pattern = re.compile('--listcolumn(-\d+)?')
-            list_column = pattern.search(self.content).group()
-
-            special_markers.append(list_column.replace('--', ''))
-            self.content = self.content.replace(list_column, '')
-
-        if '--dezaktywacja' in self.content:
-            special_markers.append("dezaktywacja")
-            self.content = self.content.replace('--dezaktywacja', '')
-
-        if '--minchoose:' in self.content:
-            pattern = re.compile('--minchoose:\d+')
-            minchoose = pattern.search(self.content).group()
-
-            special_markers.append(minchoose.replace('--', ''))
-            self.content = self.content.replace(minchoose, '')
-
-        if '--maxchoose:' in self.content:
-            pattern = re.compile('--maxchoose:\d+')
-            maxchoose = pattern.search(self.content).group()
-
-            special_markers.append(maxchoose.replace('--', ''))
-            self.content = self.content.replace(maxchoose, '')
-
-        # --nr czyli not require. Przydatne np przy liście openów nie wymaganych
-        if '--nr' in self.content:
-            self.content = self.content.replace('--nr', '')
-            special_markers.append('not_require')
-
-        if '--custom_css' in self.content:
-            self.content = self.content.replace('--custom_css', '')
-            special_markers.append('custom_css')
-
-        # endregion
+        special_markers = self.special_markers()
 
         # TODO: tutaj duużo do zrobienia - wszystkie typy
         # region begin
@@ -502,7 +615,7 @@ class Question(SurveyElements):
 
                     open_ = ControlOpen(self.id + id_suf)
                     open_.name = self.id + id_suf + ' | ' + clean_labels(caf.content)
-                    if 'not_require' in special_markers:
+                    if special_markers.get('not_require'):
                         open_.require = 'false'
                     # if self.size:
                     #     open_.size = self.size
@@ -511,7 +624,7 @@ class Question(SurveyElements):
             else:
                 open_ = ControlOpen(self.id+"_OPEN")
                 open_.name = self.id + ' | ' + clean_labels(self.content)
-                if 'not_require' in special_markers:
+                if special_markers.get('not_require'):
                     open_.require = 'false'
 
                 if self.size:
@@ -548,26 +661,12 @@ class Question(SurveyElements):
 
             # minchoice itd
             # to co do atrybutow tagow musi byc ustawione przed to_xml
-            for el in special_markers:
-                if el.startswith('minchoose:'):
-                    try:
-                        # print('BBB')
-                        minchoose = el.split(':')
-                        control.minchoose = minchoose[1]
-                        # print(control.minchoice)
-                    except:
-                        raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
-                                         'być może  po --min: jest spacja. Format to --min:x')
-
-                if el.startswith('maxchoose:'):
-                    try:
-                        # print('BBB')
-                        maxchoose = el.split(':')
-                        control.maxchoose = maxchoose[1]
-                        # print(control.minchoice)
-                    except:
-                        raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
-                                         'być może  po --min: jest spacja. Format to --min:x')
+            minchoose = special_markers.get('minchoose')
+            maxchoose = special_markers.get('maxchoose')
+            if minchoose:
+                control.minchoose = minchoose
+            if maxchoose:
+                control.maxchoose = maxchoose
 
             control.to_xml()
             self.postcode = control.postcode
@@ -1083,7 +1182,19 @@ class Question(SurveyElements):
                                      'być może  po --min: jest spacja. Format to --min:x')
 
     def to_dim(self):
-        if self.typ == "S":
+        """Generate Dimension metadata"""
+
+        options = self.special_markers()
+        defined_list = options.get("use")
+        create_list = options.get("list")
+
+        if self.typ in ["S", "M"]:
+            if create_list:
+                self.dim_out += self.dim_create_list(create_list)
+
+            if defined_list:
+                pass
+
             single = ControlSingle(self.id)
             single.cafeteria = self.cafeteria
             single.content = self.content
@@ -1317,6 +1428,14 @@ class Question(SurveyElements):
         if self.typ in ["LHS", "B"]:
             self.spss_out = baskets_syntax(self)
 
+    def dim_create_list(self, create_list):
+        return """
+    {0} - define
+    {{
+{1}
+    }};
+""".format(create_list, self.caf_to_dim(2))
+
 
 class Control:
     def __init__(self, id_, **kwargs):
@@ -1433,8 +1552,7 @@ class ControlOpen(Control):
 
 
 class ControlSingle(Control):
-    # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false"
-    # require="true" results="true" rotation="false" style="">
+    """Categorical with single response class"""
     def __init__(self, id_, **kwargs):
         Control.__init__(self, id_, **kwargs)
         self.tag = 'control_single'

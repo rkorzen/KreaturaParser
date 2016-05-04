@@ -1,5 +1,6 @@
+from lxml import etree
 from KreaturaParser.kparser import parse, print_tree
-from KreaturaParser.tools import KreaturaTestCase
+from KreaturaParser.tools import KreaturaTestCase, find_by_id
 
 class TestParse(KreaturaTestCase):
 
@@ -138,7 +139,37 @@ C
         survey.to_dim()
         result = survey.dim_out
 
-        self.assertEqual(expected, result)
+        self.assertTxtEqual(expected, result)
+
+    def test_define_list_wrong_format(self):
+        input_ = "Q S Q1 COS --list: coś\na\nb"
+        survey = parse(input_)
+        self.assertRaises(ValueError, survey.to_dim)
+
+    def test_use_list_wrong_format(self):
+        input_ = "Q S Q1 COS --use: coś\na\nb"
+        survey = parse(input_)
+        self.assertRaises(ValueError, survey.to_dim)
+
+    def test_use_marker_and_list_marker_together(self):
+        input_ = "Q S Q1 COS --use:MARKA--list:MARKA2"
+        survey = parse(input_)
+        self.assertRaises(ValueError, survey.to_dim)
+
+    def test_dim_create_list(self):
+        input_ = "Q S Q1 COS list:MARKI\na\nb"
+        survey = parse(input_)
+        question = find_by_id(survey, 'Q1')
+        x = question.dim_create_list("MARKI")
+        expected = '''
+    MARKI - define
+    {
+        x1 "a",
+        x2 "b"
+
+    };
+'''
+        self.assertTxtEqual(x, expected)
 
     def test_use_defined_list(self):
         input_ = """Q S Q1 COS --list:MARKI
@@ -180,4 +211,116 @@ C
 
     def test_DnD_scale_exclude(self):
         self.fail()
+
+class TestSpecialMarkers(KreaturaTestCase):
+
+    def test_minchoose_ibis(self):
+        input_ = "Q M Q1 COS --minchoose:4\na\nb"
+        survey = parse(input_)
+        survey.to_xml()
+        expected = """<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false" name="">
+      <question id="Q1" name="">
+        <control_layout id="Q1.labelka" layout="default" style="">
+          <content>COS </content>
+        </control_layout>
+        <control_multi id="Q1" layout="vertical" style="" itemlimit="0" name="Q1 | COS " random="false" require="true" results="true" rotation="false" minchoose="4">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>b</content>
+          </list_item>
+        </control_multi>
+      </question>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>""".format(survey.createtime)
+
+        result = etree.tostring(survey.xml, pretty_print=True)
+        self.assertXmlEqual(result, expected)
+
+    def test_maxchoose_ibis(self):
+        input_ = "Q M Q1 COS --maxchoose:4\na\nb"
+        survey = parse(input_)
+        survey.to_xml()
+        expected = """<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false" name="">
+      <question id="Q1" name="">
+        <control_layout id="Q1.labelka" layout="default" style="">
+          <content>COS </content>
+        </control_layout>
+        <control_multi id="Q1" layout="vertical" style="" itemlimit="0" name="Q1 | COS " random="false" require="true" results="true" rotation="false" maxchoose="4">
+          <list_item id="1" name="" style="">
+            <content>a</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>b</content>
+          </list_item>
+        </control_multi>
+      </question>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>""".format(survey.createtime)
+
+        result = etree.tostring(survey.xml, pretty_print=True)
+        self.assertXmlEqual(result, expected)
+
+    def test_minchoose_dim(self):
+        input_ = "Q M Q1 COS --minchoose:4\na\nb\nc\nd\ne"
+        survey = parse(input_)
+        survey.to_dim()
+        expected = """
+    Q1 "COS "
+    Categorical [4..]
+    {
+        x1 "a",
+        x2 "b",
+        x3 "c",
+        x4 "d",
+        x5 "e"
+
+    };
+"""
+        self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_maxchoose_dim(self):
+        input_ = "Q M Q1 COS --maxchoose:4\na\nb\nc\nd\ne"
+        survey = parse(input_)
+        survey.to_dim()
+        expected = """
+    Q1 "COS "
+    Categorical [1..4]
+    {
+        x1 "a",
+        x2 "b",
+        x3 "c",
+        x4 "d",
+        x5 "e"
+
+    };
+"""
+        self.assertTxtEqual(expected, survey.dim_out)
+
+
+    def test_minchoose_error(self):
+        input_ = "Q S Q1 COS --minchoose:x\na\nb"
+        survey = parse(input_)
+        self.assertRaises(ValueError, survey.to_dim)
+
+
+    def test_maxchoose_error(self):
+        input_ = "Q S Q1 COS --maxchoose:x\na\nb"
+        survey = parse(input_)
+        self.assertRaises(ValueError, survey.to_dim)
 
