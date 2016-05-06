@@ -2385,7 +2385,7 @@ var multiImageControlId = 'Q2';
         self.assertXmlEqual(got, want)
 
     def test_list_column_3(self):
-        input_ = '''Q S Q2 COS --listcolumn-3
+        input_ = '''Q S Q2 COS --listcolumn:3
 1 A
 2 B
 3 C'''
@@ -2537,7 +2537,7 @@ new IbisListColumn("Q2",2);
         self.assertXmlEqual(got, want)
 
     def test_list_column_10_col(self):
-        input_ = '''Q S Q2 COS --listcolumn-10
+        input_ = '''Q S Q2 COS --listcolumn:10
 1 A
 2 B
 3 C'''
@@ -3332,37 +3332,7 @@ A
             </survey>'''.format(survey.createtime)
         self.assertXmlEqual(got, want)
 
-    def test_multi_to_dim(self):
-        self.maxDiff = None
-        input_ = """Q M Q4 W jakiej wielkości miejscowości mieszkasz?
-1 wieś
-2 miasto do 20 tys. mieszkańców
-3 miasto 20.000-49.999 mieszkańców
-4 miasto 50.000-99.999 mieszkańców
-5 miasto 100.000-199.999 mieszkańców
-6 miasto 200.000-499.999 mieszkańców
-7 miasto 500.000 mieszkańców lub większe
-8 nie wiem/ trudno powiedzieć"""
 
-        survey = parse(input_)
-        survey.to_dim()
-        got = survey.dim_out
-        want = '''
-    Q4 "W jakiej wielkości miejscowości mieszkasz?"
-    Categorical [1..]
-    {
-        x1 "wieś",
-        x2 "miasto do 20 tys. mieszkańców",
-        x3 "miasto 20.000-49.999 mieszkańców",
-        x4 "miasto 50.000-99.999 mieszkańców",
-        x5 "miasto 100.000-199.999 mieszkańców",
-        x6 "miasto 200.000-499.999 mieszkańców",
-        x7 "miasto 500.000 mieszkańców lub większe",
-        x8 "nie wiem/ trudno powiedzieć"
-
-    };
-'''
-        self.assertEqual(got, want)
 
 
 # Number
@@ -5291,7 +5261,7 @@ FOR CATEGORIES:
 # warnings
 class TestWarnings(KreaturaTestCase):
     def test_many_columns_warning(self):
-        text_input = """Q S Q1 COS --listcolumn-5
+        text_input = """Q S Q1 COS --listcolumn:5
 1 a"""
 
         survey = parse(text_input)

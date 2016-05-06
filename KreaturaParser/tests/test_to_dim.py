@@ -172,21 +172,43 @@ C
         self.assertTxtEqual(x, expected)
 
     def test_use_defined_list(self):
-        input_ = """Q S Q1 COS --list:MARKI
-        --use:MARKI
+        input_ = """Q S Q1 COS
+--use:MARKI
 """
         expected = """
     Q1 "COS"
     Categorical [1..1]
     {
-        MARKI use \\.MARKI -
+        MARKI use \\\\.MARKI -
+
     };
 """
         survey = parse(input_)
         survey.to_dim()
         result = survey.dim_out
 
-        self.assertEqual(expected, result)
+        self.assertTxtEqual(expected, result)
+
+    def test_use_defined_list_and_other(self):
+        input_ = """Q S Q1 COS
+--use:MARKI
+98.d Don't know
+"""
+        expected = """
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        MARKI use \\\\.MARKI -,
+        - "Don't know" DK
+
+    };
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+
+        self.assertTxtEqual(result, expected)
+
 
     def test_DnD_buckets_with_image_buttons(self):
         self.fail()
@@ -211,6 +233,38 @@ C
 
     def test_DnD_scale_exclude(self):
         self.fail()
+
+    def test_multi_to_dim(self):
+        self.maxDiff = None
+        input_ = """Q M Q4 W jakiej wielkości miejscowości mieszkasz?
+1 wieś
+2 miasto do 20 tys. mieszkańców
+3 miasto 20.000-49.999 mieszkańców
+4 miasto 50.000-99.999 mieszkańców
+5 miasto 100.000-199.999 mieszkańców
+6 miasto 200.000-499.999 mieszkańców
+7 miasto 500.000 mieszkańców lub większe
+8 nie wiem/ trudno powiedzieć"""
+
+        survey = parse(input_)
+        survey.to_dim()
+        got = survey.dim_out
+        want = '''
+    Q4 "W jakiej wielkości miejscowości mieszkasz?"
+    Categorical [1..]
+    {
+        x1 "wieś",
+        x2 "miasto do 20 tys. mieszkańców",
+        x3 "miasto 20.000-49.999 mieszkańców",
+        x4 "miasto 50.000-99.999 mieszkańców",
+        x5 "miasto 100.000-199.999 mieszkańców",
+        x6 "miasto 200.000-499.999 mieszkańców",
+        x7 "miasto 500.000 mieszkańców lub większe",
+        x8 "nie wiem/ trudno powiedzieć"
+
+    };
+'''
+        self.assertTxtEqual(got, want)
 
 class TestSpecialMarkers(KreaturaTestCase):
 

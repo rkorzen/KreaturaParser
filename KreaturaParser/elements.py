@@ -17,8 +17,6 @@ def make_caf_to_dim(cafeteria, tabs=0, prov_letter = 'x'):
 
     out = ""
     ile = len(cafeteria)
-    #print(dir(cafeteria[0]))
-    #print(cafeteria.other)
     for caf in cafeteria:
 
         if '--i' in caf.content:
@@ -34,11 +32,16 @@ def make_caf_to_dim(cafeteria, tabs=0, prov_letter = 'x'):
             caf.img = caf.content[1]
             caf.content = caf.content[0]
 
+        if "--use:" in caf.content:
+            list_ = caf.content.split('--use:')[1]
+            out += "    "*tabs + r"{0} use \\.{0} -".format(list_)
+        elif caf.deactivate:
+            out += '    '*tabs + '- "{}" DK'.format(caf.content)
 
-        out += '    '*tabs + prov_letter + caf.id + ' "' + caf.content + '"'
+        else:
+            out += '    '*tabs + prov_letter + caf.id + ' "' + caf.content + '"'
 
-        if caf.deactivate:
-            out += ' DK'
+
         if caf.other:
             out += ' other'
 
@@ -419,14 +422,17 @@ class Question(SurveyElements):
 
         if '--listcolumn' in self.content:
             pattern = re.compile('--listcolumn:(\d+)')
+
             try:
                 s = pattern.search(self.content)
                 text_to_replace = s.group(0)
                 list_column = s.group(1)
+
             except AttributeError:
                 list_column = '2'
+                text_to_replace = "--listcolumn"
 
-            markers['list_column'] = list_column
+            markers['listcolumn'] = list_column
             self.content = self.content.replace(text_to_replace, '')
 
         if '--dezaktywacja' in self.content:
@@ -483,7 +489,6 @@ class Question(SurveyElements):
             markers['list'] = list_
             self.content = self.content.replace(text_to_replace, '')
 
-
         if '--use:' in self.content:
             pattern = re.compile('--use:([\d\w]+)')
             try:
@@ -517,6 +522,13 @@ class Question(SurveyElements):
         # endregion
 
         special_markers = self.special_markers()
+
+        # minchoice itd
+        # to co do atrybutow tagow musi byc ustawione przed to_xml
+        minchoose = special_markers.get('minchoose')
+        maxchoose = special_markers.get('maxchoose')
+        listcolumn = special_markers.get("listcolumn")
+        images = special_markers.get("images")
 
         # TODO: tutaj duużo do zrobienia - wszystkie typy
         # region begin
@@ -659,10 +671,8 @@ class Question(SurveyElements):
             control.name = self.id + ' | ' + clean_labels(self.content)
             control.postcode = self.postcode
 
-            # minchoice itd
-            # to co do atrybutow tagow musi byc ustawione przed to_xml
-            minchoose = special_markers.get('minchoose')
-            maxchoose = special_markers.get('maxchoose')
+
+
             if minchoose:
                 control.minchoose = minchoose
             if maxchoose:
@@ -681,42 +691,23 @@ class Question(SurveyElements):
                     self.xml.append(open_.xml)
 
             # obrazki zamiast kafeterii
-            if 'images' in special_markers:
-
+            if images:
                 script_call = ScriptsCalls(self.id)
                 script_call.obrazki_zamiast_kafeterii()
-
                 self.xml.append(script_call.to_xml())
 
             # listcolumn
-            for el in special_markers:
-                if el.startswith('listcolumn'):
+            if listcolumn:
+                print(listcolumn)
+                # jeśli mamy podejrzanie dużo kolumn to warto o tym poinformować
+                if int(listcolumn) > 3:
+                    self.warnings.append("W pytaniu " + self.id + " wskazana liczba kolumn ma być większa niż 3."
+                                                                  " Nie za szeroko?")
 
-                    # sprawdzam ile column
-                    try:
-                        columns = el.split('-')[1]
-                    except IndexError:
-                        columns = 2
+                script_call = ScriptsCalls(self.id, **{'columns': listcolumn})
+                script_call.list_column()
 
-                    # jeśli mamy podejrzanie dużo kolumn to warto o tym poinformować
-                    if int(columns) > 3:
-                        self.warnings.append("W pytaniu " + self.id + " wskazana liczba kolumn ma być większa niż 3."
-                                                                      " Nie za szeroko?")
-
-                    script_call = ScriptsCalls(self.id, **{'columns': columns})
-                    script_call.list_column()
-
-                    self.xml.append(script_call.to_xml())
-
-                if el.startswith('min:'):
-                    try:
-                        # print('BBB')
-                        min_ = el.split(':')
-                        control.minchoose = min_[1]
-                        # print(control.minchoice)
-                    except:
-                        raise ValueError("W pytaniu: ", self.id, "zadeklarowano minchoice, ale nie podano wartości",
-                                         'być może  po --min: jest spacja. Format to --min:x')
+                self.xml.append(script_call.to_xml())
 
         # endregion
 
@@ -832,9 +823,11 @@ class Question(SurveyElements):
                 control.cafeteria = self.cafeteria
                 # print(control.cafeteria)
                 lay.to_xml()
-                # min i maxchoose dla kontrolek single/multi
-                # TODO: redaktoring dla single multi
-                Question.min_max_choice(special_markers, control)
+
+                if minchoose:
+                    control.minchoose = minchoose
+                if maxchoose:
+                    control.maxchoose = maxchoose
 
                 control.name = el_id + ' | ' + clean_labels(stwierdzenie.content)
                 control.to_xml()
@@ -1157,6 +1150,7 @@ class Question(SurveyElements):
             hide = etree.Element('hide')
             hide.text = etree.CDATA(self.hide.format(self.id))
             self.xml.append(hide)
+
     @staticmethod
     def min_max_choice(special_markers, control):
         self = control
@@ -1187,28 +1181,30 @@ class Question(SurveyElements):
         options = self.special_markers()
         defined_list = options.get("use")
         create_list = options.get("list")
-
+        minchoose = options.get("minchoose")
+        maxchoose = options.get("maxchoose")
         if self.typ in ["S", "M"]:
             if create_list:
                 self.dim_out += self.dim_create_list(create_list)
-
             if defined_list:
                 pass
+            self.dim_out += '\n    ' + self.id + ' "{0}"'.format(self.content)
+            if not minchoose:
+                minchoose = "1"
+            if not maxchoose:
+                if self.typ == "S":
+                    maxchoose = "1"
+                else:
+                    maxchoose = ""
 
-            single = ControlSingle(self.id)
-            single.cafeteria = self.cafeteria
-            single.content = self.content
 
-            single.to_dim()
-            self.dim_out += single.dim_out
+            self.dim_out += """
+    Categorical [{1}..{2}]
+    {{
+{0}
+    }};
+""".format(make_caf_to_dim(self.cafeteria, 2), minchoose, maxchoose)
 
-        elif self.typ == "M":
-            single = ControlMulti(self.id)
-            single.cafeteria = self.cafeteria
-            single.content = self.content
-
-            single.to_dim()
-            self.dim_out += single.dim_out
 
         elif self.typ == "L":
             self.dim_out += "    " + self.id + ' "' + self.content + '" info;\n\n'
@@ -1642,15 +1638,6 @@ class ControlSingle(Control):
         else:
             raise ValueError("Brak kafeterii w pytaniu: ", self.id)
 
-    def to_dim(self):
-        self.dim_out += '\n    ' + self.id + ' "{0}"'.format(self.content)
-        self.dim_out += """
-    Categorical [1..1]
-    {{
-{0}
-    }};
-""".format(make_caf_to_dim(self.cafeteria, 2))
-
 
 class ControlMulti(ControlSingle):
     # example: <control_single id="Q1" itemlimit="0" layout="vertical" name="Q1 Kryss av:" random="false"
@@ -1658,14 +1645,6 @@ class ControlMulti(ControlSingle):
     def __init__(self, id_, **kwargs):
         ControlSingle.__init__(self, id_, **kwargs)
         self.tag = 'control_multi'
-
-    def to_dim(self):
-        self.dim_out += '\n    ' + self.id + ' "{0}"'.format(self.content) + '\n'
-        self.dim_out += """    Categorical [1..]
-    {{
-{0}
-    }};
-""".format(make_caf_to_dim(self.cafeteria, 2))
 
 
 class ControlNumber(Control):
