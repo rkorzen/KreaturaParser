@@ -37,7 +37,6 @@ def make_caf_to_dim(cafeteria, tabs=0, prov_letter = 'x'):
             out += "    "*tabs + r"{0} use \\.{0} -".format(list_)
         elif caf.deactivate:
             out += '    '*tabs + '- "{}" DK'.format(caf.content)
-
         else:
             out += '    '*tabs + prov_letter + caf.id + ' "' + caf.content + '"'
 
@@ -342,49 +341,107 @@ class Page(SurveyElements):
 class Question(SurveyElements):
     """Question"""
 
-    def caf_to_dim(self, tabs=0, prov_letter='x'):
+    def caf_to_dim(self, tabs=0,  use=None, prov_letter='x'):
         """:returns string
         :param cafeteria: cafeteria or statements list
         :param tabs: level of indent
         """
-        cafeteria = self.cafeteria
-        out = ""
-        ile = len(cafeteria)
-        for caf in cafeteria:
 
-            if '--i' in caf.content:
-                caf.content = caf.content.replace('--i', "")
-                caf.content = '<i>' + caf.content.strip() + '</i>'
+        if use:
+            out = "        use {} -".format(use)
+        else:
+            cafeteria = self.cafeteria
+            out = ""
+            ile = len(cafeteria)
+            for caf in cafeteria:
 
-            if '--b' in caf.content:
-                caf.content = caf.content.replace('--b', "")
-                caf.content = '<b>' + caf.content + '</b>'
+                if '--i' in caf.content:
+                    caf.content = caf.content.replace('--i', "")
+                    caf.content = '<i>' + caf.content.strip() + '</i>'
 
-            if '|' in caf.content:
-                caf.content = caf.content.split('|')
-                caf.img = caf.content[1]
-                caf.content = caf.content[0]
+                if '--b' in caf.content:
+                    caf.content = caf.content.replace('--b', "")
+                    caf.content = '<b>' + caf.content + '</b>'
 
-            if caf.deactivate:
-                out += '    ' * tabs + ' - "' + caf.content + '"'
-                out += ' DK'
+                if '|' in caf.content:
+                    caf.content = caf.content.split('|')
+                    caf.img = caf.content[1]
+                    caf.content = caf.content[0]
 
-            out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '"'
+                if "--use:" in caf.content:
+                    list_ = caf.content.split('--use:')[1]
+                    out += "    " * tabs + r"use {} -".format(list_)
+                elif caf.deactivate:
+                    out += '    ' * tabs + '- "{}" DK'.format(caf.content)
+                else:
+                    out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '"'
 
-            if caf.other:
-                out += ' other'
+                if caf.other:
+                    out += ' other'
 
-            if caf.img:
-                out += r'''
-                labelstyle(
-                    Image = "images\{0}",
-                    ImagePosition = "ImageOnly"
-                )'''.format(caf.img)
+                if caf.img:
+                    out += r'''
+            labelstyle(
+                Image = "images\{0}",
+                ImagePosition = "ImageOnly"
+            )'''.format(caf.img)
 
-            if cafeteria.index(caf) == ile - 1:
-                out += '\n'
-            else:
-                out += ",\n"
+                if cafeteria.index(caf) == ile - 1:
+                    out += '\n'
+                else:
+                    out += ",\n"
+
+        return out
+
+    def statements_to_dim(self, tabs=0, use=None, prov_letter='x'):
+        """:returns string
+        :param cafeteria: cafeteria or statements list
+        :param tabs: level of indent
+        """
+
+        if use:
+            out = "        use {} -".format(use)
+        else:
+            cafeteria = self.statements
+            out = ""
+            ile = len(cafeteria)
+            for caf in cafeteria:
+
+                if '--i' in caf.content:
+                    caf.content = caf.content.replace('--i', "")
+                    caf.content = '<i>' + caf.content.strip() + '</i>'
+
+                if '--b' in caf.content:
+                    caf.content = caf.content.replace('--b', "")
+                    caf.content = '<b>' + caf.content + '</b>'
+
+                if '|' in caf.content:
+                    caf.content = caf.content.split('|')
+                    caf.img = caf.content[1]
+                    caf.content = caf.content[0]
+
+                if "--use:" in caf.content:
+                    list_ = caf.content.split('--use:')[1]
+                    out += "    " * tabs + r"use {} -".format(list_)
+                elif caf.deactivate:
+                    out += '    ' * tabs + '- "{}" DK'.format(caf.content)
+                else:
+                    out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '"'
+
+                if caf.other:
+                    out += ' other'
+
+                if caf.img:
+                    out += r'''
+            labelstyle(
+                Image = "images\{0}",
+                ImagePosition = "ImageOnly"
+            )'''.format(caf.img)
+
+                if cafeteria.index(caf) == ile - 1:
+                    out += '\n'
+                else:
+                    out += ",\n"
 
         return out
 
@@ -468,6 +525,14 @@ class Question(SurveyElements):
         if '--nr' in self.content:
             self.content = self.content.replace('--nr', '')
             markers['not_require'] = True
+
+        if '--ran' in self.content:
+            self.content = self.content.replace('--ran', '')
+            markers['ran'] = True
+
+        if '--rot' in self.content:
+            self.content = self.content.replace('--rot', '')
+            markers['rot'] = True
 
         if '--custom_css' in self.content:
             self.content = self.content.replace('--custom_css', '')
@@ -1183,19 +1248,27 @@ class Question(SurveyElements):
         create_list = options.get("list")
         minchoose = options.get("minchoose")
         maxchoose = options.get("maxchoose")
+        images = options.get("images")
+        if not minchoose:
+            minchoose = "1"
+
+        if not maxchoose:
+            if self.typ == "S":
+                maxchoose = "1"
+            else:
+                maxchoose = ""
+
+        use = None
+
         if self.typ in ["S", "M"]:
             if create_list:
                 self.dim_out += self.dim_create_list(create_list)
+                use = create_list
+
             if defined_list:
-                pass
+                use = defined_list
+
             self.dim_out += '\n    ' + self.id + ' "{0}"'.format(self.content)
-            if not minchoose:
-                minchoose = "1"
-            if not maxchoose:
-                if self.typ == "S":
-                    maxchoose = "1"
-                else:
-                    maxchoose = ""
 
 
             self.dim_out += """
@@ -1203,7 +1276,7 @@ class Question(SurveyElements):
     {{
 {0}
     }};
-""".format(make_caf_to_dim(self.cafeteria, 2), minchoose, maxchoose)
+""".format(self.caf_to_dim(2, use), minchoose, maxchoose)
 
 
         elif self.typ == "L":
@@ -1328,32 +1401,91 @@ class Question(SurveyElements):
             self.dim_out += numeric.dim_out
 
         elif self.typ in ["B", "SDG"]:
+            if self.random:
+                ran = "ran"
+            elif self.rotation:
+                ran = "rot"
+            else:
+                ran = ""
+
+            if images:
+                row_btn_type = "Images"
+            else:
+                row_btn_type = "Text"
+
             out = """
     {id} "{content}"
         [
             flametatype = "mbdragndrop",
             toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnWidth = 200,
-            rowBtnType = "Text",
-            dropType = "buckets",
-            rowContainWidth = 1000,
-            rowBtnHeight = 200
+            rowBtnType = "{rowBtnType}",
+            dropType = "buckets"
         ]
     loop
     {{
 {stw}
-    }} fields -
+    }} {ran} fields -
     (
         slice ""
-        categorical [1..]
+        categorical [{minchoose}..{maxchoose}]
         {{
 {caf}
         }};
     ) expand grid;
 """.format(**{'id': self.id,
               'content': self.content,
-              'stw': make_caf_to_dim(self.statements, 2),
-              'caf': make_caf_to_dim(self.cafeteria, 3)
+              'stw': self.statements_to_dim(2),
+              'caf': self.caf_to_dim(3),
+              'minchoose': minchoose,
+              'maxchoose': maxchoose,
+              'ran': ran,
+              'rowBtnType': row_btn_type
+              })
+
+            self.dim_out += out
+
+        elif self.typ in ["LHS"]:
+            if self.random:
+                ran = "ran"
+            elif self.rotation:
+                ran = "rot"
+            else:
+                ran = ""
+
+            if images:
+                row_btn_type = "Images"
+            else:
+                row_btn_type = "Text"
+
+            out = """
+    {id} "{content}"
+        [
+            flametatype = "mbdragndrop",
+            toolPath = "[%ImageCacheBase%]/images/mbtools/",
+            rowBtnType = "{rowBtnType}",
+            colImgType = "LoveHate",
+            dropType = "scale"
+        ]
+    loop
+    {{
+{caf}
+    }} {ran} fields -
+    (
+        slice ""
+        categorical [{minchoose}..{maxchoose}]
+        {{
+{stw}
+        }};
+    ) expand grid;
+""".format(**{'id': self.id,
+              'content': self.content,
+              'stw': self.statements_to_dim(3),
+              #'stw': self.statements_to_dim(2),
+              'caf': self.caf_to_dim(2),
+              'minchoose': minchoose,
+              'maxchoose': maxchoose,
+              'ran': ran,
+              'rowBtnType': row_btn_type
               })
 
             self.dim_out += out

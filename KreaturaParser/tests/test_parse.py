@@ -4919,6 +4919,222 @@ bm.createBasket("Q1x2", {{
         got = etree.tostring(survey.xml)
         self.assertXmlEqual(got, want)
 
+    def test_baskets_lhs(self):
+            input_ = """Q LHS Q1 COS
+1 A
+2 B
+_
+-5 Hate it
+-4
+-3
+-2
+-1
+0 Neutral
+1
+2
+3
+4
+5 Love it"""
+            survey = parse(input_)
+            survey.to_xml()
+            want = '''<survey createtime="{0}" creator="CHANGEIT" exitpage="" layoutid="ShadesOfGray" localeCode="pl" name="CHANGEIT" sensitive="false" showbar="false" time="60000" SMSComp="false">
+  <block id="Default" name="" quoted="false" random="false" rotation="false">
+    <page id="Q1_p" hideBackButton="false" name="">
+      <question id="Q1" name="">
+        <control_layout id="Q1.labelka" layout="default" style="">
+          <content>&lt;div class="basket_instrukcja"&gt;COS&lt;/div&gt;</content>
+        </control_layout>
+        <control_single id="Q1" layout="vertical" style="" itemlimit="0" name="COS" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_single>
+        <control_multi id="Q1x1" layout="vertical" style="" itemlimit="0" name="Q1x1 | -5 Hate it" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x2" layout="vertical" style="" itemlimit="0" name="Q1x2 | -4" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x3" layout="vertical" style="" itemlimit="0" name="Q1x3 | -3" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x4" layout="vertical" style="" itemlimit="0" name="Q1x4 | -2" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x5" layout="vertical" style="" itemlimit="0" name="Q1x5 | -1" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x6" layout="vertical" style="" itemlimit="0" name="Q1x6 | 0 Neutral" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x7" layout="vertical" style="" itemlimit="0" name="Q1x7 | 1" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x8" layout="vertical" style="" itemlimit="0" name="Q1x8 | 2" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x9" layout="vertical" style="" itemlimit="0" name="Q1x9 | 3" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x10" layout="vertical" style="" itemlimit="0" name="Q1x10 | 4" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_multi id="Q1x11" layout="vertical" style="" itemlimit="0" name="Q1x11 | 5 Love it" random="false" require="false" results="true" rotation="false">
+          <list_item id="1" name="" style="">
+            <content>&lt;img src="public/Q1/1.jpg" alt = "A"&gt;</content>
+          </list_item>
+          <list_item id="2" name="" style="">
+            <content>&lt;img src="public/Q1/2.jpg" alt = "B"&gt;</content>
+          </list_item>
+        </control_multi>
+        <control_layout id="Q1.js" layout="default" style="">
+          <content>&lt;!-- Baskets --&gt;
+&lt;script type="text/javascript" src="public/baskets/jquery-ui/js/jquery-ui-1.8.18.custom.min.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="public/baskets/jquery-ui/css/ui-lightness/jquery-ui-1.8.18.custom.css" type="text/css"&gt;
+&lt;script type="text/javascript" src="public/baskets/baskets.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="public/baskets/baskets.css" type="text/css"&gt;
+&lt;script type="text/javascript"&gt;
+var bm = new BasketManager({{className: "multi", dest: "Q1"}});
+bm.createBasket("Q1", {{
+    source: true,
+    max: 0
+}});
+bm.createBasket("Q1x1", {{
+    label: "-5 Hate it",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x2", {{
+    label: "-4",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x3", {{
+    label: "-3",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x4", {{
+    label: "-2",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x5", {{
+    label: "-1",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x6", {{
+    label: "0 Neutral",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x7", {{
+    label: "1",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x8", {{
+    label: "2",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x9", {{
+    label: "3",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x10", {{
+    label: "4",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+bm.createBasket("Q1x11", {{
+    label: "5 Love it",
+    min: 0,
+    max: 11,
+    maxreplace: true
+}});
+
+&lt;/script&gt;
+&lt;link rel="stylesheet" href="public/custom.css" type="text/css"&gt;</content>
+        </control_layout>
+      </question>
+    </page>
+  </block>
+  <vars/>
+  <procedures>
+    <procedure id="PROC" shortdesc=""/>
+  </procedures>
+</survey>
+'''.format(survey.createtime)
+
+            got = etree.tostring(survey.xml)
+            self.assertXmlEqual(got, want)
+
     def test_no_kafeteria(self):
         line = "Q B Q1 COS"
         survey = parse(line)

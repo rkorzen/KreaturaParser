@@ -21,7 +21,7 @@ class Patterns:
     postcode_pattern = re.compile("^POST .*$")
     comment_line_pattern = re.compile("^//.*$")
 
-    caf_pattern = re.compile("^((\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.–%\-+\(\)&\\\\/\?!’'„”;:-<>=\"\{}\$\|\[\]\{\}@]+)$")
+    caf_pattern = re.compile("^((\-{0,1}\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.–%\-+\(\)&\\\\/\?!’'„”;:-<>=\"\{}\$\|\[\]\{\}@]+)$")
     blanck_pattern = re.compile("^$")
 
     parent_pattern = re.compile("(B )([\w._]+)( )([\w._]+).*")
@@ -147,6 +147,7 @@ def cafeteria_parser(line):
     if caf.group(2):           # id
         cafeteria.id = caf.group(2)
 
+
     if caf.group(4):           # content
         cafeteria.content = caf.group(4)
         if ' --so' in cafeteria.content:
@@ -180,18 +181,6 @@ def cafeteria_parser(line):
 
     if caf.group(3) == ".c":   # comment
         cafeteria.other = True
-
-    # if caf.group(6):           # hide
-    #     cafeteria.hide = caf.group(6)
-
-    # if caf.group(7) == ' --so':  # screen out
-    #     cafeteria.screenout = True
-    #
-    # if caf.group(7) == ' --gn':  # goto next
-    #     cafeteria.gotonext = True
-    #
-    # if caf.group(8):  # goto next
-    #     cafeteria.goto = caf.group(8)
 
     return cafeteria
 

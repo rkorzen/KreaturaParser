@@ -45,13 +45,16 @@ class TestPatterns(KreaturaTestCase):
         line1 = 'A--hide:$P4B:{0} == "1"'
         line2 = 'A --hide:$P4B:{0} == "1"'
         line3 = '1 coś coś --hide:$A1:{0} == "1"'
+        line4 = '-1 coś'
         pattern = Patterns.caf_pattern
 
         r1 = pattern.match(line1)
         r2 = pattern.match(line2)
         r3 = pattern.match(line3)
+        r4 = pattern.match(line4)
 
         self.assertIsNotNone(r1)
         self.assertIsNotNone(r2)
         self.assertIsNotNone(r3)
+        self.assertIsNotNone(r4)
 

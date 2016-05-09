@@ -27,6 +27,15 @@ class TestStatementParser(TestCase):
         result = cafeteria_parser(line)
         self.assertEqual(expected, result)
 
+    def test_cafeteria_with_minus(self):
+        line = "-1 cos"
+        expected = Cafeteria()
+        expected.id = "-1"
+        expected.content = "cos"
+        result = cafeteria_parser(line)
+        self.assertEqual(expected, result)
+
+
     def test_with_polish_signs(self):
         line = "1 coś coś"
         expected = Cafeteria()
