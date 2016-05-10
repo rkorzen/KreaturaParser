@@ -64,10 +64,9 @@ def build_precode(precode, tag, technique="ibis"):
         is_inside_if = False
         prec = etree.Element(tag)
         text = precode.split(';')
-        # print(text)
+
         # pobieżna walidacja
         # czy ilość if else i endif jest taka sama
-
         count_ifs = [x.startswith('if') for x in text].count(True)
         count_elses = [x.startswith('else') for x in text].count(True)
         count_endifs = [x.startswith('endif') for x in text].count(True)

@@ -2,9 +2,9 @@
 import datetime
 import re
 from lxml import etree
-from .tools import build_precode, find_parent, clean_labels, wersjonowanie_plci, wersjonowanie_plci_dim
-from .tools import find_parent, filter_parser
-from .spss import baskets_syntax
+from tools import build_precode, find_parent, clean_labels, wersjonowanie_plci, wersjonowanie_plci_dim
+from tools import find_parent, filter_parser
+from spss import baskets_syntax
 
 
 WERSJONOWANIE = True
@@ -736,8 +736,6 @@ class Question(SurveyElements):
             control.name = self.id + ' | ' + clean_labels(self.content)
             control.postcode = self.postcode
 
-
-
             if minchoose:
                 control.minchoose = minchoose
             if maxchoose:
@@ -1260,6 +1258,15 @@ class Question(SurveyElements):
 
         use = None
 
+        if self.typ == "DEF":
+            self.dim_out += """
+    define {0} -
+    Categorical
+    {{
+{1}
+    }};
+""".format(self.id, self.caf_to_dim(2, use))
+
         if self.typ in ["S", "M"]:
             if create_list:
                 self.dim_out += self.dim_create_list(create_list)
@@ -1423,13 +1430,13 @@ class Question(SurveyElements):
         ]
     loop
     {{
-{stw}
+{caf}
     }} {ran} fields -
     (
         slice ""
         categorical [{minchoose}..{maxchoose}]
         {{
-{caf}
+{stw}
         }};
     ) expand grid;
 """.format(**{'id': self.id,
@@ -1453,7 +1460,7 @@ class Question(SurveyElements):
                 ran = ""
 
             if images:
-                row_btn_type = "Images"
+                row_btn_type = "Image"
             else:
                 row_btn_type = "Text"
 
@@ -1881,7 +1888,7 @@ class Cafeteria:
         else:
             content.text = self.content
         self.xml.append(content)
-        # print(self.hide)
+
         if self.deactivate:
             self.xml.set('disablerest', 'true')
 

@@ -279,7 +279,7 @@ _
         self.assertTxtEqual(result, expected)
 
     def test_DnD_scale_with_image_buttons(self):
-        input_ = r"""Q LHS dndBucketsImage How familiar you are with each og these brands?<br/>
+        input_ = r"""Q LHS dndBucketsImage How familiar you are with each og these brands?<br/>--images
 --use:BRANDS
 _
 -5 Hate it
@@ -299,6 +299,61 @@ _
         result = survey.dim_out
         expected = """
     dndBucketsImage "How familiar you are with each og these brands?<br/>"
+        [
+            flametatype = "mbdragndrop",
+            toolPath = "[%ImageCacheBase%]/images/mbtools/",
+            rowBtnType = "Image",
+            colImgType = "LoveHate",
+            dropType = "scale"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            x1 "-5 Hate it",
+            x2 "-4",
+            x3 "-3",
+            x4 "-2",
+            x5 "-1",
+            x6 "0 Neutral",
+            x7 "1",
+            x8 "2",
+            x9 "3",
+            x10 "4",
+            x11 "5 Love it"
+
+        };
+    ) expand grid;
+"""
+
+        self.assertTxtEqual(result, expected)
+
+    def test_DnD_scale_with_text_buttons(self):
+        input_ = r"""Q LHS dndLoveHateScaleImage How familiar you are with each og these brands?<br/>
+        --use:BRANDS
+        _
+        -5 Hate it
+        -4
+        -3
+        -2
+        -1
+        0 Neutral
+        1
+        2
+        3
+        4
+        5 Love it
+        """
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+        expected = """
+    dndLoveHateScaleImage "How familiar you are with each og these brands?<br/>"
         [
             flametatype = "mbdragndrop",
             toolPath = "[%ImageCacheBase%]/images/mbtools/",
@@ -326,20 +381,83 @@ _
             x9 "3",
             x10 "4",
             x11 "5 Love it"
+
         };
     ) expand grid;
-        """
+"""
 
         self.assertTxtEqual(result, expected)
 
-    def test_DnD_scale_with_text_buttons(self):
-        self.fail()
-
     def test_DnD_scale_love_hate(self):
-        self.fail()
+        input_ = r"""Q LHS dndLoveHateScaleImage How familiar you are with each og these brands?<br/>--images
+--use:BRANDS
+_
+--use:lovehatescale
+        """
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+        expected = """
+    dndLoveHateScaleImage "How familiar you are with each og these brands?<br/>"
+        [
+            flametatype = "mbdragndrop",
+            toolPath = "[%ImageCacheBase%]/images/mbtools/",
+            rowBtnType = "Image",
+            colImgType = "LoveHate",
+            dropType = "scale"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            use lovehatescale -
+
+        };
+    ) expand grid;
+"""
+
+        self.assertTxtEqual(result, expected)
 
     def test_DnD_scale_gray(self):
-        self.fail()
+        input_ = r"""Q LHS dndScaleTextGray How familiar you are with each og these brands?<br/>--gray
+--use:BRANDS
+_
+--use:lovehatescale
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+        expected = """
+    dndScaleTextGray "How familiar you are with each og these brands?<br/>"
+        [
+            flametatype = "mbdragndrop",
+            toolPath = "[%ImageCacheBase%]/images/mbtools/",
+            rowBtnType = "Image",
+            colImgType = "Gray",
+            dropType = "scale"
+        ]
+    loop
+    {
+        use BRANDS -
+
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            use lovehatescale -
+
+        };
+    ) expand grid;
+"""
+
+        self.assertTxtEqual(result, expected)
 
     def test_DnD_buckets_exclude(self):
         self.fail()

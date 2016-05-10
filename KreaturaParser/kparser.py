@@ -1,9 +1,9 @@
 # coding: utf-8
 import re
 from lxml import etree
-from .parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
-from .elements import Question, Survey, Page, Block
-from .tools import find_parent
+from parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
+from elements import Question, Survey, Page, Block
+from tools import find_parent
 
 """
 Author: Rafał Korzeniewski
@@ -161,10 +161,10 @@ def parse(text_input):
 
     """
 
-#    # TODO: Źle parsuje kafeterię - ucina elementy, gdy jest więcej niż dwa znaczniki
-#    np: """Q S Q1 COS
-# A --gn
-# B --so"""
+    #    # TODO: Źle parsuje kafeterię - ucina elementy, gdy jest więcej niż dwa znaczniki
+    #    np: """Q S Q1 COS
+    # A --gn
+    # B --so"""
 
     survey = Survey()
 
@@ -177,7 +177,8 @@ def parse(text_input):
     current_question = None
     collect_statements = False
     collect_categories = False
-
+    add_id_to_content = False
+    reorder_statements = False
     # sprawdzamy czy są wewnątrz bloki programow
 
     text_input = program_parser(text_input)
@@ -192,6 +193,10 @@ def parse(text_input):
 
         line = line.strip()  # usuwam nadmiarowe spacje itp
         structure = recognize(line)  # rozpoznaję strukturę
+
+        if structure in ["BLOCK", "QUESTION", "SWITCH", "LOOP", "PRECODE", "POSTCODE"]:
+            add_id_to_content = False
+            rename_statements = False
 
         # w zależności od tego co to jest reagujemy tworząc odpowiednie obiekty
 
@@ -302,41 +307,35 @@ def parse(text_input):
 
         # region cafeteria
         if structure == "CAFETERIA":
-            # print(line)
-
             try:
-                statement = cafeteria_parser(line)
+                statement, add_id_to_content = cafeteria_parser(line, add_id_to_content)
             except AttributeError:
                 raise AttributeError('Błąd w linii: ', line)
 
-            # jeśli nie ma numeru kafeterii to nadajemy go - albo dla kafeterii odpowiedzi (cafeteria),
+            # jeśli nie ma numeru kafeterii to nadajemy go -
+            # dla kafeterii odpowiedzi (cafeteria),
             # albo dla kafeterii stwierdzen (statements), jeśli akurat je zbieramy.
             # To jest potrzebne do wyliczania filtrow screenout i gotonext
 
-            if not statement.id:
-                if not collect_statements:
+            try:
+                if int(statement.id) < 0:
+                    rename_statements = True
+
+            except TypeError:
+                pass
+
+
+            if not statement.id or rename_statements:
+                if not collect_statements:   # kafeteria odpowiedzi
                     try:
                         ktory = len(current_question.cafeteria)
                         statement.id = str(ktory + 1)
                     except AttributeError as e:
                         raise AttributeError("Błąd w linii", line)
-                else:
+                else:  # kafeteria stwierdzeń
                     ktory = len(current_question.statements)
                     statement.id = str(ktory + 1)
 
-            """Do warunku bierzemy:
-
-            id pytania (question.id)
-            nr odpowiedzi
-
-            """
-
-            # if statement.screenout:
-            #     if not current_page.postcode:
-            #         current_page.postcode = ""
-            #     current_page.postcode += '''if (${0}:{1} == "1")\n  #OUT = "1"\n  goto KONKURS\nelse\nendif'''.format(
-            #         current_question.id, statement.id
-            #     )
 
             if statement.gotonext:
                 # print("statement", statement)
@@ -349,12 +348,12 @@ def parse(text_input):
                     next_page_precode[1] += ''';;if (${0}:{1} == "1");  goto next;else;endif'''.format(
                         current_question.id, statement.id)
                     # print('CC', next_page_precode)
+
             if collect_statements:
                 current_question.statements.append(statement)
             elif collect_categories:
                 current_question.categories.append(statement)
             else:
-                # print(current_question.cafeteria)
                 current_question.cafeteria.append(statement)
 
             if statement.goto:
@@ -378,6 +377,7 @@ def parse(text_input):
             collect_categories = True
             collect_statements = False
         # endregion
+
         # region precode
         if structure == "PRECODE":
             if type(current_element) is Question:
@@ -409,9 +409,11 @@ def parse(text_input):
 
 
 if __name__ == "__main__":
-    with open(r'/home/korzen/workspace/mockups/x.txt', 'r') as f:
+    #with open(r'/home/korzen/workspace/mockups/x.txt', 'r') as f:
+    with open(r"c:\tests/pogo test script generator/input.txt") as f:
         f = f.read()
         survey = parse(f)
-        survey.to_spss()
-        print(survey.spss_out)
+        survey.to_dim()
+
+        print(survey.dim_out)
 

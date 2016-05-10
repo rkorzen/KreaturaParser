@@ -9,14 +9,14 @@ class TestStatementParser(TestCase):
         line = "Nie wiem/trudno powiedzieć"
         expected = Cafeteria()
         expected.content = "Nie wiem/trudno powiedzieć"
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_backslash(self):
         line = r"Nie wiem\trudno powiedzieć"
         expected = Cafeteria()
         expected.content = r"Nie wiem\trudno powiedzieć"
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_cafeteria_with_nr(self):
@@ -24,15 +24,23 @@ class TestStatementParser(TestCase):
         expected = Cafeteria()
         expected.id = "1"
         expected.content = "cos"
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_cafeteria_with_minus(self):
         line = "-1 cos"
         expected = Cafeteria()
         expected.id = "-1"
-        expected.content = "cos"
-        result = cafeteria_parser(line)
+        expected.content = "-1 cos"
+        result = cafeteria_parser(line)[0]
+        self.assertEqual(expected, result)
+
+    def test_cafeteria_just_minus(self):
+        line = "-1"
+        expected = Cafeteria()
+        expected.id = "-1"
+        expected.content = "-1"
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
 
@@ -41,14 +49,14 @@ class TestStatementParser(TestCase):
         expected = Cafeteria()
         expected.id = "1"
         expected.content = "coś coś"
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_with_no_id(self):
         line = "coś coś"
         expected = Cafeteria()
         expected.content = "coś coś"
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_with_deacticate(self):
@@ -57,7 +65,7 @@ class TestStatementParser(TestCase):
         expected.id = "96"
         expected.content = "coś coś"
         expected.deactivate = True
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_with_other(self):
@@ -66,16 +74,16 @@ class TestStatementParser(TestCase):
         expected.id = "96"
         expected.content = "coś coś"
         expected.other = True
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_with_hide(self):
         line = '1 coś coś --hide:$A1:{0} == "1"'
         expected = Cafeteria()
         expected.id = "1"
-        expected.content = "coś coś "
+        expected.content = "coś coś"
         expected.hide = '$A1:{0} == "1"'
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_with_screenout(self):
@@ -84,7 +92,7 @@ class TestStatementParser(TestCase):
         expected.id = "1"
         expected.content = "coś coś"
         expected.screenout = True
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_with_gotonext(self):
@@ -93,18 +101,20 @@ class TestStatementParser(TestCase):
         expected.id = "1"
         expected.content = "coś coś"
         expected.gotonext = True
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_all_possible(self):
         line = '96.d Procter&Gamble --hide: $A1:{0} == "1" --so'
         expected = Cafeteria()
         expected.id = "96"
-        expected.content = "Procter&Gamble "
-        expected.hide = ' $A1:{0} == "1"'
+        expected.content = "Procter&Gamble"
+        expected.hide = '$A1:{0} == "1"'
         expected.deactivate = True
         expected.screenout = True
-        result = cafeteria_parser(line)
+
+        result = cafeteria_parser(line)[0]
+
         self.assertEqual(expected, result)
 
     def test_screeonout_info(self):
@@ -115,7 +125,7 @@ class TestStatementParser(TestCase):
         expected.content = 'cos'
         expected.screenout = True
 
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
     def test_screeonout_info_2(self):
@@ -126,7 +136,7 @@ class TestStatementParser(TestCase):
         expected.content = 'a'
         expected.screenout = True
 
-        result = cafeteria_parser(line)
+        result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
 
 if __name__ == '__main__':

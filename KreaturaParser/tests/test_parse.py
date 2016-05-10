@@ -3333,8 +3333,6 @@ A
         self.assertXmlEqual(got, want)
 
 
-
-
 # Number
 class TestParseToXmlControlNumber(KreaturaTestCase):
     def test_control_open_xml(self):
@@ -3769,7 +3767,7 @@ _
 <hide><![CDATA[$Q1:2 == "1"]]></hide>
 <content>B</content>
 </control_layout>
-<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B " random="false" require="true"
+<control_multi id="Q1_2" itemlimit="0" layout="vertical" name="Q1_2 | B" random="false" require="true"
                results="true" rotation="false" style="">
 <hide><![CDATA[$Q1:2 == "1"]]></hide>
 <list_item id="1" name="" style="">
@@ -4363,7 +4361,7 @@ _
         <control_layout id="Q1_1_txt" layout="default" style="">
           <content>stw a</content>
         </control_layout>
-        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a " random="false"
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false"
          require="true" results="true" rotation="false">
           <list_item id="1" name="" style="">
             <content>a</content>
@@ -4436,7 +4434,7 @@ _
         <control_layout id="Q1_1_txt" layout="default" style="">
           <content>stw a</content>
         </control_layout>
-        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a " random="false"
+        <control_multi id="Q1_1" layout="vertical" style="" itemlimit="0" name="Q1_1 | stw a" random="false"
         require="true" results="true" rotation="false" maxchoose="5">
           <list_item id="1" name="" style="">
             <content>a</content>
@@ -4822,7 +4820,7 @@ hl = new IbisHighlighter('Q1.img','Q1.input', {{ hlClass: 'hl-active-green', deb
 
 # baskets
 class TestBaskets(KreaturaTestCase):
-    def test_baskets(self):
+    def test_ibis_baskets(self):
         input_ = """Q LHS Q1 COS
 1 1
 2 2
@@ -4919,7 +4917,7 @@ bm.createBasket("Q1x2", {{
         got = etree.tostring(survey.xml)
         self.assertXmlEqual(got, want)
 
-    def test_baskets_lhs(self):
+    def test_ibis_baskets_lhs(self):
             input_ = """Q LHS Q1 COS
 1 A
 2 B
