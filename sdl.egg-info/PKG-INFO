@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: sdl
+Version: 0.1
+Summary: Survey Domain Language - parse and serialize to some outputs
+Home-page: https://github.com/rkorzen/KreaturaParser.git
+Author: Rafał Korzeniewski
+Author-email: korzeniewski@gmail.com
+License: PSF
+Description: UNKNOWN
+Platform: UNKNOWN
