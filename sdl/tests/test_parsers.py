@@ -315,6 +315,15 @@ class TestQuestionParser(KreaturaTestCase):
         result = question_parser(line)
         self.assertEqual(expected, result)
 
+    def test_mutli_rot_list_lz(self):
+        input_ = "Q M M13 Czy w Pana(i) gospodarstwie domowym jest? --rot --list:dobra --lz:1"
+        expected = Question("M13")
+        expected.typ = "M"
+        expected.content = "Czy w Pana(i) gospodarstwie domowym jest? --list:dobra --lz:1"
+        expected.rotation = True
+        result = question_parser(input_)
+        self.assertEqual(expected, result)
+
 
 class TestStatementParser(KreaturaTestCase):
 
@@ -491,6 +500,7 @@ class TestStatementParser(KreaturaTestCase):
         expected.content = "cos"
         result = cafeteria_parser(line)[0]
         self.assertEqual(expected, result)
+
 
 class TestProgramParser(KreaturaTestCase):
 

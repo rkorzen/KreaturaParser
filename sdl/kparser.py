@@ -374,7 +374,7 @@ def parse(text_input):
 
 if __name__ == "__main__":
     #with open(r'/home/korzen/workspace/mockups/x.txt', 'r') as f:
-    with open(r"c:\tests/pogo test script generator/input3.txt") as f:
+    with open(r"c:\tests/pogo test script generator/input4.txt") as f:
         f = f.read()
         survey = parse(f)
         survey.to_dim()

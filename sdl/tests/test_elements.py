@@ -341,10 +341,10 @@ class TestToDim(KreaturaTestCase):
         self.assertRaises(ValueError, survey.to_dim)
 
     def test_dim_create_list(self):
-        input_ = "Q S Q1 COS list:MARKI\na\nb"
+        input_ = "Q S Q1 COS --list:MARKI\na\nb"
         survey = parse(input_)
-        question = find_by_id(survey, 'Q1')
-        x = question.dim_create_list("MARKI")
+        #question = find_by_id(survey, 'Q1')
+        survey.to_dim()
         expected = '''
     MARKI - define
     {
@@ -352,8 +352,14 @@ class TestToDim(KreaturaTestCase):
         x2 "b"
 
     };
+
+    Q1 "COS "
+    Categorical [1..1]
+    {
+        use MARKI -
+    };
 '''
-        self.assertTxtEqual(x, expected)
+        self.assertTxtEqual(survey.dim_out, expected)
 
     def test_use_defined_list(self):
         input_ = """Q S Q1 COS

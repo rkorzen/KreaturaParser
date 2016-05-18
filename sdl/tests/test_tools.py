@@ -68,7 +68,9 @@ spss_out = ""
 xml = None
 quoted = False
 web_out = ""
-warnings = []'''.splitlines())
+warnings = []
+kwargs = {}
+'''.splitlines())
 
         self.assertEqual(expected, result)
 

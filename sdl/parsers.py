@@ -22,7 +22,7 @@ class Patterns:
     comment_line_pattern = re.compile("^//.*$")
 
     #caf_pattern = re.compile("^((-{0,1}\d+)(\.d|\.c)? )?([\w ĄĘĆÓŃŚŹŻąęćóńśźż,.–%\-+\(\)&\\\\/\?!’'„”;:-<>=\"\{}\$\|\[\]\{\}@]+)$")
-    caf_pattern = re.compile("^((-{0,1}\d+)(\.d|\.c|\.|;|,|:)?\s*)?(.+)$")
+    caf_pattern = re.compile("^((-{0,1}\d+)(\.d|\.c|.f|\.|;|,|:)?\s*)?(.+)$")
     screen_out_pattern = re.compile("\s*--so")
     goto_next_pattern = re.compile("\s*--gn")
 
@@ -153,7 +153,7 @@ def cafeteria_parser(line, add_id_to_content=False):
     cafeteria = Cafeteria()
     cafeteria_pattern = Patterns.caf_pattern
     caf = cafeteria_pattern.match(line)
-    print(caf.groups())
+
     if caf.group(2):           # id
         cafeteria.id = caf.group(2)
 
@@ -207,6 +207,10 @@ def cafeteria_parser(line, add_id_to_content=False):
         cafeteria.deactivate = True
 
     if caf.group(3) == ".c":   # comment
+        cafeteria.other = True
+
+    if caf.group(3) == ".f":   # comment
+        cafeteria.fixposition = True
         cafeteria.other = True
 
     return cafeteria, add_id_to_content

@@ -313,7 +313,6 @@ def unix_creation_time(dt):
     return int(unix_time(dt) * 1000)
 
 
-
 # region testing tools
 class KreaturaTestCase(TestCase):
 

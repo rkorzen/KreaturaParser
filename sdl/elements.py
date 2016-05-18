@@ -37,6 +37,7 @@ class SurveyElements:
         self.dim_out = ""
         self.web_out = ""
         self.spss_out = ""
+        self.kwargs = {}
 
     def __eq__(self, other):
         return (self.id == other.id and
@@ -299,11 +300,10 @@ class Question(SurveyElements):
             out = ""
             ile = len(cafeteria)
             for caf in cafeteria:
-                print(caf.id)
+
                 if leadzero:
-                    #print('lz')
                     caf.id = "0"*(leadzero - len(caf.id)) + caf.id
-                    print(caf.id)
+
                 if '--i' in caf.content:
                     caf.content = caf.content.replace('--i', "")
                     caf.content = '<i>' + caf.content.strip() + '</i>'
@@ -323,8 +323,12 @@ class Question(SurveyElements):
 
                 elif caf.deactivate:
                     out += '    ' * tabs + '- "{}" DK'.format(caf.content)
+
+                elif caf.fixposition:
+                    out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '" fix'
                 else:
                     out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '"'
+
 
                 if caf.other:
                     out += ' other'
@@ -1234,18 +1238,15 @@ class Question(SurveyElements):
 
         use = None
 
+        self.kwargs = {}
+        if images:
+            self.kwargs['images'] = images
+
+        self.kwargs['leadzero'] = options.get('leadzero', 0)
+
         if self.typ == "DEF":
-            kwargs = {}
-            if images:
-                kwargs['images'] = images
 
-            kwargs['leadzero'] = options.get('leadzero', 0)
-
-
-            if images:
-                caf = self.caf_to_dim(2, use, **kwargs)
-            else:
-                caf = self.caf_to_dim(2, use)
+            caf = self.caf_to_dim(2, use, **self.kwargs)
 
             self.dim_out += """
     define {0} -
@@ -1559,12 +1560,15 @@ class Question(SurveyElements):
             self.spss_out = baskets_syntax(self)
 
     def dim_create_list(self, create_list):
+
+        caf = self.caf_to_dim(2, **self.kwargs)
+
         return """
     {0} - define
     {{
 {1}
     }};
-""".format(create_list, self.caf_to_dim(2))
+""".format(create_list, caf)
 
 
 class Control:
@@ -1853,7 +1857,7 @@ class Cafeteria:
         self.xml = None
         self.connected = False
         self.img = None
-
+        self.fixposition = False
         for key in kwargs:
             if kwargs[key]:
                 setattr(self, key, kwargs[key])
