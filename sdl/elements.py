@@ -341,13 +341,17 @@ class Question(SurveyElements):
             )'''.format(caf.img)
 
                 if images:
+                    if isinstance(images, bool):
+                        img = caf.id + '.jpg'
+                    else:
+                        img = images[0] + "\\" + caf.id + '.jpg'
 
-                    img = caf.id+ '.jpg'
+
                     out += r'''
-                        labelstyle(
-                            Image = "images\{0}",
-                            ImagePosition = "ImageOnly"
-                        )'''.format(img)
+            labelstyle(
+                Image = "images\{0}",
+                ImagePosition = "ImageOnly"
+            )'''.format(img)
 
                 if cafeteria.index(caf) == ile - 1:
                     out += '\n'
@@ -437,8 +441,16 @@ class Question(SurveyElements):
 
         # obrazki zamiast kafeterii
         if '--images' in self.content:
-            markers['images'] = True
-            self.content = self.content.replace('--images', '')
+            pattern = re.compile(r"--images:([\w\d_\\]+)")
+            path = pattern.search(self.content)
+            try:
+                markers['images'] = path.groups(1)
+                text_to_replace = path.group(0)
+            except AttributeError:
+                markers['images'] = True
+                text_to_replace = '--images'
+
+            self.content = self.content.replace(text_to_replace, '')
 
         if '--listcolumn' in self.content:
             pattern = re.compile('--listcolumn:(\d+)')
@@ -463,8 +475,8 @@ class Question(SurveyElements):
             pattern = re.compile('--minchoose:(\d+)')
             try:
                 s = pattern.search(self.content)
-                text_to_replace = s.group(0)
-                minchoose = s.group(1)
+                text_to_replace = s.groups(0)
+                minchoose = s.groups(1)
             except AttributeError:
                 raise ValueError("minchoose to powinna być liczba. prawidłowe użycie to --minchoose:x, błąd w ", self.content)
 
@@ -1249,15 +1261,14 @@ class Question(SurveyElements):
             caf = self.caf_to_dim(2, use, **self.kwargs)
 
             self.dim_out += """
-    define {0} -
-    Categorical
+    {0} - define
     {{
 {1}
     }};
 """.format(self.id, caf)
 
 
-        if self.typ in ["S", "M"]:
+        elif self.typ in ["S", "M"]:
             if create_list:
                 self.dim_out += self.dim_create_list(create_list)
                 use = create_list
@@ -1274,7 +1285,6 @@ class Question(SurveyElements):
 {0}
     }};
 """.format(self.caf_to_dim(2, use), minchoose, maxchoose)
-
 
         elif self.typ == "L":
             self.dim_out += "    " + self.id + ' "' + self.content + '" info;\n\n'
@@ -1492,7 +1502,6 @@ class Question(SurveyElements):
               })
 
             self.dim_out += out
-
 
         else:
             stat, caf = None, None

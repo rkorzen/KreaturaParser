@@ -818,17 +818,105 @@ class TestQuestionSpecialMarkers(KreaturaTestCase):
 """
         self.assertTxtEqual(expected, survey.dim_out)
 
-
     def test_minchoose_error(self):
         input_ = "Q S Q1 COS --minchoose:x\na\nb"
         survey = parse(input_)
         self.assertRaises(ValueError, survey.to_dim)
 
-
     def test_maxchoose_error(self):
         input_ = "Q S Q1 COS --maxchoose:x\na\nb"
         survey = parse(input_)
         self.assertRaises(ValueError, survey.to_dim)
+
+    def test_images_with_path(self):
+        input_ = "Q DEF Q1 COS --images:path\na\nb"
+        survey = parse(input_)
+        question = survey.childs[0].childs[0].childs[0]
+        options = question.special_markers()
+        self.assertEquals(options["images"][0], "path")
+
+
+class TestQuestionDef(KreaturaTestCase):
+    def test_define_list(self):
+        input_ = """Q DEF Q1 COS
+a
+b
+c
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        expected = """
+    Q1 - define
+    {
+        x1 "a",
+        x2 "b",
+        x3 "c"
+
+    };
+"""
+        self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_define_list_images(self):
+        input_ = """Q DEF Q1 COS --images
+a
+b
+c
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        expected = r"""
+    Q1 - define
+    {
+        x1 "a"
+            labelstyle(
+                Image = "images\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        x2 "b"
+            labelstyle(
+                Image = "images\2.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        x3 "c"
+            labelstyle(
+                Image = "images\3.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+"""
+        self.assertTxtEqual(survey.dim_out, expected)
+
+    def test_define_list_images_with_path(self):
+        input_ = r"""Q DEF Q1 COS --images:path\to\image
+a
+b
+c
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        expected = r"""
+    Q1 - define
+    {
+        x1 "a"
+            labelstyle(
+                Image = "images\path\to\image\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        x2 "b"
+            labelstyle(
+                Image = "images\path\to\image\2.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        x3 "c"
+            labelstyle(
+                Image = "images\path\to\image\3.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+"""
+        self.assertTxtEqual(survey.dim_out, expected)
 
 
 class TestControl(KreaturaTestCase):
