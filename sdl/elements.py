@@ -1,6 +1,10 @@
 # coding: utf-8
 import datetime
 import re
+from string import ascii_uppercase
+
+
+
 from lxml import etree
 from sdl.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
 from sdl.tools import find_parent, filter_parser, make_caf_to_dim, unix_time, unix_creation_time
@@ -289,10 +293,12 @@ class Question(SurveyElements):
         :param tabs: level of indent
         """
 
-        prov_letter = kwargs.get('prov_letter', 'x')
+        prov_letter = kwargs.get('prov_letter', '_')
         images = kwargs.get('images')
         leadzero = kwargs.get('leadzero', 0)
-
+        big_letters = kwargs.get("big-letters", False)
+        int_implicite = kwargs.get("int-implicite", False)
+        #print(kwargs)
         if use:
             out = "        use {} -".format(use)
         else:
@@ -303,7 +309,13 @@ class Question(SurveyElements):
 
                 if leadzero:
                     caf.id = "0"*(leadzero - len(caf.id)) + caf.id
-
+                elif big_letters:
+                    caf.id = ascii_uppercase[int(caf.id)-1]
+                elif int_implicite:
+                    #print(caf.content)
+                    caf.content = caf.id + " " + caf.content
+                    #print(caf.content)
+                    caf.id = str(cafeteria.index(caf) + 1)
                 if '--i' in caf.content:
                     caf.content = caf.content.replace('--i', "")
                     caf.content = '<i>' + caf.content.strip() + '</i>'
@@ -475,8 +487,9 @@ class Question(SurveyElements):
             pattern = re.compile('--minchoose:(\d+)')
             try:
                 s = pattern.search(self.content)
-                text_to_replace = s.groups(0)
-                minchoose = s.groups(1)
+                text_to_replace = s.group(0)
+                #print(text_to_replace)
+                minchoose = s.group(1)
             except AttributeError:
                 raise ValueError("minchoose to powinna być liczba. prawidłowe użycie to --minchoose:x, błąd w ", self.content)
 
@@ -549,7 +562,6 @@ class Question(SurveyElements):
         if '--lz:' in self.content:
             pattern = re.compile('--lz:(\d+)')
             try:
-                print("AAAAAAAAAAAAAAAAAAAA")
                 s = pattern.search(self.content)
                 leadzero = int(s.group(1))
                 text_to_replace = s.group(0)
@@ -559,6 +571,22 @@ class Question(SurveyElements):
                                  "prawidłowy format to '--lz:xx', gdzie xxxx to liczba")
             markers['leadzero'] = leadzero
             self.content = self.content.replace(text_to_replace, '')
+
+        if '--big-letters' in self.content:
+            markers["big-letters"] = True
+            self.content = self.content.replace("--big-letters", "")
+
+        if '--int-implicite' in self.content:
+            markers["int-implicite"] = True
+            self.content = self.content.replace("--int-implicite", "")
+
+        if "--sort-by-id" in self.content:
+            markers["sort_by_id"] = True
+            self.content = self.content.replace("--sort-by-id", "")
+
+        if "--sort" in self.content:
+            markers["sort"] = True
+            self.content = self.content.replace("--sort", "")
 
         return markers
 
@@ -1234,11 +1262,20 @@ class Question(SurveyElements):
         """Generate Dimension metadata"""
 
         options = self.special_markers()
+        #print(options)
         defined_list = options.get("use")
         create_list = options.get("list")
         minchoose = options.get("minchoose")
         maxchoose = options.get("maxchoose")
         images = options.get("images")
+        sort_ = options.get("sort")
+        sort_by_id = options.get("sort_by_id")
+
+        if sort_ and self.cafeteria:
+            self.cafeteria = sorted(self.cafeteria, key=lambda x: x.content)
+
+        if sort_by_id and self.cafeteria:
+            self.cafeteria = sorted(self.cafeteria, key=lambda x: x.id)
         if not minchoose:
             minchoose = "1"
 
@@ -1251,13 +1288,17 @@ class Question(SurveyElements):
         use = None
 
         self.kwargs = {}
+        if options.get("int-implicite", False):
+            self.kwargs["int-implicite"] = True
+
         if images:
             self.kwargs['images'] = images
 
         self.kwargs['leadzero'] = options.get('leadzero', 0)
 
         if self.typ == "DEF":
-
+            if options.get("big-letters", False):
+                self.kwargs["big-letters"] = True
             caf = self.caf_to_dim(2, use, **self.kwargs)
 
             self.dim_out += """
@@ -1278,13 +1319,12 @@ class Question(SurveyElements):
 
             self.dim_out += '\n    ' + self.id + ' "{0}"'.format(self.content)
 
-
             self.dim_out += """
     Categorical [{1}..{2}]
     {{
 {0}
     }};
-""".format(self.caf_to_dim(2, use), minchoose, maxchoose)
+""".format(self.caf_to_dim(2, use,  **self.kwargs), minchoose, maxchoose)
 
         elif self.typ == "L":
             self.dim_out += "    " + self.id + ' "' + self.content + '" info;\n\n'
@@ -1685,11 +1725,6 @@ class ControlOpen(Control):
     'style(
     '    Width = "3em";
     ')
-    'codes(
-    '{
-    '    - "Nie wiem" DK,
-    '    - "Te leki nie są dostępne na receptę" NA
-    '}
     text;
 '''
 
@@ -1841,11 +1876,6 @@ class ControlNumber(Control):
     'style(
     '    Width = "3em";
     ')
-    'codes(
-    '{
-    '    - "Nie wiem" DK,
-    '    - "Te leki nie są dostępne na receptę" NA
-    '}
     long;
 '''
 

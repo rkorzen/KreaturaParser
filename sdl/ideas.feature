@@ -144,3 +144,8 @@ Feature: [dim] tworzenie list na podstawie pytania single
       {
         MARKI use \\.MARKI -
       };
+
+
+
+Feature: Sortowanie kafeterii.
+  Scenario: Add --sort | --sort-desc flags in output

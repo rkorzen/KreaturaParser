@@ -685,6 +685,25 @@ class TestToDim(KreaturaTestCase):
 '''
         self.assertTxtEqual(got, want)
 
+    def test_def_big_letter(self):
+        input_= """Q DEF COS CIS --big-letters
+cos 1
+cos 2
+"""
+        want = """
+    COS - define
+    {
+        _A "cos 1",
+        _B "cos 2"
+
+    };
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        got = survey.dim_out
+
+        self.assertTxtEqual(got, want)
+
 
 class TestToWeb(KreaturaTestCase):
 
@@ -790,11 +809,11 @@ class TestQuestionSpecialMarkers(KreaturaTestCase):
     Q1 "COS "
     Categorical [4..]
     {
-        x1 "a",
-        x2 "b",
-        x3 "c",
-        x4 "d",
-        x5 "e"
+        _1 "a",
+        _2 "b",
+        _3 "c",
+        _4 "d",
+        _5 "e"
 
     };
 """
@@ -808,11 +827,11 @@ class TestQuestionSpecialMarkers(KreaturaTestCase):
     Q1 "COS "
     Categorical [1..4]
     {
-        x1 "a",
-        x2 "b",
-        x3 "c",
-        x4 "d",
-        x5 "e"
+        _1 "a",
+        _2 "b",
+        _3 "c",
+        _4 "d",
+        _5 "e"
 
     };
 """
@@ -835,6 +854,192 @@ class TestQuestionSpecialMarkers(KreaturaTestCase):
         options = question.special_markers()
         self.assertEquals(options["images"][0], "path")
 
+    def test_sort_list(self):
+        input_ = """Q DEF Brand Brand --sort
+C
+D
+A
+"""
+        kp = parse(input_)
+        kp.to_dim()
+
+        expected = """
+    Brand - define
+    {
+        _3 "A",
+        _1 "C",
+        _2 "D"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, kp.dim_out)
+
+    def test_sort_single(self):
+        input_ = """Q S Brand Brand --sort
+C
+D
+A
+"""
+        kp = parse(input_)
+        kp.to_dim()
+
+        expected = """
+    Brand "Brand "
+    Categorical [1..1]
+    {
+        _3 "A",
+        _1 "C",
+        _2 "D"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, kp.dim_out)
+
+    def test_sort_multi(self):
+        input_ = """Q M Brand Brand --sort
+C
+D
+A
+"""
+        kp = parse(input_)
+        kp.to_dim()
+
+        expected = """
+    Brand "Brand "
+    Categorical [1..]
+    {
+        _3 "A",
+        _1 "C",
+        _2 "D"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, kp.dim_out)
+
+    def test_sort_create_list(self):
+        input_ = """Q M Brand Brand --sort--list:Brands
+C
+D
+A
+"""
+        kp = parse(input_)
+        kp.to_dim()
+
+        expected = """
+    Brands - define
+    {
+        _3 "A",
+        _1 "C",
+        _2 "D"
+
+    };
+
+    Brand "Brand "
+    Categorical [1..]
+    {
+        use Brands -
+    };
+"""
+
+        self.assertTxtEqual(expected, kp.dim_out)
+
+    def test_sort_by_id_list(self):
+        input_ = """Q DEF Brand Brand --sort-by-id
+2 C
+3 D
+1 A
+"""
+        kp = parse(input_)
+        kp.to_dim()
+
+        expected = """
+    Brand - define
+    {
+        _1 "A",
+        _2 "C",
+        _3 "D"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, kp.dim_out)
+
+    def test_sort_by_id_single(self):
+        input_ = """Q S Brand Brand --sort-by-id
+2 C
+3 D
+1 A
+"""
+        kp = parse(input_)
+        kp.to_dim()
+
+        expected = """
+    Brand "Brand "
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "C",
+        _3 "D"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, kp.dim_out)
+
+    def test_sort_by_id_multi(self):
+        input_ = """Q M Brand Brand --sort-by-id
+2 C
+3 D
+1 A
+"""
+        kp = parse(input_)
+        kp.to_dim()
+
+        expected = """
+    Brand "Brand "
+    Categorical [1..]
+    {
+        _1 "A",
+        _2 "C",
+        _3 "D"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, kp.dim_out)
+
+    def test_sort_by_id_create_list(self):
+        input_ = """Q M Brand Brand --sort-by-id--list:Brands
+2 C
+3 D
+1 A
+"""
+        kp = parse(input_)
+        kp.to_dim()
+
+        expected = """
+    Brands - define
+    {
+        _1 "A",
+        _2 "C",
+        _3 "D"
+
+    };
+
+    Brand "Brand "
+    Categorical [1..]
+    {
+        use Brands -
+    };
+"""
+
+        self.assertTxtEqual(expected, kp.dim_out)
+
+
+
 
 class TestQuestionDef(KreaturaTestCase):
     def test_define_list(self):
@@ -848,13 +1053,32 @@ c
         expected = """
     Q1 - define
     {
-        x1 "a",
-        x2 "b",
-        x3 "c"
+        _1 "a",
+        _2 "b",
+        _3 "c"
 
     };
 """
         self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_define_list_custom_index(self):
+            input_ = """Q DEF Q1 COS
+2    a
+5    b
+7    c
+"""
+            survey = parse(input_)
+            survey.to_dim()
+            expected = """
+        Q1 - define
+        {
+            _2 "a",
+            _5 "b",
+            _7 "c"
+
+        };
+    """
+            self.assertTxtEqual(expected, survey.dim_out)
 
     def test_define_list_images(self):
         input_ = """Q DEF Q1 COS --images
@@ -867,17 +1091,17 @@ c
         expected = r"""
     Q1 - define
     {
-        x1 "a"
+        _1 "a"
             labelstyle(
                 Image = "images\1.jpg",
                 ImagePosition = "ImageOnly"
             ),
-        x2 "b"
+        _2 "b"
             labelstyle(
                 Image = "images\2.jpg",
                 ImagePosition = "ImageOnly"
             ),
-        x3 "c"
+        _3 "c"
             labelstyle(
                 Image = "images\3.jpg",
                 ImagePosition = "ImageOnly"
@@ -898,17 +1122,17 @@ c
         expected = r"""
     Q1 - define
     {
-        x1 "a"
+        _1 "a"
             labelstyle(
                 Image = "images\path\to\image\1.jpg",
                 ImagePosition = "ImageOnly"
             ),
-        x2 "b"
+        _2 "b"
             labelstyle(
                 Image = "images\path\to\image\2.jpg",
                 ImagePosition = "ImageOnly"
             ),
-        x3 "c"
+        _3 "c"
             labelstyle(
                 Image = "images\path\to\image\3.jpg",
                 ImagePosition = "ImageOnly"
