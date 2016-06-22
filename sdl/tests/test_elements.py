@@ -244,8 +244,8 @@ class TestToDim(KreaturaTestCase):
     Q1 "Czy może {#Pan}  powiedzieć, o co {#Panu} chodzi"
     Categorical [1..1]
     {
-        x1 "chętn{#y}",
-        x2 "niechętn{#y}"
+        _1 "chętn{#y}",
+        _2 "niechętn{#y}"
 
     };
 '''
@@ -279,12 +279,12 @@ class TestToDim(KreaturaTestCase):
     Q1 "COS"
     Categorical [1..1]
     {
-        x1 "A"
+        _1 "A"
             labelstyle(
                 Image = "images\1.jpg",
                 ImagePosition = "ImageOnly"
             ),
-        x2 "B"
+        _2 "B"
             labelstyle(
                 Image = "images\c\2.jpg",
                 ImagePosition = "ImageOnly"
@@ -306,9 +306,9 @@ class TestToDim(KreaturaTestCase):
         expected = """
     MARKI - define
     {
-        x1 "A",
-        x2 "B",
-        x3 "C"
+        _1 "A",
+        _2 "B",
+        _3 "C"
 
     };
 
@@ -348,8 +348,8 @@ class TestToDim(KreaturaTestCase):
         expected = '''
     MARKI - define
     {
-        x1 "a",
-        x2 "b"
+        _1 "a",
+        _2 "b"
 
     };
 
@@ -672,14 +672,14 @@ class TestToDim(KreaturaTestCase):
     Q4 "W jakiej wielkości miejscowości mieszkasz?"
     Categorical [1..]
     {
-        x1 "wieś",
-        x2 "miasto do 20 tys. mieszkańców",
-        x3 "miasto 20.000-49.999 mieszkańców",
-        x4 "miasto 50.000-99.999 mieszkańców",
-        x5 "miasto 100.000-199.999 mieszkańców",
-        x6 "miasto 200.000-499.999 mieszkańców",
-        x7 "miasto 500.000 mieszkańców lub większe",
-        x8 "nie wiem/ trudno powiedzieć"
+        _1 "wieś",
+        _2 "miasto do 20 tys. mieszkańców",
+        _3 "miasto 20.000-49.999 mieszkańców",
+        _4 "miasto 50.000-99.999 mieszkańców",
+        _5 "miasto 100.000-199.999 mieszkańców",
+        _6 "miasto 200.000-499.999 mieszkańców",
+        _7 "miasto 500.000 mieszkańców lub większe",
+        _8 "nie wiem/ trudno powiedzieć"
 
     };
 '''
@@ -1070,14 +1070,14 @@ c
             survey = parse(input_)
             survey.to_dim()
             expected = """
-        Q1 - define
-        {
-            _2 "a",
-            _5 "b",
-            _7 "c"
+    Q1 - define
+    {
+        _2 "a",
+        _5 "b",
+        _7 "c"
 
-        };
-    """
+    };
+"""
             self.assertTxtEqual(expected, survey.dim_out)
 
     def test_define_list_images(self):
