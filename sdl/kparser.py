@@ -2,7 +2,7 @@
 import re
 from sdl.parsers import block_parser, page_parser, question_parser, cafeteria_parser, program_parser, Patterns
 from sdl.elements import Question, Survey, Page, Block
-from sdl.tools import find_parent, clean_line
+from sdl.tools import find_parent, clean_line, find_by_id
 
 """
 Author: Rafał Korzeniewski
@@ -221,7 +221,7 @@ def parse(text_input):
                 survey.append(current_block)
 
             if current_page.parent_id:
-                block = find_parent(survey.childs, current_page.parent_id)
+                block = find_by_id(survey, current_page.parent_id)
                 block.childs.append(current_page)
             else:
                 current_block.childs.append(current_page)

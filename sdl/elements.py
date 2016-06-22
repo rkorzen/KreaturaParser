@@ -7,7 +7,7 @@ from string import ascii_uppercase
 
 from lxml import etree
 from sdl.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
-from sdl.tools import find_parent, filter_parser, make_caf_to_dim, unix_time, unix_creation_time
+from sdl.tools import find_parent, filter_parser, make_caf_to_dim, unix_time, unix_creation_time, find_by_id
 from sdl.spss import baskets_syntax
 
 
@@ -106,7 +106,7 @@ class Survey:
     def __init__(self):
         self.warnings = []
         self.childs = []
-        self.id = False   # just for a case... and for find_by_id function
+        self.id = ""   # just for a case... and for find_by_id function
         self.createtime = unix_creation_time(datetime.datetime.now())
         self.xml = False
         self.dim_out = ""
@@ -117,6 +117,9 @@ class Survey:
     def __eq__(self, other):
         return self.childs == other.childs and self.id == other.id
 
+    def __repr__(self):
+        return "survey: " + self.id
+
     def append(self, block):
         """Add child to self.childs list"""
         self.childs.append(block)
@@ -126,7 +129,8 @@ class Survey:
         Add child to his parent. Parent is nested somewhere in survey childs
         If there is not element with parent_id Exception is thrown.
         """
-        parent = find_parent(self.childs, block.parent_id)
+        #parent_id = find_parent(self, block.parent_id)
+        parent = find_by_id(self, block.parent_id)
         if parent:
             parent.childs.append(block)
         else:
@@ -188,6 +192,10 @@ class Block(SurveyElements):
         SurveyElements.__init__(self, id_)
         self.quoted = False
 
+    def __repr__(self):
+        return "Block: " + self.id
+
+
     def to_xml(self):
         """xml representation of Block element"""
         self.xml = etree.Element('block')
@@ -224,6 +232,12 @@ class Page(SurveyElements):
         SurveyElements.__init__(self, id_)
         self.hideBackButton = False
         # self.postcode = ""
+
+    def __str__(self):
+        return self.id
+
+    def __repr__(self):
+        return "Page " + self.id
 
     def to_xml(self):
         """xml representation of Page element"""
@@ -287,6 +301,9 @@ class Page(SurveyElements):
 class Question(SurveyElements):
     """Question"""
 
+    def __repr__(self):
+        return "question: {} {} ".format(self.id, self.typ)
+
     def caf_to_dim(self, tabs=0, use=False, **kwargs) :
         """:returns string
         :param cafeteria: cafeteria or statements list
@@ -298,6 +315,8 @@ class Question(SurveyElements):
         leadzero = kwargs.get('leadzero', 0)
         big_letters = kwargs.get("big-letters", False)
         int_implicite = kwargs.get("int-implicite", False)
+        raw_id = kwargs.get("raw-id", False)
+        first_id = kwargs.get("first-id", False)
         #print(kwargs)
         if use:
             out = "        use {} -".format(use)
@@ -306,35 +325,73 @@ class Question(SurveyElements):
             out = ""
             ile = len(cafeteria)
             for caf in cafeteria:
-
+                ref, na, dk = False, False, False
                 if leadzero:
                     caf.id = "0"*(leadzero - len(caf.id)) + caf.id
                 elif big_letters:
+                    prov_letter = ""
                     caf.id = ascii_uppercase[int(caf.id)-1]
                 elif int_implicite:
                     #print(caf.content)
                     caf.content = caf.id + " " + caf.content
                     #print(caf.content)
                     caf.id = str(cafeteria.index(caf) + 1)
+                elif raw_id:
+                    prov_letter = ""
+                    caf.id = re.sub("\s", "_", caf.content)
+
+                elif first_id:
+                    prov_letter = ""
+                    caf.id = caf.content.strip().split()[0]
+                    caf.content = caf.content.replace(caf.id, "", 1).strip()
+
                 if '--i' in caf.content:
                     caf.content = caf.content.replace('--i', "")
                     caf.content = '<i>' + caf.content.strip() + '</i>'
 
                 if '--b' in caf.content:
                     caf.content = caf.content.replace('--b', "")
-                    caf.content = '<b>' + caf.content + '</b>'
+                    caf.content = '<b>' + caf.content.strip() + '</b>'
 
                 if '|' in caf.content:
                     caf.content = caf.content.split('|')
                     caf.img = caf.content[1]
                     caf.content = caf.content[0]
 
+                if '--@' in caf.content:
+                    caf.content = caf.content.replace("--@", "").strip()
+                    caf.id = caf.id + "@"
+
+                if "--fix" in caf.content:
+                    caf.fixposition = True
+                    caf.content = caf.content.replace("--fix", "").strip()
+
+                if "--ref"  in caf.content:
+                    caf.content = caf.content.replace("--ref", "").strip()
+                    ref = True
+
+                if "--na" in caf.content:
+                    caf.content = caf.content.replace("--na", "").strip()
+                    na = True
+
+                if "--dk" in caf.content:
+                    caf.content = caf.content.replace("--dk", "").strip()
+                    dk = True
+
+
                 if "--use:" in caf.content:
                     list_ = caf.content.split('--use:')[1]
                     out += "    " * tabs + r"use {} -".format(list_)
 
-                elif caf.deactivate:
+                elif caf.deactivate or dk:
                     out += '    ' * tabs + '- "{}" DK'.format(caf.content)
+
+                elif ref:
+                    out += '    ' * tabs + '- "{}" REF'.format(caf.content)
+
+                elif na:
+                    out += '    ' * tabs + '- "{}" NA'.format(caf.content)
+
 
                 elif caf.fixposition:
                     out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '" fix'
@@ -372,7 +429,7 @@ class Question(SurveyElements):
 
         return out
 
-    def statements_to_dim(self, tabs=0, use=None, prov_letter='x'):
+    def statements_to_dim(self, tabs=0, use=None, prov_letter='_'):
         """:returns string
         :param cafeteria: cafeteria or statements list
         :param tabs: level of indent
@@ -423,6 +480,21 @@ class Question(SurveyElements):
                     out += ",\n"
 
         return out
+
+    def meta_info(self):
+
+        if self.typ == "B":
+
+            metainfo = """
+    [
+        flametatype = "mbdragndrop"
+        , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+        , rowBtnType = "Image"
+        , dropType = "buckets"
+        ' Optional settings:
+        ', rowBtnUseZoom = True     ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+    ]
+"""
 
     def special_markers(self):
         """Find special markers in content
@@ -587,6 +659,16 @@ class Question(SurveyElements):
         if "--sort" in self.content:
             markers["sort"] = True
             self.content = self.content.replace("--sort", "")
+
+        if "--raw-id" in self.content:
+            markers['raw-id'] = True
+            self.content = self.content.replace("--raw-id", "")
+
+        if "--first-id" in self.content:
+            markers['first-id'] = True
+            self.content = self.content.replace("--first-id", "")
+
+
 
         return markers
 
@@ -1276,6 +1358,7 @@ class Question(SurveyElements):
 
         if sort_by_id and self.cafeteria:
             self.cafeteria = sorted(self.cafeteria, key=lambda x: x.id)
+
         if not minchoose:
             minchoose = "1"
 
@@ -1287,10 +1370,10 @@ class Question(SurveyElements):
 
         use = None
 
-        self.kwargs = {}
-        if options.get("int-implicite", False):
-            self.kwargs["int-implicite"] = True
-
+        self.kwargs = options
+        # if options.get("int-implicite", False):
+        #     self.kwargs["int-implicite"] = True
+        #
         if images:
             self.kwargs['images'] = images
 
@@ -1308,7 +1391,6 @@ class Question(SurveyElements):
     }};
 """.format(self.id, caf)
 
-
         elif self.typ in ["S", "M"]:
             if create_list:
                 self.dim_out += self.dim_create_list(create_list)
@@ -1318,6 +1400,14 @@ class Question(SurveyElements):
                 use = defined_list
 
             self.dim_out += '\n    ' + self.id + ' "{0}"'.format(self.content)
+
+            if images:
+                self.dim_out += """
+        [
+            flametatype = "mbclickableimages"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+
+        ]"""
 
             self.dim_out += """
     Categorical [{1}..{2}]
@@ -1357,8 +1447,6 @@ class Question(SurveyElements):
                           'stw': make_caf_to_dim(self.statements, 2),
                           'caf': make_caf_to_dim(self.cafeteria, 3)
                           })
-
-
             else:
                 out = """
     {id} "{content}"
@@ -1447,7 +1535,7 @@ class Question(SurveyElements):
             numeric.to_dim()
             self.dim_out += numeric.dim_out
 
-        elif self.typ in ["B", "SDG"]:
+        elif self.typ in ["B", "SDG", "LHS"]:
             if self.random:
                 ran = "ran"
             elif self.rotation:
@@ -1457,6 +1545,7 @@ class Question(SurveyElements):
 
             if images:
                 row_btn_type = "Images"
+                rowBtnUseZoom = "\n            ' rowBtnUseZoom = True,             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen."
             else:
                 row_btn_type = "Text"
 
@@ -1466,17 +1555,18 @@ class Question(SurveyElements):
             flametatype = "mbdragndrop",
             toolPath = "[%ImageCacheBase%]/images/mbtools/",
             rowBtnType = "{rowBtnType}",
+            ' rowBtnUseZoom = True,              ' zoom icon if True {rowBtnUseZoom}
             dropType = "buckets"
         ]
     loop
     {{
-{caf}
+{stw}
     }} {ran} fields -
     (
         slice ""
         categorical [{minchoose}..{maxchoose}]
         {{
-{stw}
+{caf}
         }};
     ) expand grid;
 """.format(**{'id': self.id,
@@ -1486,7 +1576,8 @@ class Question(SurveyElements):
               'minchoose': minchoose,
               'maxchoose': maxchoose,
               'ran': ran,
-              'rowBtnType': row_btn_type
+              'rowBtnType': row_btn_type,
+              'rowBtnUseZoom': rowBtnUseZoom
               })
 
             self.dim_out += out

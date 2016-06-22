@@ -20,12 +20,13 @@ Survey Parser
 <!-- MarkdownTOC autolink=true autoanchor=true bracket=round depth=5 -->
 
 - [Base Concepts](#base-concepts)
-	- [Why WebApp?](#why-webapp)
+    - [Why WebApp?](#why-webapp)
 - [Case study.](#case-study)
 - [Pressuppositons:](#pressuppositons)
 - [IBM Base Proffesional examples](#ibm-base-proffesional-examples)
-	- [Basic question types and definitions](#basic-question-types-and-definitions)
-		- [Simple list definition](#simple-list-definition)
+    - [Basic question types and definitions](#basic-question-types-and-definitions)
+        - [Simple list definition](#simple-list-definition)
+        - [Cafeteria id](#cafeteria-id)
 
 <!-- /MarkdownTOC -->
 
@@ -385,20 +386,20 @@ Explicite
 
 input:
 
-	Q DEF Brands Brands
+	Q DEF Brands Smth
 	2	a
 	5	b
 	7	c	
 
-double "Brands" it's artefact. It's possible to fix this in future iterations.
+"Smth" it's artefact. It's possible to fix this in future iterations.
 
 metadata output:
 
     Brands - define
     {
-        _1 "a",
-        _2 "b",
-        _3 "c"
+        _2 "a",
+        _5 "b",
+        _7 "c"
 
     };
 
@@ -406,3 +407,175 @@ routing output:
 	
 	None
 
+<a name="cafeteria-id"></a>
+### Cafeteria id
+There are several ways to automate cafeteria id's.
+
+By default we expect that cafeteria has a numeric id, or no id.
+
+numeric row is build like this:
+
+    1   2         3        4  
+    (id)(.d|.c)[ ]Content[](special markers) 
+
+Groups in brackets are not obligatory
+    
+    1 - explicite id - natural numbers
+    2 - .d - deactivate
+        .c - comment (others)
+    [ ] - white space: spaces, tabs
+    3 - content 
+    4 - special markers:
+        --so = screen out (add screenout to routing)
+        --fix
+#### Examples
+
+##### Basic usage:
+input:
+
+    Q S Q1 Content
+    1 A
+    2 B
+    3 C
+
+output:
+
+    Q1 "Content"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    };
+
+
+input:
+
+    Q S Q1 Content
+    A
+    B
+    C
+
+output:
+
+    Q1 "Content"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    };
+
+##### do it alphabetically - with big letters
+
+We can force big letters instead of numbers:
+
+input:
+
+    Q DEF LIST smth --big-letters
+    el 1
+    el 2
+
+output:
+
+    LIST - define
+    {
+        A "el 1",
+        B "el 2"
+
+    };
+
+TODO: Exceeding the length of the alphabet. AA AB AC etc etc... Also Warning?
+
+##### `--raw-id`
+
+Other way is with `--raw-id`. Id is based on content. Replace white space with _ and strip.
+
+input:
+
+    Q M Q1 COS --raw-id
+    Mark 1
+    Mark 2
+    Mark 3
+
+output:
+
+    Q1 "COS "
+    Categorical [1..]
+    {
+        Mark_1 "Mark 1",
+        Mark_2 "Mark 2",
+        Mark_3 "Mark 3"
+
+    };
+
+##### `--first-id`
+
+For now the last method is `--first-id`. This means - first word treat like id.
+
+input:
+
+    Q M Q1 COS --first-id
+    Argh Mark 1
+    C Mark 2
+    F Mark 3
+
+output:
+
+    Q1 "COS "
+    Categorical [1..]
+    {
+        Argh "Mark 1",
+        C "Mark 2",
+        F "Mark 3"
+
+    };
+
+
+##### Easy add bold and italic
+
+input:
+    
+    Q S Q1 Smth
+    A --i
+    B --b
+    C
+
+output:
+
+    Q1 "Smth"
+    Categorical [1..1]
+    {
+        _1 "<i>A</i>",
+        _2 "<b>B</b>",
+        _3 "C"
+
+    };
+
+
+##### REF NA DK
+
+input:
+    
+    Q S Q1 Smth
+    A --ref
+    B --na
+    C --dk
+
+output:
+
+    Q1 "Smth"
+    Categorical [1..1]
+    {
+        - "A" REF,
+        - "B" NA,
+        - "C" DK
+
+    };
+
+
+
+#### Summary:
+Cafeteria can 

@@ -38,6 +38,23 @@ def find_parent(blocks, parent_id):
             if b:
                 return b
 
+def find_parent(container, el_id):
+    """Szuka bloku o zadanym parent_id"""
+    print(container)
+    if container.childs:
+        childs_id = [c.id for c in container.childs]
+        #print(childs_id)
+        if el_id in childs_id:
+            #print("Found ", el_id, " in ", container.childs)
+            return container.id
+        else:
+            for c in container.childs:
+                x = find_parent(c, el_id)
+                if x is not None:
+                    return x
+    else:
+        #print(container.id, "has no childs")
+        pass
 
 def find_by_id(parent, child_id):
     """
@@ -249,7 +266,9 @@ def print_tree(survey):
     for blok in bloki:
         element_tree(blok)
 
-    return '\n'.join(out)
+    out = '\n'.join(out)
+    print(out)
+    return out
 
 
 def make_caf_to_dim(cafeteria, tabs=0, prov_letter = 'x'):

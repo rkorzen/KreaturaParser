@@ -83,8 +83,18 @@ kwargs = {}
 
 class TestFindParrent(KreaturaTestCase):
     def test_find_parrent(self):
-        self.fail()
+        input_ = """B B0
+B B2
+P P2
 
+P P1
+Q S Q1 A
+
+B B3
+"""
+        survey = parse(input_)
+        self.assertEquals("P1", find_parent(survey, "Q1"))
+        self.assertEquals("B2", find_parent(survey, "P2"))
 
 class TestFindById(KreaturaTestCase):
     def test_find_by_id(self):
@@ -96,9 +106,7 @@ P P1
 Q S Q1 A
 
 """
-
         survey = parse(input_)
-
         qr = find_by_id(survey, 'Q1')
 
         self.assertEqual(qr.id, "Q1")

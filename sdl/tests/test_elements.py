@@ -1,6 +1,6 @@
 # from unittest import TestCase
 from lxml import etree
-from sdl.tools import KreaturaTestCase, find_by_id, make_caf_to_dim
+from sdl.tools import KreaturaTestCase, find_by_id, make_caf_to_dim, print_tree
 from sdl.kparser import parse
 from sdl.elements import Survey, Block, Page, Question, Control, ScriptsCalls, Row, Cell
 from sdl.elements import ControlLayout, ControlOpen, ControlSingle,ControlMulti, Cafeteria, ControlNumber, ControlTable
@@ -35,6 +35,9 @@ class TestSurvey(KreaturaTestCase):
         e_b1.childs.append(e_b2)
         e_b2.childs.append(e_b3)
 
+        print(surv.childs[0].childs, e_surv.childs[0].childs)
+        print_tree(surv)
+        print_tree(e_surv)
         self.assertEqual(surv, e_surv)
 
     def test_survey_attributes(self):
@@ -187,6 +190,7 @@ class TestQuestion(KreaturaTestCase):
 
 
 class TestToDim(KreaturaTestCase):
+
     # region block tests
     def test_grid_with_categories_loop(self):
         text_input = """Q G Q1 COS
@@ -231,6 +235,262 @@ class TestToDim(KreaturaTestCase):
 
         self.assertTxtEqual(expected, result)
 
+    def test_categorical_single(self):
+        input_ = """Q S Q1 Content
+1 A
+2 B
+3 C
+"""
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = r"""
+    Q1 "Content"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_categorical_single(self):
+        input_ = """Q S Q1 COS
+        A
+        B
+        C
+        """
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = r"""
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_cafeteria_with_fix(self):
+        input_ = """Q S Q1 Smth
+A
+B --fix
+C
+"""
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = """
+    Q1 "Smth"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B" fix,
+        _3 "C"
+
+    };
+"""
+
+        self.assertTxtEqual(survey.dim_out, expected)
+
+    def test_bold_italic(self):
+        input_ = """Q S Q1 Smth
+        A --i
+        B --b
+        C
+        """
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = """
+    Q1 "Smth"
+    Categorical [1..1]
+    {
+        _1 "<i>A</i>",
+        _2 "<b>B</b>",
+        _3 "C"
+
+    };
+"""
+
+        self.assertTxtEqual(survey.dim_out, expected)
+
+    def test_ref_na_dk(self):
+        input_ = """Q S Q1 Smth
+        A --ref
+        B --na
+        C --dk
+        """
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = """
+    Q1 "Smth"
+    Categorical [1..1]
+    {
+        - "A" REF,
+        - "B" NA,
+        - "C" DK
+
+    };
+"""
+
+        self.assertTxtEqual(survey.dim_out, expected)
+
+
+    def test_def_big_letter(self):
+        input_ = """Q DEF LIST smth --big-letters
+cos 1
+cos 2
+"""
+        want = """
+    LIST - define
+    {
+        A "cos 1",
+        B "cos 2"
+
+    };
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        got = survey.dim_out
+
+        self.assertTxtEqual(got, want)
+
+    def test_categorical_multi(self):
+        input_ = """Q M Q1 COS
+        A
+        B
+        C
+        """
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = r"""
+    Q1 "COS"
+    Categorical [1..]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_categorical_raw_id(self):
+        input_ = """Q M Q1 COS --raw-id
+        Mark 1
+        Mark 2
+        Mark 3
+        """
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = r"""
+    Q1 "COS "
+    Categorical [1..]
+    {
+        Mark_1 "Mark 1",
+        Mark_2 "Mark 2",
+        Mark_3 "Mark 3"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_categorical_first_id(self):
+        input_ = """Q S Q1 COS --first-id
+        Argh Mark 1
+        C Mark 2
+        F Mark 3
+        """
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = r"""
+    Q1 "COS "
+    Categorical [1..1]
+    {
+        Argh "Mark 1",
+        C "Mark 2",
+        F "Mark 3"
+
+    };
+"""
+
+        self.assertTxtEqual(survey.dim_out, expected)
+
+    def test_def_raw_id(self):
+        input_ = """Q DEF Q1 COS --raw-id
+        A
+        B
+        C
+        """
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = r"""
+    Q1 - define
+    {
+        A "A",
+        B "B",
+        C "C"
+
+    };
+"""
+
+        self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_clicableimages(self):
+        input_ = """Q S Q1 COS --images:operators
+A
+B
+C
+"""
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = r"""
+    Q1 "COS "
+        [
+            flametatype = "mbclickableimages"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+
+        ]
+    Categorical [1..1]
+    {
+        _1 "A"
+            labelstyle(
+                Image = "images\operators\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        _2 "B"
+            labelstyle(
+                Image = "images\operators\2.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        _3 "C"
+            labelstyle(
+                Image = "images\operators\3.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+"""
+
+        self.assertTxtEqual(expected, survey.dim_out)
+
     def test_wersjonowanie(self):
         text_input = """Q S Q1 Czy może Pan(i)  powiedzieć, o co Panu(i) chodzi
     1 chętny/a
@@ -244,8 +504,8 @@ class TestToDim(KreaturaTestCase):
     Q1 "Czy może {#Pan}  powiedzieć, o co {#Panu} chodzi"
     Categorical [1..1]
     {
-        x1 "chętn{#y}",
-        x2 "niechętn{#y}"
+        _1 "chętn{#y}",
+        _2 "niechętn{#y}"
 
     };
 '''
@@ -263,8 +523,8 @@ class TestToDim(KreaturaTestCase):
     Q1 "COS"
     Categorical [1..1]
     {
-        x1 "<i>odp a</i>",
-        x2 "odp b"
+        _1 "<i>odp a</i>",
+        _2 "odp b"
 
     };
 """
@@ -279,12 +539,12 @@ class TestToDim(KreaturaTestCase):
     Q1 "COS"
     Categorical [1..1]
     {
-        x1 "A"
+        _1 "A"
             labelstyle(
                 Image = "images\1.jpg",
                 ImagePosition = "ImageOnly"
             ),
-        x2 "B"
+        _2 "B"
             labelstyle(
                 Image = "images\c\2.jpg",
                 ImagePosition = "ImageOnly"
@@ -306,9 +566,9 @@ class TestToDim(KreaturaTestCase):
         expected = """
     MARKI - define
     {
-        x1 "A",
-        x2 "B",
-        x3 "C"
+        _1 "A",
+        _2 "B",
+        _3 "C"
 
     };
 
@@ -343,13 +603,12 @@ class TestToDim(KreaturaTestCase):
     def test_dim_create_list(self):
         input_ = "Q S Q1 COS --list:MARKI\na\nb"
         survey = parse(input_)
-        #question = find_by_id(survey, 'Q1')
         survey.to_dim()
         expected = '''
     MARKI - define
     {
-        x1 "a",
-        x2 "b"
+        _1 "a",
+        _2 "b"
 
     };
 
@@ -399,7 +658,7 @@ class TestToDim(KreaturaTestCase):
 
         self.assertTxtEqual(result, expected)
 
-    def test_DnD_buckets_with_image_buttons(self):
+    def test_B_buckets_with_image_buttons(self):
         input_ = r"""Q B dndBucketsImage How familiar you are with each og these brands?<br/>--images
     --use:BE2A_ans_dl
     _
@@ -414,6 +673,7 @@ class TestToDim(KreaturaTestCase):
             flametatype = "mbdragndrop",
             toolPath = "[%ImageCacheBase%]/images/mbtools/",
             rowBtnType = "Images",
+            ' rowBtnUseZoom = True,              ' zoom icon if True
             dropType = "buckets"
         ]
     loop
@@ -433,8 +693,8 @@ class TestToDim(KreaturaTestCase):
 
         self.assertTxtEqual(result, expected)
 
-    def test_DnD_buckets_with_text_buttons(self):
-        input_ = r"""Q B dndBucketsImage How familiar you are with each og these brands?<br/>
+    def test_B_buckets_with_text_buttons(self):
+        input_ = r"""Q B dndBucketsText How familiar you are with each og these brands?<br/>
     --use:BE2A_ans_dl
     _
     --use:BRANDS
@@ -443,11 +703,12 @@ class TestToDim(KreaturaTestCase):
         survey.to_dim()
         result = survey.dim_out
         expected = """
-    dndBucketsImage "How familiar you are with each og these brands?<br/>"
+    dndBucketsTexy "How familiar you are with each og these brands?<br/>"
         [
             flametatype = "mbdragndrop",
             toolPath = "[%ImageCacheBase%]/images/mbtools/",
             rowBtnType = "Text",
+            ' rowBtnWidth = 200,                 ' width should be any integer > 10
             dropType = "buckets"
         ]
     loop
@@ -467,22 +728,22 @@ class TestToDim(KreaturaTestCase):
 
         self.assertTxtEqual(result, expected)
 
-    def test_DnD_scale_with_image_buttons(self):
+    def test_LHS_scale_with_image_buttons(self):
         input_ = r"""Q LHS dndBucketsImage How familiar you are with each og these brands?<br/>--images
-    --use:BRANDS
-    _
-    -5 Hate it
-    -4
-    -3
-    -2
-    -1
-    0 Neutral
-    1
-    2
-    3
-    4
-    5 Love it
-    """
+-5 Hate it
+-4
+-3
+-2
+-1
+0 Neutral
+1
+2
+3
+4
+5 Love it
+_
+--use:BRANDS
+"""
         survey = parse(input_)
         survey.to_dim()
         result = survey.dim_out
@@ -492,7 +753,8 @@ class TestToDim(KreaturaTestCase):
             flametatype = "mbdragndrop",
             toolPath = "[%ImageCacheBase%]/images/mbtools/",
             rowBtnType = "Image",
-            colImgType = "LoveHate",
+            colImgType = "LoveHate",            ' RedBlack, Grey
+            ' rowBtnUseZoom = True,             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
             dropType = "scale"
         ]
     loop
@@ -504,17 +766,17 @@ class TestToDim(KreaturaTestCase):
         slice ""
         categorical [1..]
         {
-            x1 "-5 Hate it",
-            x2 "-4",
-            x3 "-3",
-            x4 "-2",
-            x5 "-1",
-            x6 "0 Neutral",
-            x7 "1",
-            x8 "2",
-            x9 "3",
-            x10 "4",
-            x11 "5 Love it"
+            _1 "-5 Hate it",
+            _2 "-4",
+            _3 "-3",
+            _4 "-2",
+            _5 "-1",
+            _6 "0 Neutral",
+            _7 "1",
+            _8 "2",
+            _9 "3",
+            _10 "4",
+            _11 "5 Love it"
 
         };
     ) expand grid;
@@ -522,22 +784,22 @@ class TestToDim(KreaturaTestCase):
 
         self.assertTxtEqual(result, expected)
 
-    def test_DnD_scale_with_text_buttons(self):
+    def test_LHS_scale_with_text_buttons(self):
         input_ = r"""Q LHS dndLoveHateScaleImage How familiar you are with each og these brands?<br/>
-            --use:BRANDS
-            _
-            -5 Hate it
-            -4
-            -3
-            -2
-            -1
-            0 Neutral
-            1
-            2
-            3
-            4
-            5 Love it
-            """
+-5 Hate it
+-4
+-3
+-2
+-1
+0 Neutral
+1
+2
+3
+4
+5 Love it
+ _
+ --use:BRANDS
+"""
         survey = parse(input_)
         survey.to_dim()
         result = survey.dim_out
@@ -547,7 +809,8 @@ class TestToDim(KreaturaTestCase):
             flametatype = "mbdragndrop",
             toolPath = "[%ImageCacheBase%]/images/mbtools/",
             rowBtnType = "Text",
-            colImgType = "LoveHate",
+            colImgType = "LoveHate",            ' RedBlack, Grey
+            ' rowBtnUseZoom = True,             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
             dropType = "scale"
         ]
     loop
@@ -559,17 +822,17 @@ class TestToDim(KreaturaTestCase):
         slice ""
         categorical [1..]
         {
-            x1 "-5 Hate it",
-            x2 "-4",
-            x3 "-3",
-            x4 "-2",
-            x5 "-1",
-            x6 "0 Neutral",
-            x7 "1",
-            x8 "2",
-            x9 "3",
-            x10 "4",
-            x11 "5 Love it"
+            _1 "-5 Hate it",
+            _2 "-4",
+            _3 "-3",
+            _4 "-2",
+            _5 "-1",
+            _6 "0 Neutral",
+            _7 "1",
+            _8 "2",
+            _9 "3",
+            _10 "4",
+            _11 "5 Love it"
 
         };
     ) expand grid;
@@ -577,12 +840,12 @@ class TestToDim(KreaturaTestCase):
 
         self.assertTxtEqual(result, expected)
 
-    def test_DnD_scale_love_hate(self):
+    def test_LHS_scale_love_hate(self):
         input_ = r"""Q LHS dndLoveHateScaleImage How familiar you are with each og these brands?<br/>--images
-    --use:BRANDS
-    _
     --use:lovehatescale
-            """
+    _
+    --use:BRANDS
+"""
         survey = parse(input_)
         survey.to_dim()
         result = survey.dim_out
@@ -612,11 +875,11 @@ class TestToDim(KreaturaTestCase):
 
         self.assertTxtEqual(result, expected)
 
-    def test_DnD_scale_gray(self):
+    def test_LHS_scale_gray(self):
         input_ = r"""Q LHS dndScaleTextGray How familiar you are with each og these brands?<br/>--gray
-    --use:BRANDS
-    _
     --use:lovehatescale
+    _
+    --use:BRANDS
     """
         survey = parse(input_)
         survey.to_dim()
@@ -647,8 +910,45 @@ class TestToDim(KreaturaTestCase):
 
         self.assertTxtEqual(result, expected)
 
-    def test_DnD_buckets_exclude(self):
-        self.fail()
+    def test_B_buckets_exclusive(self):
+        input_ = r"""Q B dndScaleTextGray Drop the brand to the relevant baskets<br/>
+The Best one --@
+Good
+Bad
+The worse one --@
+_
+--use:BRANDS
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+        expected = """
+    dndScaleTextGray "Drop the brand to the relevant baskets<br/>"
+        [
+            flametatype = "mbdragndrop",
+            toolPath = "[%ImageCacheBase%]/images/mbtools/",
+            rowBtnType = "Text",
+            dropType = "buckets"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            _1@ "The Best one",
+            _2 "Good",
+            _3 "Bad",
+            _4@ "The worse one"
+
+        };
+    ) expand grid;
+"""
+
+        self.assertTxtEqual(result, expected)
 
     def test_DnD_scale_exclude(self):
         self.fail()
@@ -672,37 +972,19 @@ class TestToDim(KreaturaTestCase):
     Q4 "W jakiej wielkości miejscowości mieszkasz?"
     Categorical [1..]
     {
-        x1 "wieś",
-        x2 "miasto do 20 tys. mieszkańców",
-        x3 "miasto 20.000-49.999 mieszkańców",
-        x4 "miasto 50.000-99.999 mieszkańców",
-        x5 "miasto 100.000-199.999 mieszkańców",
-        x6 "miasto 200.000-499.999 mieszkańców",
-        x7 "miasto 500.000 mieszkańców lub większe",
-        x8 "nie wiem/ trudno powiedzieć"
+        _1 "wieś",
+        _2 "miasto do 20 tys. mieszkańców",
+        _3 "miasto 20.000-49.999 mieszkańców",
+        _4 "miasto 50.000-99.999 mieszkańców",
+        _5 "miasto 100.000-199.999 mieszkańców",
+        _6 "miasto 200.000-499.999 mieszkańców",
+        _7 "miasto 500.000 mieszkańców lub większe",
+        _8 "nie wiem/ trudno powiedzieć"
 
     };
 '''
         self.assertTxtEqual(got, want)
 
-    def test_def_big_letter(self):
-        input_= """Q DEF COS CIS --big-letters
-cos 1
-cos 2
-"""
-        want = """
-    COS - define
-    {
-        _A "cos 1",
-        _B "cos 2"
-
-    };
-"""
-        survey = parse(input_)
-        survey.to_dim()
-        got = survey.dim_out
-
-        self.assertTxtEqual(got, want)
 
 
 class TestToWeb(KreaturaTestCase):
@@ -1039,8 +1321,6 @@ A
         self.assertTxtEqual(expected, kp.dim_out)
 
 
-
-
 class TestQuestionDef(KreaturaTestCase):
     def test_define_list(self):
         input_ = """Q DEF Q1 COS
@@ -1070,14 +1350,14 @@ c
             survey = parse(input_)
             survey.to_dim()
             expected = """
-        Q1 - define
-        {
-            _2 "a",
-            _5 "b",
-            _7 "c"
+    Q1 - define
+    {
+        _2 "a",
+        _5 "b",
+        _7 "c"
 
-        };
-    """
+    };
+"""
             self.assertTxtEqual(expected, survey.dim_out)
 
     def test_define_list_images(self):

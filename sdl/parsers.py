@@ -209,6 +209,7 @@ def cafeteria_parser(line, add_id_to_content=False):
     if caf.group(3) == ".c":   # comment
         cafeteria.other = True
 
+    # TODO: usunąć to
     if caf.group(3) == ".f":   # comment
         cafeteria.fixposition = True
         cafeteria.other = True

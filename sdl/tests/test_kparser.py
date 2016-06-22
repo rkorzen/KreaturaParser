@@ -410,14 +410,17 @@ B B1 B0
         self.assertEqual(expected, result)
 
     def test_page_parent(self):
-        text_input = "B MAIN\nB B1\nP P0 --parent:MAIN"
+        text_input = """B MAIN
+B B1
+P P0 --parent:MAIN"""
+
         survey = Survey()
         block = Block('MAIN')
         b1 = Block('B1')
         page = Page('P0')
         page.parent_id = 'MAIN'
-
         block.childs.append(page)
+
         survey.append(block)
         survey.append(b1)
 
@@ -3839,14 +3842,14 @@ A"""
     Q4 "W jakiej wielkości miejscowości mieszkasz?"
     Categorical [1..1]
     {
-        x1 "wieś",
-        x2 "miasto do 20 tys. mieszkańców",
-        x3 "miasto 20.000-49.999 mieszkańców",
-        x4 "miasto 50.000-99.999 mieszkańców",
-        x5 "miasto 100.000-199.999 mieszkańców",
-        x6 "miasto 200.000-499.999 mieszkańców",
-        x7 "miasto 500.000 mieszkańców lub większe",
-        x8 "nie wiem/ trudno powiedzieć"
+        _1 "wieś",
+        _2 "miasto do 20 tys. mieszkańców",
+        _3 "miasto 20.000-49.999 mieszkańców",
+        _4 "miasto 50.000-99.999 mieszkańców",
+        _5 "miasto 100.000-199.999 mieszkańców",
+        _6 "miasto 200.000-499.999 mieszkańców",
+        _7 "miasto 500.000 mieszkańców lub większe",
+        _8 "nie wiem/ trudno powiedzieć"
 
     };
 '''
@@ -6391,8 +6394,8 @@ PRE ' xxx
     Q1 "COS"
     Categorical [1..1]
     {
-        x1 "a",
-        x2 "b"
+        _1 "a",
+        _2 "b"
 
     };
 '''
