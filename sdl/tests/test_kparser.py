@@ -3854,7 +3854,7 @@ A"""
     };
 '''
 
-        self.assertEqual(got, want)
+        self.assertTxtEqual(got, want)
 
     def test_postcode(self):
         text = '''Q S Q1 COS
