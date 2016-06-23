@@ -1,10 +1,13 @@
-Metadata-Version: 1.0
-Name: sdl
-Version: 0.1
-Summary: Survey Domain Language - parse and serialize to some outputs
-Home-page: https://github.com/rkorzen/KreaturaParser.git
+Metadata-Version: 1.1
+Name: SDL
+Version: 0.0.0
+Summary: Tools to build surveys and clean data. IBIS and Dimensions
+Home-page: https://github.com/rkorzen/KreaturaParser
 Author: Rafał Korzeniewski
 Author-email: korzeniewski@gmail.com
-License: PSF
+License: Copyright Rafał Korzeniewski
 Description: UNKNOWN
 Platform: UNKNOWN
+Classifier: Environment :: Web Environment or desktop
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
