@@ -129,7 +129,7 @@ def parse(text_input):
     #    np: """Q S Q1 COS
     # A --gn
     # B --so"""
-
+    tmp_questions_id = []
     survey = Survey()
 
     next_page_precode = [None, None]
@@ -238,7 +238,10 @@ def parse(text_input):
             # endregion
 
             current_question = question_parser(line)
-
+            if current_question.id in tmp_questions_id:
+                raise ValueError("Two questions have the same id: " + current_question.id)
+            else:
+                tmp_questions_id.append(current_question.id)
             try:
                 """
                 W current element mamy question, a nowy element to też question

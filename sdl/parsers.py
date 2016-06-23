@@ -137,6 +137,7 @@ def question_parser(line):
         if " --ran" in line:
             question.random = True
             question.content = question.content.replace(' --ran', '')
+
     except AttributeError as e:
         raise AttributeError(e, line)
     return question

@@ -304,7 +304,7 @@ class Question(SurveyElements):
     def __repr__(self):
         return "question: {} {} ".format(self.id, self.typ)
 
-    def caf_to_dim(self, tabs=0, use=False, **kwargs) :
+    def caf_to_dim(self, tabs=0, use=False, statements=False, **kwargs) :
         """:returns string
         :param cafeteria: cafeteria or statements list
         :param tabs: level of indent
@@ -317,11 +317,16 @@ class Question(SurveyElements):
         int_implicite = kwargs.get("int-implicite", False)
         raw_id = kwargs.get("raw-id", False)
         first_id = kwargs.get("first-id", False)
-        #print(kwargs)
+
+        tmp_caf_id = []
+
         if use:
             out = "        use {} -".format(use)
         else:
-            cafeteria = self.cafeteria
+            if statements:
+                cafeteria = self.statements
+            else:
+                cafeteria = self.cafeteria
             out = ""
             ile = len(cafeteria)
             for caf in cafeteria:
@@ -427,59 +432,67 @@ class Question(SurveyElements):
                 else:
                     out += ",\n"
 
+                # validation
+
+                if caf.id in tmp_caf_id:
+                    raise ValueError("Two positions can't have same id. Error in: " + self.id + ". Cafeteria id: " + caf.id )
+                else:
+                    tmp_caf_id.append(caf.id)
+
+
         return out
 
-    def statements_to_dim(self, tabs=0, use=None, prov_letter='_'):
-        """:returns string
-        :param cafeteria: cafeteria or statements list
-        :param tabs: level of indent
-        """
-
-        if use:
-            out = "        use {} -".format(use)
-        else:
-            cafeteria = self.statements
-            out = ""
-            ile = len(cafeteria)
-            for caf in cafeteria:
-
-                if '--i' in caf.content:
-                    caf.content = caf.content.replace('--i', "")
-                    caf.content = '<i>' + caf.content.strip() + '</i>'
-
-                if '--b' in caf.content:
-                    caf.content = caf.content.replace('--b', "")
-                    caf.content = '<b>' + caf.content + '</b>'
-
-                if '|' in caf.content:
-                    caf.content = caf.content.split('|')
-                    caf.img = caf.content[1]
-                    caf.content = caf.content[0]
-
-                if "--use:" in caf.content:
-                    list_ = caf.content.split('--use:')[1]
-                    out += "    " * tabs + r"use {} -".format(list_)
-                elif caf.deactivate:
-                    out += '    ' * tabs + '- "{}" DK'.format(caf.content)
-                else:
-                    out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '"'
-
-                if caf.other:
-                    out += ' other'
-
-                if caf.img:
-                    out += r'''
-            labelstyle(
-                Image = "images\{0}",
-                ImagePosition = "ImageOnly"
-            )'''.format(caf.img)
-
-                if cafeteria.index(caf) == ile - 1:
-                    out += '\n'
-                else:
-                    out += ",\n"
-
-        return out
+    # def statements_to_dim(self, tabs=0, use=None, prov_letter='_'):
+    #     """:returns string
+    #     :param cafeteria: cafeteria or statements list
+    #     :param tabs: level of indent
+    #     """
+    #
+    #     if use:
+    #         out = "        use {} -".format(use)
+    #     else:
+    #         cafeteria = self.statements
+    #         out = ""
+    #         ile = len(cafeteria)
+    #         for caf in cafeteria:
+    #
+    #             if '--i' in caf.content:
+    #                 caf.content = caf.content.replace('--i', "")
+    #                 caf.content = '<i>' + caf.content.strip() + '</i>'
+    #
+    #             if '--b' in caf.content:
+    #                 caf.content = caf.content.replace('--b', "")
+    #                 caf.content = '<b>' + caf.content + '</b>'
+    #
+    #             if '|' in caf.content:
+    #                 caf.content = caf.content.split('|')
+    #                 caf.img = caf.content[1]
+    #                 caf.content = caf.content[0]
+    #
+    #             if "--use:" in caf.content:
+    #                 list_ = caf.content.split('--use:')[1]
+    #                 out += "    " * tabs + r"use {} -".format(list_)
+    #             elif caf.deactivate:
+    #                 out += '    ' * tabs + '- "{}" DK'.format(caf.content)
+    #             else:
+    #                 out += '    ' * tabs + prov_letter + caf.id + ' "' + caf.content + '"'
+    #
+    #             if caf.other:
+    #                 out += ' other'
+    #
+    #             if caf.img:
+    #                 out += r'''
+    #         labelstyle(
+    #             Image = "images\{0}",
+    #             ImagePosition = "ImageOnly"
+    #         )'''.format(caf.img)
+    #
+    #             if cafeteria.index(caf) == ile - 1:
+    #                 out += '\n'
+    #             else:
+    #                 out += ",\n"
+    #
+    #     return out
 
     def meta_info(self):
 
@@ -586,11 +599,19 @@ class Question(SurveyElements):
             self.content = self.content.replace('--nr', '')
             markers['not_require'] = True
 
-        if '--ran' in self.content:
+        if '--statements-ran' in self.content:
+            self.content = self.content.replace('--statements-ran', '')
+            markers['ran_stmt'] = True
+
+        if '--ran' in self.content or self.random:
             self.content = self.content.replace('--ran', '')
             markers['ran'] = True
 
-        if '--rot' in self.content:
+        if '--statements-rot' in self.content:
+            self.content = self.content.replace('--statements-rot', '')
+            markers['rot_stmt'] = True
+
+        if '--rot' in self.content or self.rotation:
             self.content = self.content.replace('--rot', '')
             markers['rot'] = True
 
@@ -1352,6 +1373,25 @@ class Question(SurveyElements):
         images = options.get("images")
         sort_ = options.get("sort")
         sort_by_id = options.get("sort_by_id")
+        ran = options.get("ran")
+        ran_stmt = options.get("ran_stmt")
+        rot = options.get("rot")
+        rot_stmt = options.get("rot_stmt")
+
+        print(ran, ran_stmt)
+        ran_rot, ran_rot_stmt = "", ""
+
+        if ran:
+            ran_rot = " ran "
+        if rot:
+            ran_rot = " rot "
+
+        if ran_stmt:
+            ran_rot_stmt = " ran "
+        if rot_stmt:
+            ran_rot_stmt = " rot "
+
+
 
         if sort_ and self.cafeteria:
             self.cafeteria = sorted(self.cafeteria, key=lambda x: x.content)
@@ -1413,8 +1453,8 @@ class Question(SurveyElements):
     Categorical [{1}..{2}]
     {{
 {0}
-    }};
-""".format(self.caf_to_dim(2, use,  **self.kwargs), minchoose, maxchoose)
+    }}{3};
+""".format(self.caf_to_dim(2, use,  **self.kwargs), minchoose, maxchoose, ran_rot)
 
         elif self.typ == "L":
             self.dim_out += "    " + self.id + ' "' + self.content + '" info;\n\n'
@@ -1425,12 +1465,13 @@ class Question(SurveyElements):
                 out = """
     {id} ""
         [
-            flametatype = "dynamicgrid"
+            flametatype = "mbdynamicgrid"
+             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
         ]
     loop
     {{
 {stw}
-    }} fields -
+    }}{ran_rot_stmt}fields -
     (
         slice "{content}
 
@@ -1440,34 +1481,39 @@ class Question(SurveyElements):
         categorical [1..1]
         {{
 {caf}
-        }};
+        }}{ran};
     ) expand grid;
 """.format(**{'id': self.id,
                           'content': content,
                           'stw': make_caf_to_dim(self.statements, 2),
-                          'caf': make_caf_to_dim(self.cafeteria, 3)
+                          'caf': make_caf_to_dim(self.cafeteria, 3),
+                          'ran_rot_stmt': ran_rot_stmt,
+                          'ran_rot': ran_rot
                           })
             else:
                 out = """
     {id} "{content}"
         [
-            flametatype = "dynamicgrid"
+            flametatype = "mbdynamicgrid"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
         ]
     loop
     {{
-{stw}
-    }} fields -
+{caf}
+    }}{ran_rot_stmt} fields -
     (
         slice ""
         categorical [1..1]
         {{
-{caf}
-        }};
+{stw}
+        }}{ran_rot};
     ) expand grid;
 """.format(**{'id': self.id,
               'content': self.content,
-              'stw': make_caf_to_dim(self.statements, 2),
-              'caf': make_caf_to_dim(self.cafeteria, 3)
+              'stw': self.caf_to_dim(3),
+              'caf': self.caf_to_dim(2, statements=True),
+              'ran_rot_stmt': ran_rot_stmt,
+              'ran_rot': ran_rot
               })
 
             self.dim_out += out
@@ -1536,103 +1582,63 @@ class Question(SurveyElements):
             self.dim_out += numeric.dim_out
 
         elif self.typ in ["B", "SDG", "LHS"]:
-            if self.random:
-                ran = "ran"
-            elif self.rotation:
-                ran = "rot"
-            else:
-                ran = ""
-
-            if images:
-                row_btn_type = "Images"
-                rowBtnUseZoom = "\n            ' rowBtnUseZoom = True,             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen."
-            else:
-                row_btn_type = "Text"
-
-            out = """
-    {id} "{content}"
-        [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "{rowBtnType}",
-            ' rowBtnUseZoom = True,              ' zoom icon if True {rowBtnUseZoom}
-            dropType = "buckets"
-        ]
-    loop
-    {{
-{stw}
-    }} {ran} fields -
-    (
-        slice ""
-        categorical [{minchoose}..{maxchoose}]
-        {{
-{caf}
-        }};
-    ) expand grid;
-""".format(**{'id': self.id,
-              'content': self.content,
-              'stw': self.statements_to_dim(2),
-              'caf': self.caf_to_dim(3),
-              'minchoose': minchoose,
-              'maxchoose': maxchoose,
-              'ran': ran,
-              'rowBtnType': row_btn_type,
-              'rowBtnUseZoom': rowBtnUseZoom
-              })
-
-            self.dim_out += out
-
-        elif self.typ in ["LHS"]:
-            if self.random:
-                ran = "ran"
-            elif self.rotation:
-                ran = "rot"
-            else:
-                ran = ""
 
             if images:
                 row_btn_type = "Image"
+                rowBtnUseZoom = "\n            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen."
+                rowBtnWidth = ""
             else:
                 row_btn_type = "Text"
+                rowBtnUseZoom = ""
+                rowBtnWidth = "\n            ' , rowBtnWidth = 200                 ' width should be any integer > 10"
 
-            if options.get("gray"):
-                scaleType = "Gray"
-            else:
-                scaleType = "LoveHate"
+            if self.typ in ["B"]:
+                dropType = "buckets"
+                colImgType = ""
+
+            elif self.typ in ["LHS"]:
+                dropType = "scale"
+                colImgType = '''\n            , colImgType = "LoveHate"            ' RedBlack, Grey"'''
+
 
             out = """
     {id} "{content}"
         [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "{rowBtnType}",
-            colImgType = "{scaleType}",
-            dropType = "scale"
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "{rowBtnType}"{rowBtnWidth}{rowBtnUseZoom}{colImgType}
+            , dropType = "{dropType}"
         ]
     loop
     {{
-{caf}
-    }} {ran} fields -
+{stw}
+    }}{ran_rot_stmt} fields -
     (
         slice ""
         categorical [{minchoose}..{maxchoose}]
         {{
-{stw}
-        }};
+{caf}
+        }}{ran_rot};
     ) expand grid;
 """.format(**{'id': self.id,
               'content': self.content,
-              'stw': self.statements_to_dim(3),
-              #'stw': self.statements_to_dim(2),
-              'caf': self.caf_to_dim(2),
+              'stw': self.caf_to_dim(2, statements=True),
+              'caf': self.caf_to_dim(3),
               'minchoose': minchoose,
               'maxchoose': maxchoose,
-              'ran': ran,
               'rowBtnType': row_btn_type,
-              'scaleType': scaleType
+              'rowBtnUseZoom': rowBtnUseZoom,
+              'rowBtnWidth': rowBtnWidth,
+              "dropType": dropType,
+              "colImgType": colImgType,
+              'ran_rot_stmt': ran_rot_stmt,
+              'ran_rot': ran_rot
               })
 
             self.dim_out += out
+
+        elif self.typ  == "H":
+            pass
 
         else:
             stat, caf = None, None
@@ -1961,15 +1967,11 @@ class ControlNumber(Control):
         content = etree.SubElement(self.xml, 'content')
 
     def to_dim(self):
-        self.dim_out = ""
-        self.dim_out += '\n    ' + self.id + ' "' + self.content + '"\n'
-        self.dim_out += '''
-    'style(
-    '    Width = "3em";
-    ')
+        self.dim_out = """
+    {} "{}"
+    ' style( Width = "3em" )
     long;
-'''
-
+""".format(self.id, self.content)
 
 class Cafeteria:
     """List element - to np cafeteria, statements"""

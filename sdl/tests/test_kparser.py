@@ -5531,26 +5531,27 @@ stw 2
         want = """
     Q1 "COS"
         [
-            flametatype = "dynamicgrid"
+            flametatype = "mbdynamicgrid"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
         ]
     loop
     {
-        x1 "stw 1",
-        x2 "stw 2"
+        _1 "stw 1",
+        _2 "stw 2"
 
     } fields -
     (
         slice ""
         categorical [1..1]
         {
-            x1 "a",
-            x2 "b"
+            _1 "a",
+            _2 "b"
 
         };
     ) expand grid;
 """
 
-        self.assertEqual(got, want)
+        self.assertTxtEqual(got, want)
 
     def test_grid_with_rotation(self):
         """Fix isue#8"""

@@ -192,48 +192,46 @@ class TestQuestion(KreaturaTestCase):
 class TestToDim(KreaturaTestCase):
 
     # region block tests
-    def test_grid_with_categories_loop(self):
-        text_input = """Q G Q1 COS
-    1 odp a
-    2 odp b
-    _
-    1 stw a {@}
-    2 stw b {@}
+    def test_info(self):
+        input_ = "Q L Q1intro This is a message"
 
-    FOR CATEGORIES:
-    1 cat 1
-    2 cat 2"""
-        survey = parse(text_input)
+        survey = parse(input_)
         survey.to_dim()
-        result = survey.dim_out
+        survey.to_web()
 
-        expected = """
-    Q1 - loop
-    {
-        c1 "cat 1",
-        c2 "cat 2"
+        expected = '''    Q1intro "This is a message" info;
 
-    } ran fields -
-    (
-        LR " COS" loop
-        {
-            l1 "stw a {@}",
-            l2 "stw b {@}"
+'''
 
-        } fields -
-        (
-            slice ""
-            categorical [1..1]
-            {
-                x1 "odp a",
-                x2 "odp b"
+        self.assertTxtEqual(survey.dim_out, expected)
 
-            };
-        ) expand grid;
-    ) expand;
-"""
+    def test_text(self):
+        input_ = "Q O Q1open This is open question"
 
-        self.assertTxtEqual(expected, result)
+        survey = parse(input_)
+        survey.to_dim()
+        survey.to_web()
+
+        expected = '''    Q1open "This is open question" text;
+
+'''
+
+        self.assertTxtEqual(survey.dim_out, expected)
+
+    def test_numeric(self):
+        input_ = "Q N Q1numeric This is numeric question"
+
+        survey = parse(input_)
+        survey.to_dim()
+        survey.to_web()
+
+        expected = '''
+    Q1numeric "This is numeric question"
+    ' style( Width = "3em" )
+    long;
+'''
+
+        self.assertTxtEqual(survey.dim_out, expected)
 
     def test_categorical_single(self):
         input_ = """Q S Q1 Content
@@ -275,6 +273,28 @@ class TestToDim(KreaturaTestCase):
         _3 "C"
 
     };
+"""
+
+        self.assertTxtEqual(expected, survey.dim_out)
+
+    def test_categorical_random(self):
+        input_ = """Q S Q1 COS --ran
+        A
+        B
+        C
+        """
+        survey = parse(input_)
+        survey.to_dim()
+
+        expected = r"""
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    } ran ;
 """
 
         self.assertTxtEqual(expected, survey.dim_out)
@@ -344,7 +364,6 @@ C
 """
 
         self.assertTxtEqual(survey.dim_out, expected)
-
 
     def test_def_big_letter(self):
         input_ = """Q DEF LIST smth --big-letters
@@ -531,9 +550,9 @@ C
         self.assertTxtEqual(result, expected)
 
     def test_img_caf(self):
-        input_ = """Q S Q1 COS
+        input_ = r"""Q S Q1 COS
     A|1.jpg
-    B|c\\2.jpg
+    B|c\2.jpg
     """
         expected = r'''
     Q1 "COS"
@@ -556,6 +575,84 @@ C
         survey.to_dim()
         result = survey.dim_out
         self.assertTxtEqual(result, expected)
+
+    def test_single_with_images(self):
+        input_ = """Q S Q1 Smth --images
+    A
+    B
+    """
+        expected = r'''
+    Q1 "Smth "
+        [
+            flametatype = "mbclickableimages"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+
+        ]
+    Categorical [1..1]
+    {
+        _1 "A"
+            labelstyle(
+                Image = "images\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        _2 "B"
+            labelstyle(
+                Image = "images\2.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+'''
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+        self.assertTxtEqual(result, expected)
+
+    def test_def_with_images(self):
+        input_ = r"""Q DEF Q1 Smth --images:folder\folder2
+    A
+    B
+    """
+        expected = r'''
+    Q1 - define
+    {
+        _1 "A"
+            labelstyle(
+                Image = "images\folder\folder2\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        _2 "B"
+            labelstyle(
+                Image = "images\folder\folder2\2.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+'''
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+        self.assertTxtEqual(result, expected)
+
+    def test_two_qustions_same_id_error(self):
+        input_ = """Q S Q1 Smth
+A
+B
+
+Q S Q1 Smth
+A
+B
+"""
+        #survey = parse(input_)
+        self.assertRaises(ValueError, parse, input_)
+
+    def test_cafeteria_error_same_id(self):
+        input_ = """Q S Q1 Smth
+1    A
+1    A
+    """
+        survey = parse(input_)
+        self.assertRaises(ValueError, survey.to_dim)
 
     def test_define_and_use_list(self):
         input_ = """Q S Q1 COS--list:MARKI
@@ -601,34 +698,38 @@ C
         self.assertRaises(ValueError, survey.to_dim)
 
     def test_dim_create_list(self):
-        input_ = "Q S Q1 COS --list:MARKI\na\nb"
+        input_ = """Q S Q1 The best car brand is .. --list:CARBRANDS
+Mercedes
+Bugatti
+Porsche"""
         survey = parse(input_)
         survey.to_dim()
         expected = '''
-    MARKI - define
+    CARBRANDS - define
     {
-        _1 "a",
-        _2 "b"
+        _1 "Mercedes",
+        _2 "Bugatti",
+        _3 "Porsche"
 
     };
 
-    Q1 "COS "
+    Q1 "The best car brand is .. "
     Categorical [1..1]
     {
-        use MARKI -
+        use CARBRANDS -
     };
 '''
         self.assertTxtEqual(survey.dim_out, expected)
 
     def test_use_defined_list(self):
-        input_ = """Q S Q1 COS
-    --use:MARKI
+        input_ = """Q M Q1 Which of the following brands you know?
+    --use:BRANDS
     """
         expected = """
-    Q1 "COS"
-    Categorical [1..1]
+    Q1 "Which of the following brands you know?"
+    Categorical [1..]
     {
-        use MARKI -
+        use BRANDS -
 
     };
 """
@@ -659,7 +760,7 @@ C
         self.assertTxtEqual(result, expected)
 
     def test_B_buckets_with_image_buttons(self):
-        input_ = r"""Q B dndBucketsImage How familiar you are with each og these brands?<br/>--images
+        input_ = r"""Q B dndBucketsImage How familiar you are with each og these brands?<br/> --images
     --use:BE2A_ans_dl
     _
     --use:BRANDS
@@ -668,19 +769,19 @@ C
         survey.to_dim()
         result = survey.dim_out
         expected = """
-    dndBucketsImage "How familiar you are with each og these brands?<br/>"
+    dndBucketsImage "How familiar you are with each og these brands?<br/> "
         [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "Images",
-            ' rowBtnUseZoom = True,              ' zoom icon if True
-            dropType = "buckets"
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Image"
+            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , dropType = "buckets"
         ]
     loop
     {
         use BRANDS -
 
-    }  fields -
+    } fields -
     (
         slice ""
         categorical [1..]
@@ -694,28 +795,28 @@ C
         self.assertTxtEqual(result, expected)
 
     def test_B_buckets_with_text_buttons(self):
-        input_ = r"""Q B dndBucketsText How familiar you are with each og these brands?<br/>
+        input_ = r"""Q B dndBucketsText How familiar you are with each of these brands?<br/>
     --use:BE2A_ans_dl
     _
     --use:BRANDS
-            """
+"""
         survey = parse(input_)
         survey.to_dim()
         result = survey.dim_out
         expected = """
-    dndBucketsTexy "How familiar you are with each og these brands?<br/>"
+    dndBucketsText "How familiar you are with each of these brands?<br/>"
         [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "Text",
-            ' rowBtnWidth = 200,                 ' width should be any integer > 10
-            dropType = "buckets"
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Text"
+            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            , dropType = "buckets"
         ]
     loop
     {
         use BRANDS -
 
-    }  fields -
+    } fields -
     (
         slice ""
         categorical [1..]
@@ -750,18 +851,18 @@ _
         expected = """
     dndBucketsImage "How familiar you are with each og these brands?<br/>"
         [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "Image",
-            colImgType = "LoveHate",            ' RedBlack, Grey
-            ' rowBtnUseZoom = True,             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
-            dropType = "scale"
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Image"
+            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            , dropType = "scale"
         ]
     loop
     {
         use BRANDS -
 
-    }  fields -
+    } fields -
     (
         slice ""
         categorical [1..]
@@ -785,7 +886,7 @@ _
         self.assertTxtEqual(result, expected)
 
     def test_LHS_scale_with_text_buttons(self):
-        input_ = r"""Q LHS dndLoveHateScaleImage How familiar you are with each og these brands?<br/>
+        input_ = r"""Q LHS dndLoveHateScaleText How familiar you are with each og these brands?<br/>
 -5 Hate it
 -4
 -3
@@ -804,20 +905,20 @@ _
         survey.to_dim()
         result = survey.dim_out
         expected = """
-    dndLoveHateScaleImage "How familiar you are with each og these brands?<br/>"
+    dndLoveHateScaleText "How familiar you are with each og these brands?<br/>"
         [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "Text",
-            colImgType = "LoveHate",            ' RedBlack, Grey
-            ' rowBtnUseZoom = True,             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
-            dropType = "scale"
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Text"
+            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            , dropType = "scale"
         ]
     loop
     {
         use BRANDS -
 
-    }  fields -
+    } fields -
     (
         slice ""
         categorical [1..]
@@ -852,17 +953,18 @@ _
         expected = """
     dndLoveHateScaleImage "How familiar you are with each og these brands?<br/>"
         [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "Image",
-            colImgType = "LoveHate",
-            dropType = "scale"
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Image"
+            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            , dropType = "scale"
         ]
     loop
     {
         use BRANDS -
 
-    }  fields -
+    } fields -
     (
         slice ""
         categorical [1..]
@@ -870,6 +972,42 @@ _
             use lovehatescale -
 
         };
+    ) expand grid;
+"""
+
+        self.assertTxtEqual(result, expected)
+
+    def test_LHS_scale_love_hate_ran_rot(self):
+        input_ = r"""Q LHS dndLoveHateScaleImage How familiar you are with each og these brands?<br/>--images --ran --statements-ran
+    --use:lovehatescale
+    _
+    --use:BRANDS
+"""
+        survey = parse(input_)
+        survey.to_dim()
+        result = survey.dim_out
+        expected = """
+    dndLoveHateScaleImage "How familiar you are with each og these brands?<br/> "
+        [
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Image"
+            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            , dropType = "scale"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    } ran  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            use lovehatescale -
+
+        } ran ;
     ) expand grid;
 """
 
@@ -887,11 +1025,12 @@ _
         expected = """
     dndScaleTextGray "How familiar you are with each og these brands?<br/>"
         [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "Text",
-            colImgType = "Gray",
-            dropType = "scale"
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Text"
+            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            , colImgType = "Grey"            ' RedBlack, Grey"
+            , dropType = "scale"
         ]
     loop
     {
@@ -925,16 +1064,17 @@ _
         expected = """
     dndScaleTextGray "Drop the brand to the relevant baskets<br/>"
         [
-            flametatype = "mbdragndrop",
-            toolPath = "[%ImageCacheBase%]/images/mbtools/",
-            rowBtnType = "Text",
-            dropType = "buckets"
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Text"
+            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            , dropType = "buckets"
         ]
     loop
     {
         use BRANDS -
 
-    }  fields -
+    } fields -
     (
         slice ""
         categorical [1..]
@@ -949,9 +1089,6 @@ _
 """
 
         self.assertTxtEqual(result, expected)
-
-    def test_DnD_scale_exclude(self):
-        self.fail()
 
     def test_multi_to_dim(self):
         self.maxDiff = None
@@ -985,6 +1122,120 @@ _
 '''
         self.assertTxtEqual(got, want)
 
+    def test_grid_with_categories_loop(self):
+        text_input = """Q G Q1 COS
+    1 odp a
+    2 odp b
+    _
+    1 stw a {@}
+    2 stw b {@}
+
+    FOR CATEGORIES:
+    1 cat 1
+    2 cat 2"""
+        survey = parse(text_input)
+        survey.to_dim()
+        result = survey.dim_out
+
+        expected = """
+    Q1 - loop
+    {
+        c1 "cat 1",
+        c2 "cat 2"
+
+    } ran fields -
+    (
+        LR " COS" loop
+        {
+            l1 "stw a {@}",
+            l2 "stw b {@}"
+
+        } fields -
+        (
+            slice ""
+            categorical [1..1]
+            {
+                x1 "odp a",
+                x2 "odp b"
+
+            };
+        ) expand grid;
+    ) expand;
+"""
+
+        self.assertTxtEqual(expected, result)
+
+    def test_dynamic_grid_text(self):
+        input_ = """Q G Q1 COS
+answer a
+answer b
+_
+statment I
+statment II"""
+
+        s = parse(input_)
+        s.to_dim()
+
+        expected = """
+    Q1 "COS"
+        [
+            flametatype = "mbdynamicgrid"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+        ]
+    loop
+    {
+        _1 "statment I",
+        _2 "statment II"
+
+    } fields -
+    (
+        slice ""
+        categorical [1..1]
+        {
+            _1 "answer a",
+            _2 "answer b"
+
+        };
+    ) expand grid;
+"""
+
+        self.assertTxtEqual(s.dim_out, expected)
+
+    def test_dynamic_grid_ran_rotate(self):
+        input_ = """Q G Q1 COS --ran --statements-rot
+answer a
+answer b
+_
+statment I
+statment II"""
+
+        s = parse(input_)
+        s.to_dim()
+
+        expected = """
+    Q1 "COS "
+        [
+            flametatype = "mbdynamicgrid"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+        ]
+    loop
+    {
+        _1 "statment I",
+        _2 "statment II"
+
+    } rot  fields -
+    (
+        slice ""
+        categorical [1..1]
+        {
+            _1 "answer a",
+            _2 "answer b"
+
+        } ran ;
+    ) expand grid;
+"""
+
+        self.assertTxtEqual(s.dim_out, expected)
 
 
 class TestToWeb(KreaturaTestCase):
