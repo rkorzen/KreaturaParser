@@ -2,15 +2,15 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='SDL',
-    version="",
+    name='sdl',
+    version="0.2",
     description='Tools to build surveys and clean data. IBIS and Dimensions',
     #long_description=open('docs/manual.md').read(),
     author='Rafał Korzeniewski',
     author_email='korzeniewski@gmail.com',
     url='https://github.com/rkorzen/KreaturaParser',
     license='Copyright Rafał Korzeniewski',
-    packages=find_packages(exclude=('example', )),
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=True,
     setup_requires=[

@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
-Name: SDL
-Version: 0.0.0
+Name: sdl
+Version: 0.2
 Summary: Tools to build surveys and clean data. IBIS and Dimensions
 Home-page: https://github.com/rkorzen/KreaturaParser
 Author: Rafał Korzeniewski
