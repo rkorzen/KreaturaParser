@@ -140,7 +140,7 @@ DOC after doc makro:
 and here we have SDL input
 I think - for now it's one of the most advanced examples, because there is a concept of nesting Python scripts.
 
-	Q S Q1 What is Yours <b>favorite car brand</b> --sort --list:carBrands --listcolumn:3 
+	Q S Q1 What is Yours <b>favorite car brand</b> --sort --list:carBrands
 	1    ALFA ROMEO
 	...
 	69    SSANGYONG
