@@ -1459,7 +1459,7 @@ class Question(SurveyElements):
         elif self.typ == "L":
             self.dim_out += "    " + self.id + ' "' + self.content + '" info;\n\n'
 
-        elif self.typ == "G" and not self.categories:
+        elif self.typ in ["G", "SDG"] and not self.categories:
             if '--byslice' in self.content:
                 content = self.content.replace('--byslice', '')
                 out = """
@@ -1518,7 +1518,7 @@ class Question(SurveyElements):
 
             self.dim_out += out
 
-        elif self.typ == "G" and self.categories:
+        elif self.typ in ["G", "SDG"] and self.categories:
             if '--byslice' in self.content:
                 out = """
                     {id} - loop
@@ -1581,7 +1581,7 @@ class Question(SurveyElements):
             numeric.to_dim()
             self.dim_out += numeric.dim_out
 
-        elif self.typ in ["B", "SDG", "LHS"]:
+        elif self.typ in ["B", "LHS"]:
 
             if images:
                 row_btn_type = "Image"
