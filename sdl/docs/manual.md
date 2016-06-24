@@ -75,7 +75,6 @@ Survey Parser
   - [precod i postcode](#precod-i-postcode)
 - [PYTHON RECIPES](#python-recipes)
   - [json to dict example](#json-to-dict-example)
-- [English](#english)
 - [Base Concepts](#base-concepts)
   - [Why WebApp?](#why-webapp)
 - [Case study.](#case-study)
@@ -1776,9 +1775,6 @@ from collections import OrderedDict
 OrderedDict([('01', '7 sadów'), ('02', 'App!'), ('03', 'CiderINN'), ('04', 'Cydr Ignaców'), ('05', 'Cydr Lubelski'), ('06', 'Dobroński Cydr'), ('07', 'eXcite Strong Premium Cider'), ('08', 'Kiss'), ('09', 'Fizz'), ('10', 'Jocker'), ('11', 'Lajk'), ('12', 'My Cider'), ('13', 'Green Mill Cider'), ('14', 'Somersby'), ('15', 'Sun Cider'), ('16', 'Warka Cydr Premium'), ('17', 'XCider'), ('18', 'Cydr Polski'), ('19', 'Cydr Dziki'), ('20', 'Strongbow'), ('21', 'Cydr Miłosławski'), ('22', 'Cider Smiler'), ('23', 'Desire')])
 
 ```
-
-<a name="english"></a>
-# English
 
 
 <a name="base-concepts"></a>
