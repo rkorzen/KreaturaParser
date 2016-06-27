@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Your Title Here</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- This is template for http://remarkjs.com/ by Ole Petter Bang -->
+    <!-- CSS modifcations by J. M. Lilly-->
+      
+    <style type="text/css">
+      body { font-family: 'Georgia';letter-spacing:0.025em;}
+      h1, h2, h3 {
+        font-family: 'Georgia';
+        font-weight: normal;
+      }
+      .remark-slide-content h1 { font-size: 2.4em; color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+      .remark-slide-content h2 { font-size: 1.55em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+      .remark-slide-content  h3 { font-size: 1.4em;color:#606060;font-weight: bold;letter-spacing:0.05em;margin-top:0em}
+      .remark-slide-content p,ol,ul { font-size: 1.2em; }
+      .remark-code, .remark-inline-code { font-family: 'Courier'; }
+      .remark-fading { z-index: 9; } 
+        
+      /* Thanks to http://www.partage-it.com/animez-vos-presentations-remark-js/  (in French) */
+      .remark-slide-container {transition: opacity 0.5s ease-out;opacity: 0;}
+      .remark-visible {transition: opacity 0.5s ease-out;opacity: 1;}
+        
+      /* Two-column layout */
+      .left-column {
+        width: 50%;
+        float: left;
+      }
+      .right-column {
+        width: 49%;
+        float: right;
+        padding-top: 0em;
+        margin-top: 0em;
+        text-align: left;
+      }    
+      .footnote {  
+        position:absolute;
+        bottom: 1em;
+        left: 14em;
+        font-size: 0.7em;
+       }
+        
+      /* Some special classes */
+      .title {font-size: 3.3em; color:#606060;font-weight:bold;letter-spacing:0.05em}
+      .subtitle {font-size: 1.4em}
+      .author {font-size: 1.4em; color:#606060;font-weight:bold;letter-spacing:0.02em}  
+      .coauthor {font-size: 1.0em; color:#606060;font-weight:bold;letter-spacing:0.02em}  
+      .institution {font-size: 1.0em;}
+      .date {font-size: 1.0em;font-style: italic}
+      .small {font-size: 0.6em;}
+      .cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+      .strike {color:salmon;text-decoration:line-through}
+      .center {text-align: center}        
+      .cite_author {font-size: 0.7em; font-style: oblique; float: right;}         
+      /*Set color scheme for links.*/    
+      a {text-decoration: none; color: #666666;text-align:center; width: 24%}
+      /*Setting link properties is particular, do not change order below*/   
+      a:visited {color:#666666}
+      a:hover {color:#33AA99}  
+      a:active, a#active {color:#FF9700;} 
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle
+
+.title[SDL]     
+.subtitle[Survey Domain Language]  
+&nbsp;  
+&nbsp;
+&nbsp;              
+&nbsp;              
+&nbsp;              
+.author[Rafał Korzeniewski]  
+.institution[MillwardBrown]      
+&nbsp;              
+&nbsp;  
+&nbsp;
+.date[27 Czerwiec 2016]   
+&nbsp;          
+&nbsp;          
+&nbsp;          
+.small[[https://github.com/rkorzen/KreaturaParser/blob/master/sdl/docs/manual.md](https://github.com/rkorzen/KreaturaParser/blob/master/sdl/docs/manual.md)]       
+.small[[http://rkorzen.pythonanywhere.com/parser/](http://rkorzen.pythonanywhere.com/parser/)]               
+
+
+---
+
+# Agenda
+
+1. Język domenowy
+2. Budowa ankiety
+3. Narzędzia
+4. Automatyzacja - możliwości i ograniczenia
+5. Metodyka pracy
+6. Przykłady
+
+---
+
+## Język domenowy
+
+.cite[ Język dziedzinowy, także język dedykowany, język specjalizowany (ang. domain-specific language, DSL) to język programowania przystosowany do rozwiązywania określonej dziedziny problemów, określonej reprezentacji problemu lub określonej techniki ich rozwiązywania.]
+
+.cite_author[Źródło: Wikipedia]
+
+&nbsp;          
+--
+
+<hr/>
+
+SDL służy opisywaniu budowy ankiet. Definuje się w nim typy pytań, kafeterie stwierdzeń, odpowiedzi a także proste elementy logiki.
+
+--
+
+<div class="center">
+KOD SDL<br/> 
+&darr; <br/> 
+Reprezentacja obiektowa <br/> 
+&darr; <br/> 
+metody serializacji <br>
+<small>(IBIS, IBM Base Professional Metadata i Routing, Syntax SPSS, inne?)</small><br/> 
+</div>
+---
+
+## Budowa ankiety (CAWI) 
+
+Różne typy pytań, np:
+
+otwarte (tekstowe i numeryczne), zamknięte (categoricale - single/multi), półotwarte (single/multi z dopytaniem)
+--
+
+Różne sposoby prezentacji:
+
+Listy, tabele, gridy, koszyki, skale, rankingi, higlightery, concept selecty, intuitive itp.
+
+--
+
+<hr>
+
+Różne systemy mają podobny repertuar typów i sposobów prezentacji. Osiągane są one różnymi drogami, ale w kwestionariuszu i z punkty widzenia respondenta są to rozwiązania bardzo podobne. 
+
+To zachęca do szerszego, kompleksowego spojrzenia i zastosowania mądrej, wspomagającej automatyzacji.
+
+SDL nie ma na celu zastąpienia skryptera. Ma na celu jego wsparcie.
+
+---
+
+## Narzędzia
+
+W obecnej formie SDL nie wymaga instalowania żadnego oprogramowaia.
+Jest to aplikacja internetowa.  
+
+--
+
+Warto jednak zainstalowć edytor tekstowy pozwalający na wygodną pracę w kodowaniu ANSI oraz UTF-8 oraz radzący sobie ze znakmi nowych lini w stylu unix.
+Może to być w zasadzie dowolny edytor spełniający powyższe wymogi. Ja polecam notepad++, który jest darmowy i dobrze sobie radzi.
+Boxer będzie mieć problemy z polskimi znakami
+zwykły notatnik nie wyświetli nowych lini.
+
+--
+
+Nie pracujemy w Word!
+Choć 99% kwestionariuszy to dokumenty Worda, to jednak on sam niezbyt dobrze nadaje się do pracy z SDL. 
+Word dodaje dużo własnego formatowania, znaczników, zamienia też automatycznie niektóre znaki i ciągi znaków na inne. 
+
+---
+
+## Autmatyzacja
+
+Przed wszystkim SDL to nie jest coś, co rozwiązuje wszelkie problemy i co napisze ankietę za Ciebie. SDL automatyzuje pewne zadania, które i tak skrypter robi, tyle że ręcznie.
+SDL to narzędzie, które jak każde inne narzędzie może być wykorzystane w sposób mądry, inteligentny, albo głupi. 
+
+Mądra droga to taka, która pozwoli Ci napisać szybciej i sprawniej dobry skrypt. 
+
+SDL nie zwolni Cię z myślenia. Zastąpi Cię lub znacznie wspomoże w zadaniach, które myślenia nie wymagają.
+
+---
+
+## Automatyzacja - możliwości
+
+Po co to wszystko? 
+
+<ul>
+<li>łatwiej</li>
+--
+<li>szybciej</li>
+--
+<li>mniej błędów</li>
+--
+<li>czytelny, jednolity kod</li>
+--
+<li>niski koszt wejścia i przeniesienia do innej technologii</li>
+</ul>
+
+---
+
+## Automatyzacja - możliwości
+
+#### Dlaczego łatwiej i szybciej?
+
+SDL jest prosty. SDL wykona za nas dużo zwykłej, mrówczej pracy - np szkielety pytań, tworzenie i numerowanie list.
+To są operacje, które i tak robi skrypter. Czasem ręcznie, czasem korzystając z jakichś pomocy (excel, hotei, makra w edytorach). Nie ma w nich nic twórczego. Używajac SDL zaoszczędzicie ten czas. W SDL całą ankietę możcie zrobić "od razu" - tzn nie trzeba robić każdego z pytań oddzielnie, ale wszystkie w jednym podejściu. To znacznie mniej klikania, kopiowania, przeklejania. 
+
+--
+
+Dodatkowy profit: niski koszt wejścia nowych pracowników. SDL jest prostszy do nauczenia niż IBIS czy BP. 
+Na dobrą sprawę ogarniętym badaczom zajęłoby chwilę, by zaczać pisać skrypty w ten, lub zbliżony do tego sposób. Wtedy cały proces pisania ankiet byłby jeszcze szybszy.
+
+---
+
+## Automatyzacja - możliwości
+
+#### Dlaczego mniej błędów?
+
+Automat nie zapomni o przecinku, średniku. Przeprowadzi też proste walidacje (powtarzające się identyfikatory odpowiedzi, pytań)
+Filozofia idąca za SDL zachęca też do patrzenia na badanie jako pewną całość. Łatwiej jest w ten sposób zaplanować badanie, pomyśleć o tym co będzie w wynikach. Wiele z tych rzeczy można zrealizować już na poziomie SDL. A wiele innych można będzie tu dodać o ile koncepcja będzie rozwijana.
+
+---
+
+## Automatyzacja - możliwości
+
+#### Czytelny, jednolity kod
+
+Czytelność kodu poprawia jakość skryptu, szczególnie cenne jest to wtedy, gdy ktoś inny niż autor zmuszony jest do pracy nad skryptem.
+Jednolity kod to także przewidywalność. Jeśli coś jest przewidywalne, to można zaplanować inne. wspomagajace operacje.
+Przykładem tego jest np syntax do koszyków w IBISie. 
+
+--
+
+#### Niski koszt wejścia i przeniesienia...
+
+Reprezentacja SDL w małym stopniu zależy od wybranej techniki. 
+Definicja pytania nie jest zależna od techniki, do której chcemy exportować wynik.
+Gridy, Buckety, Single, Openy... zapisujemy w SDL zawsze tak samo. 
+
+Jest to proste. Jest to w miarę dobrze udokumentowane. Wydaje mi się też, że jest to intuicyjne.
+
+---
+## Automatyzacja - ograniczenia
+
+##### Ogóły
+
+Z pewnością nowe narzędzia wymagają wyjścia poza strefę własnego komfortu i przyzwyczajeń. Nie każdy to lubi, ale na pewno zawsze warto to robić.
+SDL jest narzędziem wspomagającym. Opcjonalnym. Można obejść się bez niego. Choć moim zdaniem na pewno warto się z nim zapoznać i zaprzyjaźnić.
+
+Ogólnie mówiąc też nie da się jeszcze zautomatyzować wszystkiego. Kwestionariusze które do nas trafiają sa tak różnorodne, że po prostu nie sposób wszystkiego przewidzieć. 
+
+
+---
+## Automatyzacja - ograniczenia
+
+##### Szczegóły
+<small>
+Nie wszystko jeszcze jest zrobione. Są: Listy, categoricale, openy, gridy, koszyki. Reszta wkrótce.
+</small>
+
+<small>
+W BP tknięta jest tylko strona logiki badania. Realizacji logiki jest czymś, co stanowi znaczną różnicę pomiędzy systemami. Chcąc zachować zgodność wsteczną zmuszałbym skrypterów BP do przyjmowania nawyków i myślenia z IBISa a to nie jest dobra droga. Z drugiej strony definiowanie logiki dla każdego z systemów z osobna burzy uniwersalność rozwiązania.
+</small>
+
+<small>
+Rozwiązaniem było by bardziej abstrakcyjne i uniwersalne podejście do opisu logiki. Opisanie jej w SDL a następnie tłumaczona na inne systemu. To zadanie do przemyślenia i wykonania. 
+Warto też pamiętać, że SDL nie ma na celu zastąpienie skryptera, a jedynie wsparcie go w powtarzalnych, nie wymagających myślenia czynnościach.
+</small>
+
+<small>
+Denerwujące i ograniczające jest też na razie to, że treść pytania musi być w SDL w jednej linii. To z czasem można poprawić, ale to spora zmiana.
+</small>
+
+---
+
+## Metodyka pracy
+
+No to w końcu jak pracować, by szybko odczuć korzyści?
+
++ Stwórz sobie dobre środowisko (np ten notepad++).
++ Nie bój się dokumentacji.
+
+---
+
+## Metodyka pracy
+
+#### Word
+1. Spójrz na kwestionariusz jako całość.
+2. Sprawdź błędy w Wordzie. 
+3. Ujednolić wersjonowania płci (SDL rozpozna najpopularniejsze przykłady wersjonowania, w miarę upływu czasu możemy jego wiedzę powiększać)
+4. Zrób italic i bold gdzie trzeba. Odpal makro, które zamieni formatowanie word na html.
+
+---
+
+## Metodyka pracy
+
+#### Edytor:
+1. Skopuj całość kwesta z worda i wklej do edytora tekstowego.
+2. Idź od góry kwesta i formatuj tekst do reguł SDL. Rzeczy niepotrzebne usuwaj:
+Są proste reguły. Definicja pytania wygląda zawsze tak:
+
+  ```
+  1 2   3             4     (5)    
+  Q TYP IDENTYFIKATOR treść --special-markers
+  kafeteria     (6)
+  _             (7)
+  stwierdzenia  (8)
+  ```
+
+liczby w nawiasie to pozycje obligatoryjne. Niektóre pytania mogą ich wymagać inne nie.
+
+---
+## Przykłady
+
+<a name="info-page"></a>
+### Info page
+
+input:
+
+    Q L Q1_intro This is a message.
+
+metadata output:
+
+    Q1_intro "This is a message." info;
+
+routing output:
+    
+    Q1_intro.Ask()
+
+---
+
+<a name="open-question"></a>
+### Open question
+
+input:
+
+    Q O Q1_open This is open question.
+
+metadata output:
+
+    Q1_open "This is open question." text;
+
+routing output:
+    
+    Q1_open.Ask()
+
+---
+<a name="numeric-question"></a>
+### Numeric question
+
+input:
+
+    Q O Q1_numeric This is numeric question.
+
+metadata output:
+
+    Q1_numeric "This is numeric question."
+    ' style( Width = "3em" )
+    long;    
+
+routing output:
+    
+    Q1_numeric.Ask()
+
+---
+
+<a name="simple-list-definition"></a>
+### Simple list definition
+input:
+    
+    Q DEF Brands Smth
+    2 a
+    5 b
+    7 c 
+metadata output:
+
+    Brands - define
+    {
+        _2 "a",
+        _5 "b",
+        _7 "c"
+
+    };
+routing output: `None`
+
+---
+
+<a name="categorical-single-answer"></a>
+### Categorical single answer
+
+input:
+
+    Q S Brands Smth
+    2   a
+    7   c   
+
+metadata output:
+
+    Brands "Smth"
+    Categorical [1..1]
+    {
+        _2 "a",
+        _7 "c"
+
+    };
+routing output: `Brands.Ask()`
+
+---
+
+<a name="categorical-multiple-answer"></a>
+### Categorical multiple answer
+input:
+
+    Q M Brands Smth
+    2   a
+    5   b
+    7   c   
+metadata output:
+
+    Brands "Smth"
+    Categorical [1..1]
+    {
+        _2 "a",
+        _5 "b",
+        _7 "c"
+
+    };
+
+routing output: `Brands.Ask()`
+
+
+<a name="categorical-with-defined-list"></a>
+### Categorical with defined list
+
+input:
+
+    Q M Q1 which of the following brands you know
+    --use:BRANDS
+
+metadata output:
+
+    Q1 "Which of the following brands you know?"
+    Categorical [1..]
+    {
+        use BRANDS -
+
+    };
+
+routing output:
+    
+    Q1.Ask()
+
+<a name="categorical-create-list"></a>
+### Categorical create list
+
+input:
+
+    Q S Q1 The best car brand is .. --list:CARBRANDS
+    Mercedes
+    Bugatti
+    Porsche
+
+
+metadata output:
+
+    CARBRANDS - define
+    {
+        _1 "Mercedes",
+        _2 "Bugatti",
+        _3 "Porsche"
+
+    };
+
+    Q1 "The best car brand is .. "
+    Categorical [1..1]
+    {
+        use CARBRANDS -
+    };
+
+routing output:
+    
+    Q1.Ask()
+
+
+
+<a name="automate-cafeteria-id"></a>
+### Automate cafeteria id
+There are several ways to automate cafeteria id's.
+
+By default we expect that cafeteria has a numeric id, or no id at all.
+
+cafeteria row is build like this:
+
+    1   2         3        4  
+    (id)(.d|.c)[ ]Content[](special markers) 
+
+Groups in () are not obligatory
+    
+    1 - explicite id - natural numbers
+    2 - .d - DK
+        .c - comment (others)
+    [ ] - white space: spaces, tabs
+    3 - content 
+    4 - special markers:
+        --so = screen out (add screenout to routing)
+        --fix
+<a name="examples"></a>
+#### Examples
+
+<a name="basic-usage"></a>
+##### Basic usage:
+input:
+
+    Q S Q1 Content
+    1 A
+    2 B
+    3 C
+
+output:
+
+    Q1 "Content"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    };
+
+
+input:
+
+    Q S Q1 Content
+    A
+    B
+    C
+
+output:
+
+    Q1 "Content"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    };
+
+<a name="do-it-alphabetically---with-big-letters"></a>
+##### do it alphabetically - with big letters
+
+We can force big letters instead of numbers:
+
+input:
+
+    Q DEF LIST smth --big-letters
+    el 1
+    el 2
+
+output:
+
+    LIST - define
+    {
+        A "el 1",
+        B "el 2"
+
+    };
+
+TODO: Exceeding the length of the alphabet. AA AB AC etc etc... Also Warning?
+
+<a name="--raw-id"></a>
+##### `--raw-id`
+
+Other way is with `--raw-id`. Id is based on content. Replace white space with _ and strip.
+
+input:
+
+    Q M Q1 COS --raw-id
+    Mark 1
+    Mark 2
+    Mark 3
+
+output:
+
+    Q1 "COS "
+    Categorical [1..]
+    {
+        Mark_1 "Mark 1",
+        Mark_2 "Mark 2",
+        Mark_3 "Mark 3"
+
+    };
+
+<a name="--first-id"></a>
+##### `--first-id`
+
+For now the last method is `--first-id`. This means - first word treat like id.
+
+input:
+
+    Q M Q1 COS --first-id
+    Argh Mark 1
+    C Mark 2
+    F Mark 3
+
+output:
+
+    Q1 "COS "
+    Categorical [1..]
+    {
+        Argh "Mark 1",
+        C "Mark 2",
+        F "Mark 3"
+
+    };
+
+
+<a name="easy-add-bold-and-italic"></a>
+##### Easy add bold and italic
+When someone ask you to add a bold or italic to some answers, you don't need to add `<a></a>` arround phrase. Just add `--i`, `--b`.
+
+
+input:
+    
+    Q S Q1 Smth
+    A --i
+    B --b
+    C
+
+output:
+
+    Q1 "Smth"
+    Categorical [1..1]
+    {
+        _1 "<i>A</i>",
+        _2 "<b>B</b>",
+        _3 "C"
+
+    };
+
+
+<a name="ref-na-dk"></a>
+##### REF NA DK
+
+input:
+    
+    Q S Q1 Smth
+    A --ref
+    B --na
+    C --dk
+
+output:
+
+    Q1 "Smth"
+    Categorical [1..1]
+    {
+        - "A" REF,
+        - "B" NA,
+        - "C" DK
+
+    };
+
+<a name="cafeteria-with-images"></a>
+##### cafeteria with images
+There are two ways to create cafeteria with images. 
+You can use special marker `--images` or `--images:path\to\files` to do it globally (example 1a / 1b)
+Or You can do it explicite with `|path\img.jpg` (example2)
+
+example 1a
+input:
+    
+    Q S Q1 Smth --images
+    A
+    B
+
+output:
+
+    Q1 "Smth "
+        [
+            flametatype = "mbclickableimages"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+
+        ]
+    Categorical [1..1]
+    {
+        _1 "A"
+            labelstyle(
+                Image = "images\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        _2 "B"
+            labelstyle(
+                Image = "images\2.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+
+ecample 1b
+input:
+    
+    Q DEF Q1 Smth --images:folder\folder2
+    A
+    B
+
+output:
+
+    Q1 - define
+    {
+        _1 "A"
+            labelstyle(
+                Image = "images\folder\folder2\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        _2 "B"
+            labelstyle(
+                Image = "images\folder\folder2\2.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+'''
+
+example 2:
+input:
+    
+    Q S Q1 COS
+    A|1.jpg
+    B|c\2.jpg
+
+output:
+
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        _1 "A"
+            labelstyle(
+                Image = "images\1.jpg",
+                ImagePosition = "ImageOnly"
+            ),
+        _2 "B"
+            labelstyle(
+                Image = "images\c\2.jpg",
+                ImagePosition = "ImageOnly"
+            )
+
+    };
+
+<a name="sorting"></a>
+#### Sorting
+
+Cafeteria have to methods to sort `--sort` and `--sort-by-id`
+
+Example1 `--sort`
+input:
+
+    Q DEF Brand Brand --sort
+    C
+    D
+    A
+
+output:
+
+    Brand - define
+    {
+        _3 "A",
+        _1 "C",
+        _2 "D"
+
+    };
+
+
+Example2  `--sort-by-id`
+input:
+
+    Q S Brand Brand --sort-by-id
+    2 C
+    3 D
+    1 A
+
+output:
+
+    Brand "Brand "
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "C",
+        _3 "D"
+
+    };
+
+Example3 - You can combine sorting with list creation
+
+input:
+
+    Q M Brand Brand --sort--list:Brands
+    C
+    D
+    A
+
+output:
+
+    Brands - define
+    {
+        _3 "A",
+        _1 "C",
+        _2 "D"
+
+    };
+
+    Brand "Brand "
+    Categorical [1..]
+    {
+        use Brands -
+    };
+
+
+
+<a name="randomizerotation"></a>
+#### Randomize/Rotation
+To rotate/randomize add special marker
+
+`--rot` - rotate cafeteria
+`--statements-rot` - rotate statements
+
+`--ran` - randomize cafeteria
+`--statements-ran` - randomize statements
+
+input:
+    
+    Q S Q1 COS --ran
+    A
+    B
+    C
+
+
+output:
+
+    Q1 "COS"
+    Categorical [1..1]
+    {
+        _1 "A",
+        _2 "B",
+        _3 "C"
+
+    } ran ;
+
+<a name="another-question-examples"></a>
+## Another question examples
+
+<a name="drag-and-drop"></a>
+### Drag and Drop
+
+<a name="buckets-with-text"></a>
+#### Buckets with text
+
+input:
+
+    Q B dndBucketsText How familiar you are with each of these brands?<br/>
+    --use:BE2A_ans_dl
+    _
+    --use:BRANDS
+
+output:
+
+    dndBucketsText "How familiar you are with each of these brands?<br/>"
+        [
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Text"
+            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            , dropType = "buckets"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            use BE2A_ans_dl -
+
+        };
+    ) expand grid;
+
+
+<a name="buckets-with-images"></a>
+#### Buckets with images
+
+input:
+
+    Q B dndBucketsImage How familiar you are with each of these brands?<br/> --images
+    --use:BE2A_ans_dl
+    _
+    --use:BRANDS
+
+output:
+
+    dndBucketsImage "How familiar you are with each of these brands?<br/>"
+        [
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Images"
+            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , dropType = "buckets"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            use BE2A_ans_dl -
+
+        };
+    ) expand grid;
+
+<a name="exclude-in-buckets"></a>
+#### Exclude in buckets
+
+input:
+
+    Q B dndScaleTextGray Drop the brand to the relevant baskets<br/>
+    The Best one --@
+    Good
+    Bad
+    The worse one --@
+    _
+    --use:BRANDS
+
+output:
+
+    dndScaleTextGray "Drop the brand to the relevant baskets<br/>"
+        [
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Text"
+            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            , dropType = "buckets"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            _1@ "The Best one",
+            _2 "Good",
+            _3 "Bad",
+            _4@ "The worse one"
+
+        };
+    ) expand grid;
+
+
+
+<a name="love-hate-scale-with-text-buttons"></a>
+#### Love hate scale with text buttons
+
+input:
+
+    Q LHS dndLoveHateScaleText How familiar you are with each og these brands?<br/>
+    -5 Hate it
+    -4
+    -3
+    -2
+    -1
+    0 Neutral
+    1
+    2
+    3
+    4
+    5 Love it
+     _
+     --use:BRANDS
+
+output:
+
+    dndLoveHateScaleText "How familiar you are with each og these brands?<br/>"
+        [
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Text"
+            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            , dropType = "scale"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            _1 "-5 Hate it",
+            _2 "-4",
+            _3 "-3",
+            _4 "-2",
+            _5 "-1",
+            _6 "0 Neutral",
+            _7 "1",
+            _8 "2",
+            _9 "3",
+            _10 "4",
+            _11 "5 Love it"
+
+        };
+    ) expand grid;
+
+
+<a name="love-hate-scale-with-image-buttons"></a>
+#### Love hate scale with image buttons
+
+it's similar - just add `--images`
+
+input:
+
+    Q LHS dndBucketsImage How familiar you are with each og these brands?<br/>--images
+    -5 Hate it
+    -4
+    -3
+    -2
+    -1
+    0 Neutral
+    1
+    2
+    3
+    4
+    5 Love it
+    _
+    --use:BRANDS
+
+output:
+
+    dndBucketsImage "How familiar you are with each og these brands?<br/>"
+        [
+            flametatype = "mbdragndrop"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+            , rowBtnType = "Image"
+            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            , dropType = "scale"
+        ]
+    loop
+    {
+        use BRANDS -
+
+    }  fields -
+    (
+        slice ""
+        categorical [1..]
+        {
+            _1 "-5 Hate it",
+            _2 "-4",
+            _3 "-3",
+            _4 "-2",
+            _5 "-1",
+            _6 "0 Neutral",
+            _7 "1",
+            _8 "2",
+            _9 "3",
+            _10 "4",
+            _11 "5 Love it"
+
+        };
+    ) expand grid;
+
+
+<a name="dynamic-grid"></a>
+#### Dynamic Grid
+
+example 1
+input:
+
+    Q G Q1 COS
+    answer a
+    answer b
+    _
+    statment I
+    statment II
+
+output:
+
+    Q1 "COS"
+        [
+            flametatype = "mbdynamicgrid"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+        ]
+    loop
+    {
+        _1 "statment I",
+        _2 "statment II"
+
+    } fields -
+    (
+        slice ""
+        categorical [1..1]
+        {
+            _1 "answer a",
+            _2 "answer b"
+
+        };
+    ) expand grid;
+
+example2 - randomize cafeteria rotate statements
+
+input:
+    
+    Q G Q1 COS --ran --statements-rot
+    answer a
+    answer b
+    _
+    statment I
+    statment II
+
+output:
+
+    Q1 "COS "
+        [
+            flametatype = "mbdynamicgrid"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+        ]
+    loop
+    {
+        _1 "statment I",
+        _2 "statment II"
+
+    } rot  fields -
+    (
+        slice ""
+        categorical [1..1]
+        {
+            _1 "answer a",
+            _2 "answer b"
+
+        } ran ;
+    ) expand grid;
+
+<a name="slider-not-implemented-yet"></a>
+#### Slider (Not implemented yet)
+Not implemented yet
+
+<a name="click-and-fly-not-implemented-yet"></a>
+#### Click and Fly (Not implemented yet)
+Not implemented yest
+
+<a name="clicakble-images"></a>
+#### Clicakble Images 
+Check single/multi with `--images`
+
+<a name="clickable-tiles-not-implemented-yet"></a>
+#### Clickable Tiles (Not implemented yet)
+Not implemented yet
+
+<a name="button-matrix-not-implemented-yet"></a>
+#### Button Matrix (Not implemented yet)
+Not implemented yet
+
+<a name="semantic-differential-bi-polar---not-implemented-yet"></a>
+#### Semantic Differential (Bi-polar) - Not implemented yet
+Not implemented yet
+
+<a name="errors-and-validation"></a>
+# errors and validation
+There are also few basic validators
+
+<a name="two-questions-with-the-same-id"></a>
+## two questions with the same id
+
+input:
+
+    Q S Q1 Smth
+    A
+    B
+
+    Q S Q1 Smth
+    A
+    B
+
+
+output:
+
+    ValueError: Two questions have the same id: Q1  
+
+
+<a name="two-positions-in-cafetera-have-the-same-id"></a>
+## two positions in cafetera have the same id
+
+input:
+
+    Q S Q1 Smth
+    1    A
+    1    A
+
+output:
+
+    ValueError: Two positions can't have same id. Error in: Q1. Cafeteria id: 1   
+
+
+
+    </textarea>
+    <!-- This is the link to the local copy of Remark -->
+    <script src="liminal/javascript/remark-latest.min.js" type="text/javascript"></script>
+    <!-- See discussion at https://github.com/gnab/remark/issues/222-->
+    <!-- You could alternately use the libraries from remote location -->
+    <!--<script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>-->
+      
+    <!-- This is the link to the remote MathJax libraries --> 
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML&delayStartupUntil=configured" type="text/javascript"></script> 
+    <!-- If you want to run your presentation offline, you need to download the MathJax -->
+    <!-- libraries, then uncomment the line below and comment out the one above.-->
+    <!--<script src="../javascript/MathJax/MathJax.js?config=TeX-AMS_HTML&delayStartupUntil=configured,local/local" type="text/javascript"></script> -->
+    <!-- Note: see comment at http://stackoverflow.com/questions/19208536/mathjax-not-working-if-loaded-from-local-js-file-or-if-the-source-code-is-includ-->
+      
+    <script type="text/javascript"> 
+      var slideshow = remark.create({navigation: {click: false}, properties: {class: "center, middle"}});
+
+      // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+          }
+      });
+      MathJax.Hub.Queue(function() {
+          $(MathJax.Hub.getAllJax()).map(function(index, elem) {
+              return(elem.SourceElement());
+          }).parent().addClass('has-jax');
+      });
+
+      MathJax.Hub.Configured();
+    </script>
+  </body>
+</html>
