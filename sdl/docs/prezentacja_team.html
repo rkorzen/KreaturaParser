@@ -50,9 +50,13 @@
       .institution {font-size: 1.0em;}
       .date {font-size: 1.0em;font-style: italic}
       .small {font-size: 0.6em;}
+      .small .remark-code {font-size: 0.8em;}
+
       .cite {font-size: 0.8em; color:#33AA99;font-style: italic}
+
       .strike {color:salmon;text-decoration:line-through}
-      .center {text-align: center}        
+      .center {text-align: center}
+      .justify {text-align: justify;}        
       .cite_author {font-size: 0.7em; font-style: oblique; float: right;}         
       /*Set color scheme for links.*/    
       a {text-decoration: none; color: #666666;text-align:center; width: 24%}
@@ -73,8 +77,8 @@ class: center, middle
 &nbsp;              
 &nbsp;              
 &nbsp;              
-.author[Rafał Korzeniewski]  
-.institution[MillwardBrown]      
+<!--.author[Rafał Korzeniewski]  
+.institution[MillwardBrown, Lab Rafał Korzeniewski]-->      
 &nbsp;              
 &nbsp;  
 &nbsp;
@@ -101,7 +105,11 @@ class: center, middle
 
 ## Język domenowy
 
-.cite[ Język dziedzinowy, także język dedykowany, język specjalizowany (ang. domain-specific language, DSL) to język programowania przystosowany do rozwiązywania określonej dziedziny problemów, określonej reprezentacji problemu lub określonej techniki ich rozwiązywania.]
+.justify[.cite[ Język dziedzinowy, dedykowany, specjalizowany (ang. domain-specific language, DSL) 
+
+język programowania przystosowany do rozwiązywania określonej dziedziny problemów, określonej reprezentacji problemu lub określonej techniki ich rozwiązywania.
+
+]]
 
 .cite_author[Źródło: Wikipedia]
 
@@ -110,56 +118,229 @@ class: center, middle
 
 <hr/>
 
-SDL służy opisywaniu budowy ankiet. Definuje się w nim typy pytań, kafeterie stwierdzeń, odpowiedzi a także proste elementy logiki.
+.center[SDL - język opisu ankiet.] 
 
---
+* defuniuje pytania, sposób prezentacji i typ odpowiedzi 
+* definiuje logikę *(obecnie to jest w fazie koncepcji)*
+* porządkuje strukture odpowiedzi - zarówno poprzez samą automatyzację i powtarzalność jak i poprzez manipulowanie zbiorami
 
-<div class="center">
+
+---
+
+## SDL - język opisu ankiet.
+&nbsp;
+&nbsp;
+&nbsp;
+
+
+.center[
 KOD SDL<br/> 
 &darr; <br/> 
 Reprezentacja obiektowa <br/> 
 &darr; <br/> 
 metody serializacji <br>
 <small>(IBIS, IBM Base Professional Metadata i Routing, Syntax SPSS, inne?)</small><br/> 
-</div>
+]
+
 ---
 
 ## Budowa ankiety (CAWI) 
 
-Różne typy pytań, np:
+#### Różne typy pytań, np:
 
 otwarte, zamknięte, półotwarte, higlightery, concept selecty, intuitive itp.
 
 --
 
-Różne sposoby prezentacji:
+#### Różne sposoby prezentacji i interakcji:
 
 Listy, tabele, gridy, koszyki, skale, rankingi, slidery
 
 --
 
-<hr>
+#### Relacje pomiędzy pytaniami i opdpowiedziami - logika
 
-Systemy mają podobny repertuar typów i sposobów prezentacji. Osiągane są one różnymi drogami, ale w kwestionariuszu i z punkty widzenia respondenta są to rozwiązania bardzo podobne. 
+Filtry, losowania, ...
 
-To zachęca do szerszego, kompleksowego spojrzenia i zastosowania automatyzacji.
+--
 
-I tu właśnie wkracza SDL. Ma on na celu wsparcie skryptera a nie jego zastąpienie.
+#### Warstwa wyników
+
+Kwotowanie, zmienne, wartości, opisy.
+
+---
+## Budowa ankiety (CAWI) 
+
+
+#### Kilka spotrzeżeń:
+
+* Kwestionariusze są do siebie podobne
+--
+
+* Systemy ankiet mają podobny repertuar typów pytań
+--
+
+* Systemy ankiet mają podobny repertuar sposobów wizualizacji, prezentacji. 
+--
+
+* Respondent widzi podobne rozwiązania
+
+.cite[W systemach do tworzenia ankiet, w oparciu o podobne do siebie dokumenty, budujemy podobne do siebie rozwiązania] 
+
+.center[Szerokie spojrzenie | automatyzacja | optymalizacja]
+
+I tu właśnie wkracza SDL. 
+
+--
+
+.center[Automatyzacja wspiera skryptera. Nie zastępuje go.]
+---
+
+## Możliwości
+
+#### Czego SDL nie robi
+
+* SDL nie pisze za skryptera ankiet.  
+* SDL nie zwalnia z myślenia
+
+--
+
+#### Co SDL robi?
+
+* automatyzuje zadania - szczególnie te bezmyślne ale pracochłonne i monotonne
+* wspiera skryptera w sprawnym budowaniu skryptów 
+* promuje szerokie, globalne spojrzenie na ankietę
+* pomaga zoptypmalizować produkt wyniki
+* ujednolica i formatuje kod
+
+--
+
+SDL najlepiej sprawdzi się przy odpowiednim podejściu do procesu pisania ankiety.
+
+Mądra droga to taka, która pozwoli Ci napisać szybko dobry skrypt. 
+Mądrze jest wykorzystać to co już napisałeś do innych celów.
+
+.center[.cite[DRY -  don't repeat yourself]]
+
 
 ---
 
-## Narzędzia
+## Możliwości
 
-* SDL to aplikacja internetowa
-* SDL to moduł pythona
-* (SDL API ? SDL Standalone?)
+#### To gdzie ta wartość dodana?
+
+<ul>
+<li>łatwiej</li>
+<li>szybciej</li>
+<li>mniej błędów</li>
+<li>czytelny, jednolity kod</li>
+<li>niski koszt wejścia i przeniesienia do innej technologii</li>
+<li>dodatkowe korzyści - np syntax spss (numeracja w multi, koszyki w IBIS)</li>
+</ul>
+
+---
+
+## Możliwości
+
+#### Dlaczego łatwiej i szybciej?
+
+* Budowa podobna do zwykłego kwestionariusza.
+* Proste reguły, intuicyjne konstrukcje 
+* Automatyzacja tworzenia docelowego kodu 
+* Możliwość wbudowania w kod skryptów pythona
+* Stosuj mockupy
+
+--
+
+.center[.cite[prostota | elastyczność | intuicyjność | kompleksowość]]
+
+--
+
+.small[Srypter w czasie pisania wykonuje wiele różnych operacji. Tworzy listy, szkielety pytań, wywołania, filtry. 
+Obecne - znane mi - rozwiązania automatyzacji nie wykorzystują jej potencjału. 
+Jedne zmuszają nas do rozbijania pracy na małe kawałki, które składamy w całość a inne są bardzo zamknięte (SAT)  
+W SDL wskazane jest by podejść do skryptu jako do całości. 
+To znacznie mniej klikania, kopiowania, przeklejania.
+Jeśli coś nas stopuje to można to po prostu zasygnalizować i zostawić rozwiązanie na później.]
+
+--
+* niski koszt wejścia nowych pracowników. SDL jest prostszy do nauczenia niż IBIS czy BP
+
+--
+* reużywalność. Jeden kod, wiele możliwości. 
+
+--
+* stosunkowo mały koszt wejścia w nowe technologie - o ile udostępniają jakieś API do tworzenia ankiet
+
+---
+
+## Możliwości
+
+#### Dlaczego mniej błędów?
+
+Automat się nie myli. Co najwyżej robi coś źle. 
+
+--
+
+#### Czytelny, jednolity kod
+
+Te same typy pytań zawsze sa napisane w ten sam sposób. Dobre, czytelne sformatowanie kodu ułatwia czytanie.
+Dodatkowo - jako, że robi to automat - można w szablony kodu wplatać rozmaite komentarze, zakomentowane dodatkowe opcje, przykłady itd.
+Wszystko wtedy może być "pod ręką"
+
+.center[.cite[Readability counts.]]
+
+---
+## Możliwości
+#### Niski koszt wejścia i przeniesienia...
+
+* Reprezentacja SDL w małym stopniu zależy od wybranej techniki. 
+* Gridy, Buckety, Single, Openy... zapisujemy w SDL tak samo dla BP jak i dla DIM 
+
+Jest to proste. Jest to w miarę dobrze udokumentowane. Wydaje mi się też, że jest to intuicyjne.
+
+---
+
+## Ograniczenia
+
+* nowe = konieczność wyjścia poza strefę własnego komfortu i przyzwyczajeń
+* Bardzo ograniczone prototypowanie. SDL automatyzuje tylko dobrze znane rozwiazania
+* To nie jest jeszcze kompletne rozwiazanie. .small[(Są: Listy, categoricale, openy, gridy, koszyki. Reszta wkrótce.)]
+
+---
+
+<small>
+W BP tknięta jest tylko strona logiki badania. Realizacji logiki jest czymś, co stanowi znaczną różnicę pomiędzy systemami. Chcąc zachować zgodność wsteczną zmuszałbym skrypterów BP do przyjmowania nawyków i myślenia z IBISa a to nie jest dobra droga. Z drugiej strony definiowanie logiki dla każdego z systemów z osobna burzy uniwersalność rozwiązania.
+</small>
+
+<small>
+Rozwiązaniem było by bardziej abstrakcyjne i uniwersalne podejście do opisu logiki. Opisanie jej w SDL a następnie tłumaczona na inne systemy. To zadanie do przemyślenia i wykonania. 
+Warto też pamiętać, że SDL nie ma na celu zastąpienie skryptera, a jedynie wsparcie go w powtarzalnych, nie wymagających myślenia czynnościach.
+</small>
+
+<small>
+Denerwujące i ograniczające jest też na razie to, że treść pytania musi być w SDL w jednej linii. To z czasem można poprawić, choć to spora zmiana. 
+</small>
+
+---
+
+## Metodyka pracy - Narzędzia
+
+#### SDL
+* aplikacja internetowa
+--
+
+* moduł pythona
+--
+
+* (web API? Aplikacja desktopowa?)
 
 --
 
 #### narzędzia wspomagajace:
 
-* Edytor tekstowy - taki z przyzwoitą obsługą kodowania np. notepad++, atom, sublime
-* [IBIS] Edytor xml - np firstobject - pozwala na kopionwanie blokowe
+* Edytor tekstowy - np. notepad++, atom, sublime
+* Edytor xml - np firstobject
 
 --
 
@@ -168,149 +349,14 @@ I tu właśnie wkracza SDL. Ma on na celu wsparcie skryptera a nie jego zastąpi
 * Boxer
 * notatnik
 * Word
+* Słabo wypada TextPad
 
 ---
 
-## Autmatyzacja - ogóły
-
-#### Czego SDL nie robi
-SDL nie pisze ankiet. 
-
-#### Co SDL robi?
-SDL automatyzuje zadania.
-
---
-
-SDL to narzędzie, które jak każde inne narzędzie może być wykorzystane w sposób mądry, inteligentny, albo głupi. 
-
-Mądra droga to taka, która pozwoli Ci napisać szybciej i sprawniej dobry skrypt. 
-Mądra droga to taka, w której to co już napisałeś możesz wykorzystać do innych celów. 
-
-SDL nie zwolni Cię z myślenia. Zastąpi Cię lub znacznie wspomoże w zadaniach, które myślenia nie wymagają.
-
----
-
-## Automatyzacja - możliwości
-
-#### To gdzie ta wartość dodana?
-
-<ul>
-<li>łatwiej</li>
---
-<li>szybciej</li>
---
-<li>mniej błędów</li>
---
-<li>czytelny, jednolity kod</li>
---
-<li>niski koszt wejścia i przeniesienia do innej technologii</li>
---
-<li>dodatkowe korzyści - np syntax spss (numeracja w multi, koszyki w IBIS)</li>
-</ul>
-
----
-
-## Automatyzacja - możliwości
-
-#### Dlaczego łatwiej i szybciej?
-
-* SDL jest prosty. 
-* SDL jest podobny do zwykłego kwestionariusza.
-* SDL automatyzuje wiele różnych zadań 
-* SDL łatwo rozbudować 
-
---
-
-.center[.cite[prostota | elastyczność | intuicyjność | kompleksowość]]
-
---
-
-.small[Srypter w czasie pisania wykonuje wiele różnych operacji. Tworzy listy, szkielety pytań, wywołania, filtry. Obecne rozwiązania automatyzacji nie wykorzystują jej potencjału. 
-Ograniczają się do bardzo szczeółowych zadań, albo są bardzo zamknięte.  
-W SDL całą ankietę można zrobić "od razu". Podejść do niej jako do całości. To znacznie mniej klikania, kopiowania, przeklejania.
-Jeśli coś nas stopuje to można to po prostu zasygnalizować i zostawić rozwiązanie na później.]
-
---
-
-* niski koszt wejścia nowych pracowników. SDL jest prostszy do nauczenia niż IBIS czy BP. 
-
---
-
-* przygotowany plik sdl może służyć także do innych zadań - np. ogarnięcia labelek w spss
-
----
-
-## Automatyzacja - możliwości
-
-#### Dlaczego mniej błędów?
-
-Automat nie zapomni o przecinku, średniku. Przeprowadzi też proste walidacje (powtarzające się identyfikatory odpowiedzi, pytań)
-Filozofia idąca za SDL zachęca też do patrzenia na badanie jako pewną całość. Łatwiej jest w ten sposób zaplanować badanie, pomyśleć o tym co będzie w wynikach. Wiele z tych rzeczy można zrealizować już na poziomie SDL. A wiele innych można będzie tu dodać o ile koncepcja będzie rozwijana.
-
----
-
-## Automatyzacja - możliwości
-
-#### Czytelny, jednolity kod
-
-Czytelność kodu poprawia jakość skryptu, szczególnie cenne jest to wtedy, gdy ktoś inny niż autor zmuszony jest do pracy nad skryptem.
-Jednolity kod to także przewidywalność. Jeśli coś jest przewidywalne, to można zaplanować inne. wspomagajace operacje.
-Przykładem tego jest np syntax do koszyków w IBISie. 
-
---
-
-#### Niski koszt wejścia i przeniesienia...
-
-Reprezentacja SDL w małym stopniu zależy od wybranej techniki. 
-Definicja pytania nie jest zależna od techniki, do której chcemy exportować wynik.
-Gridy, Buckety, Single, Openy... zapisujemy w SDL zawsze tak samo. 
-
-Jest to proste. Jest to w miarę dobrze udokumentowane. Wydaje mi się też, że jest to intuicyjne.
-
----
-## Automatyzacja - ograniczenia
-
-##### Ogóły
-
-Z pewnością nowe narzędzia wymagają wyjścia poza strefę własnego komfortu i przyzwyczajeń. Nie każdy to lubi, ale na pewno zawsze warto to robić.
-SDL jest narzędziem wspomagającym. Opcjonalnym. Można obejść się bez niego. Choć moim zdaniem na pewno warto się z nim zapoznać i zaprzyjaźnić.
-
-Ogólnie mówiąc też nie da się jeszcze zautomatyzować wszystkiego. Kwestionariusze które do nas trafiają sa tak różnorodne, że po prostu nie sposób wszystkiego przewidzieć. 
-
-
----
-## Automatyzacja - ograniczenia
-
-##### Szczegóły
-<small>
-Nie wszystko jeszcze jest zrobione. Są: Listy, categoricale, openy, gridy, koszyki. Reszta wkrótce.
-</small>
-
-<small>
-W BP tknięta jest tylko strona logiki badania. Realizacji logiki jest czymś, co stanowi znaczną różnicę pomiędzy systemami. Chcąc zachować zgodność wsteczną zmuszałbym skrypterów BP do przyjmowania nawyków i myślenia z IBISa a to nie jest dobra droga. Z drugiej strony definiowanie logiki dla każdego z systemów z osobna burzy uniwersalność rozwiązania.
-</small>
-
-<small>
-Rozwiązaniem było by bardziej abstrakcyjne i uniwersalne podejście do opisu logiki. Opisanie jej w SDL a następnie tłumaczona na inne systemu. To zadanie do przemyślenia i wykonania. 
-Warto też pamiętać, że SDL nie ma na celu zastąpienie skryptera, a jedynie wsparcie go w powtarzalnych, nie wymagających myślenia czynnościach.
-</small>
-
-<small>
-Denerwujące i ograniczające jest też na razie to, że treść pytania musi być w SDL w jednej linii. To z czasem można poprawić, ale to spora zmiana.
-</small>
-
----
-
-## Metodyka pracy
-
-No to w końcu jak pracować, by szybko odczuć korzyści?
+## Metodyka pracy ..
 
 + Stwórz sobie dobre środowisko (np ten notepad++).
 + Nie bój się dokumentacji.
-
----
-
-## Metodyka pracy
 
 #### Word
 1. Spójrz na kwestionariusz jako całość.
@@ -320,12 +366,12 @@ No to w końcu jak pracować, by szybko odczuć korzyści?
 
 ---
 
-## Metodyka pracy
+## Metodyka pracy ..
 
 #### Edytor:
-1. Skopuj całość kwesta z worda i wklej do edytora tekstowego.
-2. Idź od góry kwesta i formatuj tekst do reguł SDL. Rzeczy niepotrzebne usuwaj:
-Są proste reguły. Definicja pytania wygląda zawsze tak:
+* Skopuj całość kwesta z worda i wklej do edytora tekstowego.
+* Idź od góry kwesta i formatuj tekst do reguł SDL. Rzeczy niepotrzebne usuwaj lub komentuj. 
+* Są proste reguły. Definicja pytania wygląda zawsze tak:
 
   ```
   1 2   3             4     (5)    
@@ -338,7 +384,11 @@ Są proste reguły. Definicja pytania wygląda zawsze tak:
 liczby w nawiasie to pozycje obligatoryjne. Niektóre pytania mogą ich wymagać inne nie.
 
 ---
-## Przykłady
+
+.title[Przykłady]
+
+
+---
 ### Info page
 input:
 
@@ -608,7 +658,7 @@ output:
 ---
 
 ##### Easy add bold and italic
-When someone ask you to add a bold or italic to some answers, you don't need to add `<a></a>` arround phrase. Just add `--i`, `--b`.
+When someone ask you to add a bold or italic to some answers, you don't need to add `<i></i>` arround phrase. Just add `--i`, `--b`.
 
 input:
     
@@ -651,6 +701,7 @@ output:
 
 ##### cafeteria with images
 ###### `--images` 
+.small[
 input:
     
     Q S Q1 Smth --images
@@ -678,7 +729,7 @@ output:
             )
 
     };
-
+]
 ---
 
 ##### cafeteria with images
@@ -825,6 +876,7 @@ Similar for `--ran`
 ---
 #### Randomize/Rotation
 ##### `--statements-ran` - rotate statements
+.small[
 input:
 
     Q G Q1 COS --statements-ran
@@ -852,11 +904,12 @@ output:
         categorical [1..1]
         ...
     ) expand grid;
-
+]
 ---
 
 ### Drag and Drop
 #### Buckets with text
+.small[
 input:
 
     Q B dndBucketsText How familiar you are with each of these brands?<br/>
@@ -886,12 +939,14 @@ output:
 
         };
     ) expand grid;
+]
 
 ---
 
 ### Drag and Drop
 #### Buckets with images
 
+.small[
 input:
 
     Q B dndBucketsImage How familiar you are with each of these brands?<br/> --images
@@ -921,11 +976,12 @@ output:
 
         };
     ) expand grid;
+]
 
 ---
 ### Drag and Drop
 #### Exclude in buckets
-
+.small[
 input:
 
     Q B dndScaleTextGray Drop the brand to the relevant baskets<br/>
@@ -959,13 +1015,12 @@ output:
 
         };
     ) expand grid;
-
-
+]
 
 ---
 ### Drag and Drop
 #### Love hate scale with text buttons
-
+.small[
 input:
 
     Q LHS dndLoveHateScaleText How familiar you are with each og these brands?<br/>
@@ -982,11 +1037,13 @@ input:
     5 Love it
      _
      --use:BRANDS
-
+]
 
 ---
+
 ### Drag and Drop
 #### Love hate scale with text buttons
+.small[
 output:
 
     dndLoveHateScaleText "How familiar you are with each og these brands?<br/>"
@@ -1022,10 +1079,13 @@ output:
         };
     ) expand grid;
 
+]
 
 ---
+
 ### Drag and Drop
 #### `--images` - Love hate scale with image buttons
+.small[
 input:
 
     Q LHS dndBucketsImage How familiar you are with each og these brands?<br/>--images
@@ -1043,9 +1103,14 @@ input:
     _
     --use:BRANDS
 
+]
+
 ---
+
+
 ### Drag and Drop
 #### `--images` - Love hate scale with image buttons
+.small[
 output:
 
     dndBucketsImage "How familiar you are with each og these brands?<br/>"
@@ -1080,9 +1145,12 @@ output:
 
         };
     ) expand grid;
+]
 
 ---
+
 #### Dynamic Grid
+.small[
 input:
 
     Q G Q1 COS
@@ -1113,10 +1181,13 @@ output:
 
         };
     ) expand grid;
+]
 
 ---
 #### Dynamic Grid
 ##### randomize cafeteria rotate statements
+.small[
+
 input:
     
     Q G Q1 COS --ran --statements-rot
@@ -1147,8 +1218,10 @@ output:
 
         } ran ;
     ) expand grid;
+]
 
 ---
+
 #### Slider (Not implemented yet)
 Not implemented yet
 
@@ -1200,6 +1273,36 @@ input:
 output:
 
     ValueError: Two positions can't have same id. Error in: Q1. Cafeteria id: 1   
+
+
+---
+
+The Zen of Python, by Tim Peters:
+
+    Beautiful is better than ugly.
+    Explicit is better than implicit.
+    Simple is better than complex.
+    Complex is better than complicated.
+    Flat is better than nested.
+    Sparse is better than dense.
+    Readability counts.
+    Special cases aren't special enough to break the rules.
+    Although practicality beats purity.
+    Errors should never pass silently.
+    Unless explicitly silenced.
+    In the face of ambiguity, refuse the temptation to guess.
+    There should be one-- and preferably only one --obvious way to do it.
+    Although that way may not be obvious at first unless you're Dutch.
+    Now is better than never.
+    Although never is often better than *right* now.
+    If the implementation is hard to explain, it's a bad idea.
+    If the implementation is easy to explain, it may be a good idea.
+    Namespaces are one honking great idea -- let's do more of those!
+
+---
+
+.center[.title[Dziękuję]]
+
 
 
 
