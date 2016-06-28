@@ -376,8 +376,8 @@ def parse(text_input):
 
 if __name__ == "__main__":
     #with open(r'/home/korzen/workspace/mockups/x.txt', 'r') as f:
-    with open(r"c:\tests\nicola_example.txt") as f:
+    with open(r"c:\badania\ADHOC.2016\127659.06\DIME\SKRYPT\skrypt.txt") as f:
         f = f.read()
         survey = parse(f)
-        survey.to_web()
-        print(survey.web_out)
+        survey.to_spss()
+        print(survey.spss_out)

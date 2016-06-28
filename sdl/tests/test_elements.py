@@ -2131,5 +2131,76 @@ class TestControlTable(KreaturaTestCase):
         self.assertRaises(ValueError, self.table.to_xml)
 
 
+class TestToSpss(KreaturaTestCase):
+
+    def test_multi(self):
+        input_ = """Q M Q1 COS
+A
+B
+C
+"""
+        s = parse(input_)
+        s.to_spss()
+        #print(s.spss_out)
+
+        expected = """RENAME VARIABLES (Q11 Q12 Q13 = Q1_1 Q1_2 Q1_3).
+EXECUTE.
+var lab Q1_1 "Q1_1 | A | COS ".
+var lab Q1_2 "Q1_2 | B | COS ".
+var lab Q1_3 "Q1_3 | C | COS ".
+"""
+
+        self.assertTxtEqual(expected, s.spss_out)
+
+
+    def test_multi_with_97DK(self):
+        input_ = """Q M Q1 COS
+A
+B
+C
+97 Nie wiem --dk
+"""
+        s = parse(input_)
+        s.to_spss()
+        #print(s.spss_out)
+
+        expected = """RENAME VARIABLES (Q11 Q12 Q13 Q14 = Q1_1 Q1_2 Q1_3 Q1_97).
+EXECUTE.
+var lab Q1_1 "Q1_1 | A | COS ".
+var lab Q1_2 "Q1_2 | B | COS ".
+var lab Q1_3 "Q1_3 | C | COS ".
+var lab Q1_97 "Q1_97 | Nie wiem | COS ".
+"""
+
+        self.assertTxtEqual(expected, s.spss_out)
+
+
+    def test_multi_with_use(self):
+        input_ = """
+Q DEF BRAND cos
+A
+B
+C
+
+Q M Q1 COS
+--use:BRAND
+97 Nie wiem --dk
+"""
+        s = parse(input_)
+        s.to_spss()
+        #print(s.spss_out)
+
+        expected = """RENAME VARIABLES (Q11 Q12 Q13 Q14 = Q1_1 Q1_2 Q1_3 Q1_97).
+EXECUTE.
+var lab Q1_1 "Q1_1 | A | COS ".
+var lab Q1_2 "Q1_2 | B | COS ".
+var lab Q1_3 "Q1_3 | C | COS ".
+var lab Q1_97 "Q1_97 | Nie wiem | COS ".
+"""
+
+        self.assertTxtEqual(expected, s.spss_out)
+
+
+
 if __name__ == '__main__':
     KreaturaTestCase.main()

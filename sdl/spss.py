@@ -130,14 +130,21 @@ def do_repeat(question):
     return out
 
 
-def var_lab(question):
+def var_lab(question, lista=None):
 
     id_ = question.id
-    things = question.cafeteria
+    if lista:
+        things = lista.cafeteria
+    else:
+        things = question.cafeteria
     statement = question.content
 
     out = ""
     for thing in things:
+        for m in ["--dk", "--na", "--ref"]:
+            if m in thing.content:
+                thing.content = thing.content.replace(m, "")
+        thing.content = thing.content.strip()
         out += 'var lab {0}_{1} "{0}_{1} | {2} | {3} ".\n'.format(id_, thing.id, thing.content, statement)
 
     return out
@@ -179,6 +186,26 @@ def baskets_syntax(question):
     out += val_lab(question)
     out += add_comment("END {} baskets clean sytax".format(id_))
     return out
+
+
+def multi_syntax(question):
+    id_ = question.id
+    old, new = [], []
+
+    for c, caf in enumerate(question.cafeteria):
+        old.append(id_ + str(c+1))
+        new.append(id_ + "_" + caf.id)
+
+    old = " ".join(old)
+    new = " ".join(new)
+
+    rename_tmp = "RENAME VARIABLES ({} = {}).\nEXECUTE.\n"
+
+    syntax = rename_tmp.format(old, new)
+
+    return syntax
+
+
 
 
 if __name__ == "__main__":

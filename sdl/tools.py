@@ -38,6 +38,7 @@ def find_parent(blocks, parent_id):
             if b:
                 return b
 
+
 def find_parent(container, el_id):
     """Szuka bloku o zadanym parent_id"""
     print(container)
@@ -55,6 +56,7 @@ def find_parent(container, el_id):
     else:
         #print(container.id, "has no childs")
         pass
+
 
 def find_by_id(parent, child_id):
     """

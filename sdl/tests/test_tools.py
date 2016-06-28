@@ -96,6 +96,7 @@ B B3
         self.assertEquals("P1", find_parent(survey, "Q1"))
         self.assertEquals("B2", find_parent(survey, "P2"))
 
+
 class TestFindById(KreaturaTestCase):
     def test_find_by_id(self):
         input_ = """B B0

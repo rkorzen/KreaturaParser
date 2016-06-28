@@ -128,51 +128,63 @@ metody serializacji <br>
 
 Różne typy pytań, np:
 
-otwarte (tekstowe i numeryczne), zamknięte (categoricale - single/multi), półotwarte (single/multi z dopytaniem)
+otwarte, zamknięte, półotwarte, higlightery, concept selecty, intuitive itp.
+
 --
 
 Różne sposoby prezentacji:
 
-Listy, tabele, gridy, koszyki, skale, rankingi, higlightery, concept selecty, intuitive itp.
+Listy, tabele, gridy, koszyki, skale, rankingi, slidery
 
 --
 
 <hr>
 
-Różne systemy mają podobny repertuar typów i sposobów prezentacji. Osiągane są one różnymi drogami, ale w kwestionariuszu i z punkty widzenia respondenta są to rozwiązania bardzo podobne. 
+Systemy mają podobny repertuar typów i sposobów prezentacji. Osiągane są one różnymi drogami, ale w kwestionariuszu i z punkty widzenia respondenta są to rozwiązania bardzo podobne. 
 
-To zachęca do szerszego, kompleksowego spojrzenia i zastosowania mądrej, wspomagającej automatyzacji.
+To zachęca do szerszego, kompleksowego spojrzenia i zastosowania automatyzacji.
 
-SDL nie ma na celu zastąpienia skryptera. Ma na celu jego wsparcie.
+I tu właśnie wkracza SDL. Ma on na celu wsparcie skryptera a nie jego zastąpienie.
 
 ---
 
 ## Narzędzia
 
-W obecnej formie SDL nie wymaga instalowania żadnego oprogramowaia.
-Jest to aplikacja internetowa.  
+* SDL to aplikacja internetowa
+* SDL to moduł pythona
+* (SDL API ? SDL Standalone?)
 
 --
 
-Warto jednak zainstalowć edytor tekstowy pozwalający na wygodną pracę w kodowaniu ANSI oraz UTF-8 oraz radzący sobie ze znakmi nowych lini w stylu unix.
-Może to być w zasadzie dowolny edytor spełniający powyższe wymogi. Ja polecam notepad++, który jest darmowy i dobrze sobie radzi.
-Boxer będzie mieć problemy z polskimi znakami
-zwykły notatnik nie wyświetli nowych lini.
+#### narzędzia wspomagajace:
+
+* Edytor tekstowy - taki z przyzwoitą obsługą kodowania np. notepad++, atom, sublime
+* [IBIS] Edytor xml - np firstobject - pozwala na kopionwanie blokowe
 
 --
 
-Nie pracujemy w Word!
-Choć 99% kwestionariuszy to dokumenty Worda, to jednak on sam niezbyt dobrze nadaje się do pracy z SDL. 
-Word dodaje dużo własnego formatowania, znaczników, zamienia też automatycznie niektóre znaki i ciągi znaków na inne. 
+#### nie sprawdzają się:
+
+* Boxer
+* notatnik
+* Word
 
 ---
 
-## Autmatyzacja
+## Autmatyzacja - ogóły
 
-Przed wszystkim SDL to nie jest coś, co rozwiązuje wszelkie problemy i co napisze ankietę za Ciebie. SDL automatyzuje pewne zadania, które i tak skrypter robi, tyle że ręcznie.
+#### Czego SDL nie robi
+SDL nie pisze ankiet. 
+
+#### Co SDL robi?
+SDL automatyzuje zadania.
+
+--
+
 SDL to narzędzie, które jak każde inne narzędzie może być wykorzystane w sposób mądry, inteligentny, albo głupi. 
 
 Mądra droga to taka, która pozwoli Ci napisać szybciej i sprawniej dobry skrypt. 
+Mądra droga to taka, w której to co już napisałeś możesz wykorzystać do innych celów. 
 
 SDL nie zwolni Cię z myślenia. Zastąpi Cię lub znacznie wspomoże w zadaniach, które myślenia nie wymagają.
 
@@ -180,7 +192,7 @@ SDL nie zwolni Cię z myślenia. Zastąpi Cię lub znacznie wspomoże w zadaniac
 
 ## Automatyzacja - możliwości
 
-Po co to wszystko? 
+#### To gdzie ta wartość dodana?
 
 <ul>
 <li>łatwiej</li>
@@ -192,6 +204,8 @@ Po co to wszystko?
 <li>czytelny, jednolity kod</li>
 --
 <li>niski koszt wejścia i przeniesienia do innej technologii</li>
+--
+<li>dodatkowe korzyści - np syntax spss (numeracja w multi, koszyki w IBIS)</li>
 </ul>
 
 ---
@@ -200,13 +214,29 @@ Po co to wszystko?
 
 #### Dlaczego łatwiej i szybciej?
 
-SDL jest prosty. SDL wykona za nas dużo zwykłej, mrówczej pracy - np szkielety pytań, tworzenie i numerowanie list.
-To są operacje, które i tak robi skrypter. Czasem ręcznie, czasem korzystając z jakichś pomocy (excel, hotei, makra w edytorach). Nie ma w nich nic twórczego. Używajac SDL zaoszczędzicie ten czas. W SDL całą ankietę możcie zrobić "od razu" - tzn nie trzeba robić każdego z pytań oddzielnie, ale wszystkie w jednym podejściu. To znacznie mniej klikania, kopiowania, przeklejania. 
+* SDL jest prosty. 
+* SDL jest podobny do zwykłego kwestionariusza.
+* SDL automatyzuje wiele różnych zadań 
+* SDL łatwo rozbudować 
 
 --
 
-Dodatkowy profit: niski koszt wejścia nowych pracowników. SDL jest prostszy do nauczenia niż IBIS czy BP. 
-Na dobrą sprawę ogarniętym badaczom zajęłoby chwilę, by zaczać pisać skrypty w ten, lub zbliżony do tego sposób. Wtedy cały proces pisania ankiet byłby jeszcze szybszy.
+.center[.cite[prostota | elastyczność | intuicyjność | kompleksowość]]
+
+--
+
+.small[Srypter w czasie pisania wykonuje wiele różnych operacji. Tworzy listy, szkielety pytań, wywołania, filtry. Obecne rozwiązania automatyzacji nie wykorzystują jej potencjału. 
+Ograniczają się do bardzo szczeółowych zadań, albo są bardzo zamknięte.  
+W SDL całą ankietę można zrobić "od razu". Podejść do niej jako do całości. To znacznie mniej klikania, kopiowania, przeklejania.
+Jeśli coś nas stopuje to można to po prostu zasygnalizować i zostawić rozwiązanie na później.]
+
+--
+
+* niski koszt wejścia nowych pracowników. SDL jest prostszy do nauczenia niż IBIS czy BP. 
+
+--
+
+* przygotowany plik sdl może służyć także do innych zadań - np. ogarnięcia labelek w spss
 
 ---
 
@@ -309,60 +339,46 @@ liczby w nawiasie to pozycje obligatoryjne. Niektóre pytania mogą ich wymagać
 
 ---
 ## Przykłady
-
-<a name="info-page"></a>
 ### Info page
-
 input:
 
     Q L Q1_intro This is a message.
-
 metadata output:
 
     Q1_intro "This is a message." info;
-
 routing output:
     
     Q1_intro.Ask()
 
 ---
 
-<a name="open-question"></a>
 ### Open question
 
 input:
 
     Q O Q1_open This is open question.
-
 metadata output:
 
     Q1_open "This is open question." text;
-
 routing output:
     
     Q1_open.Ask()
-
 ---
-<a name="numeric-question"></a>
-### Numeric question
 
+### Numeric question
 input:
 
     Q O Q1_numeric This is numeric question.
-
 metadata output:
 
     Q1_numeric "This is numeric question."
     ' style( Width = "3em" )
     long;    
-
 routing output:
     
     Q1_numeric.Ask()
-
 ---
 
-<a name="simple-list-definition"></a>
 ### Simple list definition
 input:
     
@@ -383,15 +399,12 @@ routing output: `None`
 
 ---
 
-<a name="categorical-single-answer"></a>
 ### Categorical single answer
-
 input:
 
     Q S Brands Smth
     2   a
     7   c   
-
 metadata output:
 
     Brands "Smth"
@@ -405,7 +418,6 @@ routing output: `Brands.Ask()`
 
 ---
 
-<a name="categorical-multiple-answer"></a>
 ### Categorical multiple answer
 input:
 
@@ -426,15 +438,12 @@ metadata output:
 
 routing output: `Brands.Ask()`
 
-
-<a name="categorical-with-defined-list"></a>
+---
 ### Categorical with defined list
-
 input:
 
     Q M Q1 which of the following brands you know
     --use:BRANDS
-
 metadata output:
 
     Q1 "Which of the following brands you know?"
@@ -443,22 +452,18 @@ metadata output:
         use BRANDS -
 
     };
-
 routing output:
     
     Q1.Ask()
-
+---
 <a name="categorical-create-list"></a>
 ### Categorical create list
-
 input:
 
     Q S Q1 The best car brand is .. --list:CARBRANDS
     Mercedes
     Bugatti
     Porsche
-
-
 metadata output:
 
     CARBRANDS - define
@@ -474,24 +479,17 @@ metadata output:
     {
         use CARBRANDS -
     };
+routing output: `Q1.Ask()`
 
-routing output:
-    
-    Q1.Ask()
+---
 
-
-
-<a name="automate-cafeteria-id"></a>
 ### Automate cafeteria id
 There are several ways to automate cafeteria id's.
-
 By default we expect that cafeteria has a numeric id, or no id at all.
-
 cafeteria row is build like this:
 
     1   2         3        4  
-    (id)(.d|.c)[ ]Content[](special markers) 
-
+    (id)(.d|.c)[ ]Content[](--special markers) 
 Groups in () are not obligatory
     
     1 - explicite id - natural numbers
@@ -499,21 +497,19 @@ Groups in () are not obligatory
         .c - comment (others)
     [ ] - white space: spaces, tabs
     3 - content 
-    4 - special markers:
+    4 - --special markers:
         --so = screen out (add screenout to routing)
         --fix
-<a name="examples"></a>
-#### Examples
 
-<a name="basic-usage"></a>
-##### Basic usage:
+---
+#### Examples
+##### explicite id
 input:
 
     Q S Q1 Content
     1 A
     2 B
     3 C
-
 output:
 
     Q1 "Content"
@@ -525,14 +521,16 @@ output:
 
     };
 
+---
 
+#### Examples
+##### implicite id
 input:
 
     Q S Q1 Content
     A
     B
     C
-
 output:
 
     Q1 "Content"
@@ -544,17 +542,15 @@ output:
 
     };
 
-<a name="do-it-alphabetically---with-big-letters"></a>
-##### do it alphabetically - with big letters
+---
 
-We can force big letters instead of numbers:
+##### do it alphabetically - with big letters. We can force big letters instead of numbers:
 
 input:
 
     Q DEF LIST smth --big-letters
     el 1
     el 2
-
 output:
 
     LIST - define
@@ -563,21 +559,18 @@ output:
         B "el 2"
 
     };
-
 TODO: Exceeding the length of the alphabet. AA AB AC etc etc... Also Warning?
 
-<a name="--raw-id"></a>
+---
+
 ##### `--raw-id`
-
 Other way is with `--raw-id`. Id is based on content. Replace white space with _ and strip.
-
 input:
 
     Q M Q1 COS --raw-id
     Mark 1
     Mark 2
     Mark 3
-
 output:
 
     Q1 "COS "
@@ -589,7 +582,8 @@ output:
 
     };
 
-<a name="--first-id"></a>
+---
+
 ##### `--first-id`
 
 For now the last method is `--first-id`. This means - first word treat like id.
@@ -600,7 +594,6 @@ input:
     Argh Mark 1
     C Mark 2
     F Mark 3
-
 output:
 
     Q1 "COS "
@@ -612,11 +605,10 @@ output:
 
     };
 
+---
 
-<a name="easy-add-bold-and-italic"></a>
 ##### Easy add bold and italic
 When someone ask you to add a bold or italic to some answers, you don't need to add `<a></a>` arround phrase. Just add `--i`, `--b`.
-
 
 input:
     
@@ -624,7 +616,6 @@ input:
     A --i
     B --b
     C
-
 output:
 
     Q1 "Smth"
@@ -636,17 +627,15 @@ output:
 
     };
 
+---
 
-<a name="ref-na-dk"></a>
 ##### REF NA DK
-
 input:
     
     Q S Q1 Smth
     A --ref
     B --na
     C --dk
-
 output:
 
     Q1 "Smth"
@@ -658,19 +647,15 @@ output:
 
     };
 
-<a name="cafeteria-with-images"></a>
-##### cafeteria with images
-There are two ways to create cafeteria with images. 
-You can use special marker `--images` or `--images:path\to\files` to do it globally (example 1a / 1b)
-Or You can do it explicite with `|path\img.jpg` (example2)
+---
 
-example 1a
+##### cafeteria with images
+###### `--images` 
 input:
     
     Q S Q1 Smth --images
     A
     B
-
 output:
 
     Q1 "Smth "
@@ -694,13 +679,15 @@ output:
 
     };
 
-ecample 1b
+---
+
+##### cafeteria with images
+###### `--images:path\to\files`
 input:
     
     Q DEF Q1 Smth --images:folder\folder2
     A
     B
-
 output:
 
     Q1 - define
@@ -717,15 +704,16 @@ output:
             )
 
     };
-'''
 
-example 2:
+---
+
+##### cafeteria with images
+###### `|path\img.jpg`
 input:
     
     Q S Q1 COS
     A|1.jpg
     B|c\2.jpg
-
 output:
 
     Q1 "COS"
@@ -744,19 +732,16 @@ output:
 
     };
 
-<a name="sorting"></a>
+---
+
 #### Sorting
-
-Cafeteria have to methods to sort `--sort` and `--sort-by-id`
-
-Example1 `--sort`
+##### `--sort`
 input:
 
     Q DEF Brand Brand --sort
     C
     D
     A
-
 output:
 
     Brand - define
@@ -767,15 +752,16 @@ output:
 
     };
 
+---
 
-Example2  `--sort-by-id`
+#### Sorting
+##### `--sort-by-id`
 input:
 
     Q S Brand Brand --sort-by-id
     2 C
     3 D
     1 A
-
 output:
 
     Brand "Brand "
@@ -787,7 +773,9 @@ output:
 
     };
 
-Example3 - You can combine sorting with list creation
+---
+#### Sorting
+##### combine sorting with list creation
 
 input:
 
@@ -795,7 +783,6 @@ input:
     C
     D
     A
-
 output:
 
     Brands - define
@@ -812,26 +799,16 @@ output:
         use Brands -
     };
 
+---
 
-
-<a name="randomizerotation"></a>
 #### Randomize/Rotation
-To rotate/randomize add special marker
-
-`--rot` - rotate cafeteria
-`--statements-rot` - rotate statements
-
-`--ran` - randomize cafeteria
-`--statements-ran` - randomize statements
-
+##### `--rot` - rotate cafeteria
 input:
     
-    Q S Q1 COS --ran
+    Q S Q1 COS --rot
     A
     B
     C
-
-
 output:
 
     Q1 "COS"
@@ -841,24 +818,51 @@ output:
         _2 "B",
         _3 "C"
 
-    } ran ;
+    } rot ;
 
-<a name="another-question-examples"></a>
-## Another question examples
+Similar for `--ran`
 
-<a name="drag-and-drop"></a>
+---
+#### Randomize/Rotation
+##### `--statements-ran` - rotate statements
+input:
+
+    Q G Q1 COS --statements-ran
+    answer a
+    answer b
+    _
+    statment I
+    statment II
+
+output:
+
+    Q1 "COS"
+        [
+            flametatype = "mbdynamicgrid"
+            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
+        ]
+    loop
+    {
+        _1 "statment I",
+        _2 "statment II"
+
+    } ran fields -
+    (
+        slice ""
+        categorical [1..1]
+        ...
+    ) expand grid;
+
+---
+
 ### Drag and Drop
-
-<a name="buckets-with-text"></a>
 #### Buckets with text
-
 input:
 
     Q B dndBucketsText How familiar you are with each of these brands?<br/>
     --use:BE2A_ans_dl
     _
     --use:BRANDS
-
 output:
 
     dndBucketsText "How familiar you are with each of these brands?<br/>"
@@ -883,8 +887,9 @@ output:
         };
     ) expand grid;
 
+---
 
-<a name="buckets-with-images"></a>
+### Drag and Drop
 #### Buckets with images
 
 input:
@@ -893,7 +898,6 @@ input:
     --use:BE2A_ans_dl
     _
     --use:BRANDS
-
 output:
 
     dndBucketsImage "How familiar you are with each of these brands?<br/>"
@@ -918,7 +922,8 @@ output:
         };
     ) expand grid;
 
-<a name="exclude-in-buckets"></a>
+---
+### Drag and Drop
 #### Exclude in buckets
 
 input:
@@ -930,15 +935,12 @@ input:
     The worse one --@
     _
     --use:BRANDS
-
 output:
 
     dndScaleTextGray "Drop the brand to the relevant baskets<br/>"
         [
             flametatype = "mbdragndrop"
-            , toolPath = "[%ImageCacheBase%]/images/mbtools/"
-            , rowBtnType = "Text"
-            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            ...
             , dropType = "buckets"
         ]
     loop
@@ -960,7 +962,8 @@ output:
 
 
 
-<a name="love-hate-scale-with-text-buttons"></a>
+---
+### Drag and Drop
 #### Love hate scale with text buttons
 
 input:
@@ -980,6 +983,10 @@ input:
      _
      --use:BRANDS
 
+
+---
+### Drag and Drop
+#### Love hate scale with text buttons
 output:
 
     dndLoveHateScaleText "How familiar you are with each og these brands?<br/>"
@@ -1016,11 +1023,9 @@ output:
     ) expand grid;
 
 
-<a name="love-hate-scale-with-image-buttons"></a>
-#### Love hate scale with image buttons
-
-it's similar - just add `--images`
-
+---
+### Drag and Drop
+#### `--images` - Love hate scale with image buttons
 input:
 
     Q LHS dndBucketsImage How familiar you are with each og these brands?<br/>--images
@@ -1038,6 +1043,9 @@ input:
     _
     --use:BRANDS
 
+---
+### Drag and Drop
+#### `--images` - Love hate scale with image buttons
 output:
 
     dndBucketsImage "How familiar you are with each og these brands?<br/>"
@@ -1073,11 +1081,8 @@ output:
         };
     ) expand grid;
 
-
-<a name="dynamic-grid"></a>
+---
 #### Dynamic Grid
-
-example 1
 input:
 
     Q G Q1 COS
@@ -1086,7 +1091,6 @@ input:
     _
     statment I
     statment II
-
 output:
 
     Q1 "COS"
@@ -1110,8 +1114,9 @@ output:
         };
     ) expand grid;
 
-example2 - randomize cafeteria rotate statements
-
+---
+#### Dynamic Grid
+##### randomize cafeteria rotate statements
 input:
     
     Q G Q1 COS --ran --statements-rot
@@ -1120,7 +1125,6 @@ input:
     _
     statment I
     statment II
-
 output:
 
     Q1 "COS "
@@ -1144,36 +1148,31 @@ output:
         } ran ;
     ) expand grid;
 
-<a name="slider-not-implemented-yet"></a>
+---
 #### Slider (Not implemented yet)
 Not implemented yet
 
-<a name="click-and-fly-not-implemented-yet"></a>
 #### Click and Fly (Not implemented yet)
 Not implemented yest
 
-<a name="clicakble-images"></a>
 #### Clicakble Images 
 Check single/multi with `--images`
 
-<a name="clickable-tiles-not-implemented-yet"></a>
 #### Clickable Tiles (Not implemented yet)
 Not implemented yet
 
-<a name="button-matrix-not-implemented-yet"></a>
 #### Button Matrix (Not implemented yet)
 Not implemented yet
 
-<a name="semantic-differential-bi-polar---not-implemented-yet"></a>
 #### Semantic Differential (Bi-polar) - Not implemented yet
 Not implemented yet
 
-<a name="errors-and-validation"></a>
-# errors and validation
+---
+
+### errors and validation
 There are also few basic validators
 
-<a name="two-questions-with-the-same-id"></a>
-## two questions with the same id
+#### two questions with the same id
 
 input:
 
@@ -1184,22 +1183,20 @@ input:
     Q S Q1 Smth
     A
     B
-
 
 output:
 
     ValueError: Two questions have the same id: Q1  
 
+---
 
-<a name="two-positions-in-cafetera-have-the-same-id"></a>
-## two positions in cafetera have the same id
-
+### errors and validation
+#### two positions in cafetera have the same id
 input:
 
     Q S Q1 Smth
     1    A
     1    A
-
 output:
 
     ValueError: Two positions can't have same id. Error in: Q1. Cafeteria id: 1   

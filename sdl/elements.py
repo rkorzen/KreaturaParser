@@ -8,7 +8,7 @@ from string import ascii_uppercase
 from lxml import etree
 from sdl.tools import build_precode, find_parent, clean_labels, wersjonowanie_plci
 from sdl.tools import find_parent, filter_parser, make_caf_to_dim, unix_time, unix_creation_time, find_by_id
-from sdl.spss import baskets_syntax
+from sdl.spss import baskets_syntax, multi_syntax, var_lab, val_lab
 
 
 WERSJONOWANIE = True
@@ -1704,6 +1704,19 @@ class Question(SurveyElements):
     def to_spss(self):
         if self.typ in ["LHS", "B"]:
             self.spss_out = baskets_syntax(self)
+
+
+        if self.typ == "M":
+            self.spss_out =  multi_syntax(self)
+            lista = None
+            if "--use:" in self.cafeteria[0].content:
+                l_name = self.cafeteria[0].content.replace("--use:", "").strip()
+                #print(self.parent_id)
+                #lista = find_by_id(l_name)
+
+            self.spss_out += var_lab(self, lista)
+
+
 
     def dim_create_list(self, create_list):
 
