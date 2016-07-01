@@ -2162,7 +2162,7 @@ C
 """
         s = parse(input_)
         s.to_spss()
-        #print(s.spss_out)
+        print(s.spss_out)
 
         expected = """RENAME VARIABLES (Q11 Q12 Q13 Q14 = Q1_1 Q1_2 Q1_3 Q1_97).
 EXECUTE.
