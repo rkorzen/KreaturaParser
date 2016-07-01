@@ -376,8 +376,11 @@ def parse(text_input):
 
 if __name__ == "__main__":
     #with open(r'/home/korzen/workspace/mockups/x.txt', 'r') as f:
-    with open(r"c:\badania\ADHOC.2016\127659.06\DIME\SKRYPT\skrypt.txt") as f:
+    from lxml import etree
+
+    with open(r"c:\badania\ADHOC.2016\127744.07\IBIS\SKRYPT\tanatos.txt") as f:
         f = f.read()
         survey = parse(f)
-        survey.to_spss()
-        print(survey.spss_out)
+        survey.to_xml()
+        with open(r"c:\badania\ADHOC.2016\127744.07\IBIS\SKRYPT\tanatos.xml", "wb") as g:
+            g.write(etree.tostring(survey.xml, pretty_print=True))

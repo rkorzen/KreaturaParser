@@ -619,6 +619,12 @@ class Question(SurveyElements):
             self.content = self.content.replace('--custom_css', '')
             markers['custom_css'] = True
 
+        if '--custom-js' in self.content:
+            self.content = self.content.replace('--custom-js', '')
+            markers['custom_js'] = True
+
+
+
         if '--use:' in self.content and '--list:' in self.content:  # this should be before --list and --use
             raise ValueError("You should'nt use '--use:' and '--list:' at the same time")
 
@@ -1329,6 +1335,12 @@ class Question(SurveyElements):
         if 'custom_css' in special_markers:
             css_lay = ControlLayout(self.id + '_css')
             css_lay.content = '<link rel="stylesheet" href="public/custom.css" type="text/css">'
+            css_lay.to_xml()
+            self.xml.append(css_lay.xml)
+
+        if 'custom_js' in special_markers:
+            css_lay = ControlLayout(self.id + '_js')
+            css_lay.content = '<script src="public/custom.js" type="text/js"></script>'
             css_lay.to_xml()
             self.xml.append(css_lay.xml)
 

@@ -2144,9 +2144,9 @@ class TestToSpss(KreaturaTestCase):
         print(s.spss_out)
         expected = """RENAME VARIABLES (Q11 Q12 Q13 = Q1_3 Q1_5 Q1_7).
 EXECUTE.
-var lab Q1_3 "Q1_1 | A | COS ".
-var lab Q1_5 "Q1_2 | B | COS ".
-var lab Q1_7 "Q1_3 | C | COS ".
+var lab Q1_3 "Q1_3 | A | COS ".
+var lab Q1_5 "Q1_5 | B | COS ".
+var lab Q1_7 "Q1_7 | C | COS ".
 """
         self.assertTxtEqual(expected, s.spss_out)
 
