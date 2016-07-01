@@ -2135,23 +2135,20 @@ class TestToSpss(KreaturaTestCase):
 
     def test_multi(self):
         input_ = """Q M Q1 COS
-A
-B
-C
+3 A
+5 B
+7 C
 """
         s = parse(input_)
         s.to_spss()
-        #print(s.spss_out)
-
-        expected = """RENAME VARIABLES (Q11 Q12 Q13 = Q1_1 Q1_2 Q1_3).
+        print(s.spss_out)
+        expected = """RENAME VARIABLES (Q11 Q12 Q13 = Q1_3 Q1_5 Q1_7).
 EXECUTE.
-var lab Q1_1 "Q1_1 | A | COS ".
-var lab Q1_2 "Q1_2 | B | COS ".
-var lab Q1_3 "Q1_3 | C | COS ".
+var lab Q1_3 "Q1_1 | A | COS ".
+var lab Q1_5 "Q1_2 | B | COS ".
+var lab Q1_7 "Q1_3 | C | COS ".
 """
-
         self.assertTxtEqual(expected, s.spss_out)
-
 
     def test_multi_with_97DK(self):
         input_ = """Q M Q1 COS
@@ -2173,7 +2170,6 @@ var lab Q1_97 "Q1_97 | Nie wiem | COS ".
 """
 
         self.assertTxtEqual(expected, s.spss_out)
-
 
     def test_multi_with_use(self):
         input_ = """
@@ -2204,3 +2200,4 @@ var lab Q1_97 "Q1_97 | Nie wiem | COS ".
 
 if __name__ == '__main__':
     KreaturaTestCase.main()
+
