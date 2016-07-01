@@ -149,3 +149,6 @@ Feature: [dim] tworzenie list na podstawie pytania single
 
 Feature: Sortowanie kafeterii.
   Scenario: Add --sort | --sort-desc flags in output
+
+Feature: Wielkość liter
+  Scenario: --to-big --to-small --capitalize
