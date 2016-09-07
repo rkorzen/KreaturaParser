@@ -654,9 +654,9 @@ class Question(SurveyElements):
             markers['use'] = use
             self.content = self.content.replace(text_to_replace, '')
 
-        if '--gray'in self.content:
-            markers['gray'] = True
-            self.content = self.content.replace('--gray', '')
+        if '--grey'in self.content:
+            markers['grey'] = True
+            self.content = self.content.replace('--grey', '')
 
         if '--lz:' in self.content:
             pattern = re.compile('--lz:(\d+)')
@@ -1390,7 +1390,7 @@ class Question(SurveyElements):
         rot = options.get("rot")
         rot_stmt = options.get("rot_stmt")
 
-        print(ran, ran_stmt)
+        #print(ran, ran_stmt)
         ran_rot, ran_rot_stmt = "", ""
 
         if ran:
@@ -1597,12 +1597,12 @@ class Question(SurveyElements):
 
             if images:
                 row_btn_type = "Image"
-                rowBtnUseZoom = "\n            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen."
+                rowBtnUseZoom = "\n            ' , rowBtnUseZoom = True  ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen."
                 rowBtnWidth = ""
             else:
                 row_btn_type = "Text"
                 rowBtnUseZoom = ""
-                rowBtnWidth = "\n            ' , rowBtnWidth = 200                 ' width should be any integer > 10"
+                rowBtnWidth = "\n            ' , rowBtnWidth = 200  ' width should be any integer > 10"
 
             if self.typ in ["B"]:
                 dropType = "buckets"
@@ -1610,8 +1610,11 @@ class Question(SurveyElements):
 
             elif self.typ in ["LHS"]:
                 dropType = "scale"
-                colImgType = '''\n            , colImgType = "LoveHate"            ' RedBlack, Grey"'''
 
+                if options.get("grey"):
+                    colImgType = '''\n            , colImgType = "Grey"  ' RedBlack, Grey"'''
+                else:
+                    colImgType = '''\n            , colImgType = "LoveHate"  ' RedBlack, Grey"'''
 
             out = """
     {id} "{content}"

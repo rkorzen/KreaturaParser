@@ -774,7 +774,7 @@ Porsche"""
             flametatype = "mbdragndrop"
             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
             , rowBtnType = "Image"
-            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            ' , rowBtnUseZoom = True  ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
             , dropType = "buckets"
         ]
     loop
@@ -809,7 +809,7 @@ Porsche"""
             flametatype = "mbdragndrop"
             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
             , rowBtnType = "Text"
-            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            ' , rowBtnWidth = 200  ' width should be any integer > 10
             , dropType = "buckets"
         ]
     loop
@@ -854,8 +854,8 @@ _
             flametatype = "mbdragndrop"
             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
             , rowBtnType = "Image"
-            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
-            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            ' , rowBtnUseZoom = True  ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , colImgType = "LoveHate"  ' RedBlack, Grey"
             , dropType = "scale"
         ]
     loop
@@ -910,8 +910,8 @@ _
             flametatype = "mbdragndrop"
             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
             , rowBtnType = "Text"
-            ' , rowBtnWidth = 200                 ' width should be any integer > 10
-            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            ' , rowBtnWidth = 200  ' width should be any integer > 10
+            , colImgType = "LoveHate"  ' RedBlack, Grey"
             , dropType = "scale"
         ]
     loop
@@ -956,8 +956,8 @@ _
             flametatype = "mbdragndrop"
             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
             , rowBtnType = "Image"
-            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
-            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            ' , rowBtnUseZoom = True  ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , colImgType = "LoveHate"  ' RedBlack, Grey"
             , dropType = "scale"
         ]
     loop
@@ -992,8 +992,8 @@ _
             flametatype = "mbdragndrop"
             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
             , rowBtnType = "Image"
-            ' , rowBtnUseZoom = True             ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
-            , colImgType = "LoveHate"            ' RedBlack, Grey"
+            ' , rowBtnUseZoom = True  ' Setting to true enables a zoom icon on each of the row images that allows the respondents to view a larger version on screen.
+            , colImgType = "LoveHate"  ' RedBlack, Grey"
             , dropType = "scale"
         ]
     loop
@@ -1014,7 +1014,7 @@ _
         self.assertTxtEqual(result, expected)
 
     def test_LHS_scale_gray(self):
-        input_ = r"""Q LHS dndScaleTextGray How familiar you are with each og these brands?<br/>--gray
+        input_ = r"""Q LHS dndScaleTextGray How familiar you are with each og these brands?<br/>--grey
     --use:lovehatescale
     _
     --use:BRANDS
@@ -1028,15 +1028,15 @@ _
             flametatype = "mbdragndrop"
             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
             , rowBtnType = "Text"
-            ' , rowBtnWidth = 200                 ' width should be any integer > 10
-            , colImgType = "Grey"            ' RedBlack, Grey"
+            ' , rowBtnWidth = 200  ' width should be any integer > 10
+            , colImgType = "Grey"  ' RedBlack, Grey"
             , dropType = "scale"
         ]
     loop
     {
         use BRANDS -
 
-    }  fields -
+    } fields -
     (
         slice ""
         categorical [1..]
@@ -1067,7 +1067,7 @@ _
             flametatype = "mbdragndrop"
             , toolPath = "[%ImageCacheBase%]/images/mbtools/"
             , rowBtnType = "Text"
-            ' , rowBtnWidth = 200                 ' width should be any integer > 10
+            ' , rowBtnWidth = 200  ' width should be any integer > 10
             , dropType = "buckets"
         ]
     loop
