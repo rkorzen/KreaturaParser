@@ -3,7 +3,7 @@ KreaturaParser
 
 Parsing and building tools for surveys domain language.
 
-##Instalation
+## Instalation
 
 I'am strongly recommended to use vierual envs.<br>
 Activate virtual env:
@@ -18,6 +18,6 @@ Uninstall:
 
     pip uninstall KreaturaParser
 
-##Manual
+## Manual
 
-Checkout manual in [Docs](https://github.com/rkorzen/KreaturaParser/sdl/docs/manual.md)
+Checkout manual in [Docs](https://github.com/rkorzen/KreaturaParser/blob/master/sdl/docs/manual.md)
