@@ -20,4 +20,4 @@ Uninstall:
 
 ##Manual
 
-Checkout manual in [Docs](https://github.com/rkorzen/KreaturaParser/blob/master/KreaturaParser/docs/manual.md)
+Checkout manual in [Docs](https://github.com/rkorzen/KreaturaParser/sdl/docs/manual.md)
