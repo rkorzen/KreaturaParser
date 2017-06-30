@@ -2,7 +2,7 @@ KreaturaParser
 ==============
 
 Parsing and building tools for surveys domain language.
-Also avaiable as web app under adress: rkorzen.pythonanywhere.com/parser/
+Also avaiable as web app under adress: [rkorzen.pythonanywhere.com/parser/](http://rkorzen.pythonanywhere.com/parser/)
 
 ## Instalation
 
